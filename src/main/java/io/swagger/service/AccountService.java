@@ -2,6 +2,7 @@ package io.swagger.service;
 
 import io.swagger.model.Account;
 /*import io.swagger.Repository.AccountRepository;*/
+import io.swagger.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public List<Account> getAllAccounts {
+   /* public List<Account> getAllAccounts {
         return (List<Account>) accountRepository.findAll();
-    }
+    }*/
 }
