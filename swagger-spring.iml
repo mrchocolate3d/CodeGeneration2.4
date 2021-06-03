@@ -146,7 +146,7 @@
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.4.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.4.6" level="project" />
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.18" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.20" level="project" />
     <orderEntry type="library" name="Maven: io.swagger.core.v3:swagger-jaxrs2-jakarta:2.1.9" level="project" />
     <orderEntry type="library" name="Maven: io.github.classgraph:classgraph:4.8.95" level="project" />
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.25.0-GA" level="project" />
