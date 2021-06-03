@@ -1,7 +1,11 @@
 package io.swagger.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.extern.java.Log;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import javax.persistence.*;
@@ -21,7 +25,9 @@ import java.util.Set;
 public class dbUser {
     @Id
     @GeneratedValue
+    @Column(name="userId")
     private long id;
+
     private String firstName;
     private String lastName;
     private String username;
@@ -40,13 +46,15 @@ public class dbUser {
         this.transactionLimit = transactionLimit;
     }
 
+    //TODO: List role -> role
     @ElementCollection(fetch = FetchType.EAGER)
     List<UserRole> roles;
     private double transactionLimit;
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private Set<dbAccount> accounts;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy="user")
-    private Set<dbAccount> accounts = new HashSet<>();
 
 
 }

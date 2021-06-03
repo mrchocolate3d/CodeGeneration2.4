@@ -34,11 +34,11 @@ public class UserServiceImplement implements UserService {
             dbUser user = new dbUser(
                     firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
             );
-            if (roles.size() == 0){
-                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
-            }else{
-                user.setRoles(roles);
-            }
+//            if (roles.size() == 0){
+//                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
+//            }else{
+//                user.setRoles(roles);
+//            }
             userRepository.save(user);
 
             return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
