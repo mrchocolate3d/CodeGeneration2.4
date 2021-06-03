@@ -1,6 +1,7 @@
 package io.swagger;
 
 import io.swagger.model.User;
+import io.swagger.model.UserRole;
 import io.swagger.service.AccountService;
 import io.swagger.service.LoginService;
 import io.swagger.service.TransactionService;
@@ -11,6 +12,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Log
 @Component
@@ -32,6 +35,8 @@ public class CodeGenApplicationRunner implements ApplicationRunner {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("testpasswd");
-        user.set
+        user.setRoles(List.of(UserRole.ROLE_CUSTOMER));
+        String token =userService.add(user.getUsername(), user.getPassword(), user.getRoles());
+        log.info("Token: " + token);
     }
 }

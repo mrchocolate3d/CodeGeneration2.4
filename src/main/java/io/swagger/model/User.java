@@ -1,16 +1,24 @@
 package io.swagger.model;
 
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
  * User personal information
  */
+@Entity
+@Data
 @Schema(description = "User personal information")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
@@ -46,6 +54,10 @@ public class User   {
 
   @JsonProperty("passowrd")
   private String password = null;
+
+  // set role
+  @ElementCollection(fetch = FetchType.EAGER) // get all data at once
+  List<UserRole> roles;
 
   public User id(Long id) {
     this.id = id;
