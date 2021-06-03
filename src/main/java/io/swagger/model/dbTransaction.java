@@ -1,22 +1,21 @@
 package io.swagger.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class dbTransaction {
     @Id
     @GeneratedValue
-    private long id;
+    private long ID;
+    private String IBAN;
+
+    public dbTransaction(long ID,String IBAN) {
+        this.IBAN = IBAN;
+        this.ID = ID;
+    }
 
 }
