@@ -2,7 +2,7 @@ package io.swagger.configuration;
 
 import io.swagger.model.UserRole;
 import io.swagger.model.dbUser;
-import io.swagger.service.UserServiceImplement;
+import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class BankApplicationRunner implements ApplicationRunner {
     @Autowired
-    private UserServiceImplement userServiceImplement;
+    private UserService userServiceImplement;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

@@ -45,8 +45,9 @@ public class dbUser {
     private double transactionLimit;
 
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy="user")
-    private Set<dbAccount> accounts = new HashSet<>();
+   // @OneToMany(cascade = CascadeType.ALL,mappedBy="user")
+   // private Set<dbAccount> accounts = new HashSet<>();
+
 
 
 }

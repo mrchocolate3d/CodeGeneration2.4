@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @Table(name="DB_ACCOUNT")
 public class dbAccount {
@@ -23,7 +23,16 @@ public class dbAccount {
     private double balance;
     private String iban;
 
-//    @ManyToOne
+    public dbAccount(long id, List<AccountType> accountTypes, double balance, String iban) {
+        this.id = id;
+        this.accountTypes = accountTypes;
+        this.balance = balance;
+        this.iban = iban;
+    }
+
+
+
+    //    @ManyToOne
 //    private dbUser user;
 
 }

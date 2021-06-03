@@ -4,7 +4,7 @@ import io.swagger.model.InsertUser;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.dbUser;
-import io.swagger.service.UserServiceImplement;
+import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,7 +28,7 @@ import java.util.List;
 public class UsersApiController implements UsersApi {
 
     @Autowired
-    private UserServiceImplement userServiceImplement;
+    private UserService userServiceImplement;
 
     @PostMapping(value = "add")
     public ResponseEntity<String> addUser(@RequestBody dbUser user){
