@@ -27,8 +27,14 @@ public class TransactionService {
         return (List<dbTransaction>)transactionRepository.findAll();
         //not complete
     }
-    public dbTransaction getTransactionsByID(long ID){
-        return transactionRepository.findById(ID).get();
+    public dbTransaction createTransaction(dbTransaction transaction){
+        transactionRepository.save(transaction); //saves to the db
+        return transaction;
     }
+
+
+    //public dbTransaction getTransactionsByID(long ID){
+        //return transactionRepository.findById(ID).get();
+    //}
 
 }
