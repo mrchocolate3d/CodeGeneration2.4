@@ -44,6 +44,9 @@ public class User   {
   @JsonProperty("transactionLimit")
   private Integer transactionLimit = null;
 
+  @JsonProperty("passowrd")
+  private String password = null;
+
   public User id(Long id) {
     this.id = id;
     return this;
@@ -82,6 +85,10 @@ public class User   {
     this.username = username;
   }
 
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
   public User firstName(String firstName) {
     this.firstName = firstName;
     return this;
@@ -93,7 +100,7 @@ public class User   {
    **/
   @Schema(example = "James", description = "")
   
-    public String getFirstName() {
+  public String getFirstName() {
     return firstName;
   }
 
@@ -105,6 +112,7 @@ public class User   {
     this.lastName = lastName;
     return this;
   }
+
 
   /**
    * Get lastName
