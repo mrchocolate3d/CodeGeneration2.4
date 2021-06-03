@@ -22,8 +22,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
     private static final String[] AUTH_WHITELIST = {
-<<<<<<< Updated upstream
-=======
             "/api/**",
             "/users",
             "/login",
@@ -46,7 +44,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/api/users").permitAll()
                 .anyRequest().authenticated();

@@ -2,7 +2,6 @@ package io.swagger.configuration;
 
 import io.swagger.model.UserRole;
 import io.swagger.model.dbUser;
-import io.swagger.service.UserServiceImplement;
 import io.swagger.service.UserService;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +14,11 @@ import java.util.List;
 @Component
 public class BankApplicationRunner implements ApplicationRunner {
     @Autowired
-    private UserServiceImplement userServiceImplement;
     private UserService userService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         dbUser user = new dbUser("test", "test", "test", "test", "test", "test", List.of(UserRole.ROLE_EMPLOYEE), 2500);
-        String token = userServiceImplement.add(user.getFirstName(), user.getLastName(),
         String token = userService.add(user.getFirstName(), user.getLastName(),
                 user.getUsername(),user.getEmail(),user.getPhone(),user.getPassword(),user.getRoles(),user.getTransactionLimit());
 

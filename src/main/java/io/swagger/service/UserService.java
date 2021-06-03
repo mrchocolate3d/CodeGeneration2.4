@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.model.UserRole;
 import io.swagger.model.dbUser;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,14 +28,14 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public String add(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit){
-        if(userRepository.findUserByUsername(username) == null){
+    public String add(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit) {
+        if (userRepository.findUserByUsername(username) == null) {
             dbUser user = new dbUser(
                     firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
             );
-            if (roles.size() == 0){
+            if (roles.size() == 0) {
                 user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
-            }else{
+            } else {
                 user.setRoles(roles);
             }
             userRepository.save(user);
@@ -47,20 +50,22 @@ public class UserService {
         return new BCryptPasswordEncoder(12);
     }
 
-    public dbUser addUser(dbUser user){
+    public dbUser addUser(dbUser user) {
         userRepository.save(user);
         return user;
     }
 
-    public List<dbUser> getUsers(){
+    public List<dbUser> getUsers() {
         return (List<dbUser>) userRepository.findAll();
     }
 
-import java.util.List;
-
-public interface UserService {
-    dbUser addUser(dbUser user);
-    dbUser getUserByUsername(String username);
-
-    List<dbUser> getUsers();
+    public String login(String username, String password) {
+        try{
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            return jwtTokenProvider.createToken(username, userRepository.findUserByUsername(username).getRoles());
+        }catch(AuthenticationException ae){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invallid credentials");
+        }
+    }
 }
+
