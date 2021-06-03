@@ -30,7 +30,7 @@ public class UsersApiController implements UsersApi {
     @Autowired
     private UserService userServiceImplement;
 
-    @PostMapping(value = "add")
+   /* @PostMapping(value = "add")
     public ResponseEntity<String> addUser(@RequestBody dbUser user){
         String token = userServiceImplement.add(user.getFirstName(), user.getLastName(), user.getUsername(),
                 user.getEmail(), user.getPhone(), user.getPassword(), user.getRoles(), user.getTransactionLimit());
@@ -41,7 +41,7 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<List<dbUser>> getUser(){
         return new ResponseEntity<>(userServiceImplement.getUsers(), HttpStatus.OK);
 
-    }
+    }*/
 //    @RequestMapping(value="/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<dbUser> editUserInfo(@PathVariable Long id, @RequestBody dbUser changedInfoUser){
 //        dbUser user = userServiceImplement.getUserById(id);
