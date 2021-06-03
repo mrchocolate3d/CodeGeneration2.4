@@ -30,9 +30,9 @@ public class dbUser {
     private double transactionLimit;
     private String password;
 
-//
-//    @OneToMany(cascade = CascadeType.ALL,mappedBy="dbUser")
-//    private Set<dbAccount> accounts = new HashSet<>();
+    //
+    //    @OneToMany(cascade = CascadeType.ALL,mappedBy="dbUser")
+    //    private Set<dbAccount> accounts = new HashSet<>();
 
 
 }
