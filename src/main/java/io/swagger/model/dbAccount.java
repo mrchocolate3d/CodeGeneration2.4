@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-//@Table(name="Account")
+@Table(name="DB_ACCOUNT")
 public class dbAccount {
     @Id
     @GeneratedValue
@@ -23,7 +23,6 @@ public class dbAccount {
     private double balance;
     private String iban;
 
-//    //TODO
 //    @ManyToOne
 //    private dbUser user;
 
