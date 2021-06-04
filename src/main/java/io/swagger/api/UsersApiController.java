@@ -4,7 +4,7 @@ import io.swagger.model.InsertUser;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.dbUser;
-import io.swagger.service.UserServiceImplement;
+import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,18 +28,18 @@ import java.util.List;
 public class UsersApiController implements UsersApi {
 
     @Autowired
-    private UserServiceImplement userServiceImplement;
+    private UserService userService;
 
     @PostMapping(value = "add")
     public ResponseEntity<String> addUser(@RequestBody dbUser user){
-        String token = userServiceImplement.add(user.getFirstName(), user.getLastName(), user.getUsername(),
+        String token = userService.add(user.getFirstName(), user.getLastName(), user.getUsername(),
                 user.getEmail(), user.getPhone(), user.getPassword(), user.getRoles(), user.getTransactionLimit());
         return ResponseEntity.ok(token);
     }
 
     @RequestMapping(value="", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<dbUser>> getUser(){
-        return new ResponseEntity<>(userServiceImplement.getUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
 
     }
 //    @RequestMapping(value="/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
