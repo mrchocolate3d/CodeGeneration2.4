@@ -46,7 +46,6 @@ public class dbUser {
         this.transactionLimit = transactionLimit;
     }
 
-    //TODO: List role -> role
     @ElementCollection(fetch = FetchType.EAGER)
     List<UserRole> roles;
     private double transactionLimit;

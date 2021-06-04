@@ -50,9 +50,8 @@ public class UserService {
         return new BCryptPasswordEncoder(12);
     }
 
-    public dbUser addUser(dbUser user) {
+    public void addUser(dbUser user) {
         userRepository.save(user);
-        return user;
     }
 
     public List<dbUser> getUsers() {

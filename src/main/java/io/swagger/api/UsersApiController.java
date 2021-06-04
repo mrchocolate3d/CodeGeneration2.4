@@ -4,6 +4,7 @@ import io.swagger.model.InsertUser;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.dbUser;
+import io.swagger.repository.UserRepository;
 import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -33,6 +34,9 @@ public class UsersApiController implements UsersApi {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping(value = "add")
     public ResponseEntity<String> addUser(@RequestBody dbUser user){
@@ -96,32 +100,33 @@ public class UsersApiController implements UsersApi {
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "get User by name" ,schema=@Schema()) @Valid @RequestParam(value = "name", required = false) String name) {
         List<User> userList = new ArrayList<>();
 
-       /* if (limit == null || limit == 0){
-            limit = 10;
-            
+
+
             List<dbUser> dbUsers = userService.getUsers();
             List<User> user = new ArrayList<>();
             for (dbUser x : dbUsers) {
-
-                User u = new User(x.getUsername(),x.getFirstName(),x.getLastName(),x.getEmail(),x.getPhone());
+                int transInt = (int)x.getTransactionLimit();
+                User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),transInt);
                 user.add(u);
             }
             return ResponseEntity.status(200).body(user);
-        }*/
 
 
-        for (int i = 0; i<limit; i++){
-            User user = new User();
-            user.setFirstName("seyi");
-            user.setLastName("gandonu");
-            user.email("seyifunmig75@outlook.com");
 
-            userList.add(user);
+//        for (int i = 0; i<3; i++){
+//            dbUser user = new dbUser();
+//            user.setFirstName("seyi");
+//            user.setLastName("gandonu");
+//            user.setEmail("seyifunmig75@outlook.com");
+//
+//            userList.add(user);
+//
+//        }
 
-        }
 
 
-        return ResponseEntity.status(200).body(userList);
+
+       // return ResponseEntity.status(200).body(userList);
 
 
 
@@ -134,7 +139,6 @@ public class UsersApiController implements UsersApi {
                 return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }*/
-
         //return new ResponseEntity<List<User>>(HttpStatus.UNAUTHORIZED);
     }
 
