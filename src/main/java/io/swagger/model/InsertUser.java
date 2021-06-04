@@ -1,13 +1,13 @@
 package io.swagger.model;
 
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Creating a new user
@@ -16,7 +16,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 
-
+@Data
 public class InsertUser   {
   @JsonProperty("username")
   private String username = null;
@@ -35,6 +35,9 @@ public class InsertUser   {
 
   @JsonProperty("phone")
   private String phone = null;
+
+  @JsonProperty("transactionLimit")
+  private Double transactionLimit = null;
 
   /**
    * Gets or Sets role
@@ -67,7 +70,7 @@ public class InsertUser   {
     }
   }
   @JsonProperty("role")
-  private RoleEnum role = null;
+  private List<UserRole> roles = null;
 
   public InsertUser username(String username) {
     this.username = username;
@@ -91,6 +94,19 @@ public class InsertUser   {
   public InsertUser password(String password) {
     this.password = password;
     return this;
+  }
+
+  @Schema(example = "3000", description = "")
+  public Double getTransactionLimit(){
+    return transactionLimit;
+  }
+
+  public InsertUser transactionLimit(Double transactionLimit){
+    this.transactionLimit = transactionLimit;
+    return this;
+  }
+  public void setTransactionLimit(Double transactionLimit){
+    this.transactionLimit = transactionLimit;
   }
 
   /**
@@ -183,8 +199,8 @@ public class InsertUser   {
     this.phone = phone;
   }
 
-  public InsertUser role(RoleEnum role) {
-    this.role = role;
+  public InsertUser roles(List<UserRole> roles) {
+    this.roles = roles;
     return this;
   }
 
@@ -194,12 +210,12 @@ public class InsertUser   {
    **/
   @Schema(example = "Customer", description = "")
   
-    public RoleEnum getRole() {
-    return role;
+    public List<UserRole> getRoles() {
+    return roles;
   }
 
-  public void setRole(RoleEnum role) {
-    this.role = role;
+  public void setRole(UserRole role) {
+    this.roles = roles;
   }
 
 
@@ -218,12 +234,13 @@ public class InsertUser   {
         Objects.equals(this.lastName, insertUser.lastName) &&
         Objects.equals(this.email, insertUser.email) &&
         Objects.equals(this.phone, insertUser.phone) &&
-        Objects.equals(this.role, insertUser.role);
+        Objects.equals(this.roles, insertUser.roles) &&
+        Objects.equals(this.transactionLimit, insertUser.transactionLimit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(username, password, firstName, lastName, email, phone, role);
+    return Objects.hash(username, password, firstName, lastName, email, phone, roles, transactionLimit);
   }
 
   @Override
@@ -237,7 +254,8 @@ public class InsertUser   {
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
-    sb.append("    role: ").append(toIndentedString(role)).append("\n");
+    sb.append("    role: ").append(toIndentedString(roles)).append("\n");
+    sb.append("    transactionLimit:").append(toIndentedString(transactionLimit)).append("\n");
     sb.append("}");
     return sb.toString();
   }
