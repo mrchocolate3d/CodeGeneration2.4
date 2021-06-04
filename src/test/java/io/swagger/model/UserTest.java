@@ -11,7 +11,7 @@ public class UserTest {
 
     @BeforeEach
     public void Setup(){
-        user = new User();
+        //user = new User();
     }
     @Test
     public void createUserShouldNotBeNull(){

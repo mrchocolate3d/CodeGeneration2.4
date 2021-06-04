@@ -10,3 +10,4 @@ public interface UserRepository extends CrudRepository<dbUser, Long>{
     dbUser findUserById(Long id);
     //dbUser deletedbUserBy(Long id);
 }
+

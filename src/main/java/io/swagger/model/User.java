@@ -44,6 +44,7 @@ public class User   {
   @JsonProperty("transactionLimit")
   private Integer transactionLimit = null;
 
+
   public User id(Long id) {
     this.id = id;
     return this;
