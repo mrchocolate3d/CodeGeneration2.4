@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,5 +51,22 @@ public class UserService {
         return new BCryptPasswordEncoder(12);
     }
 
+    public dbUser addUser(dbUser user) {
+        userRepository.save(user);
+        return user;
+    }
+
+    public List<dbUser> getUsers() {
+        return (List<dbUser>) userRepository.findAll();
+    }
+
+    public String login(String username, String password) {
+        try{
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            return jwtTokenProvider.createToken(username, userRepository.findUserByUsername(username).getRoles());
+        }catch(AuthenticationException ae){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invallid credentials");
+        }
+    }
 }
 
