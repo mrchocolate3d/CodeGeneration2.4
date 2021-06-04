@@ -3,6 +3,8 @@ package io.swagger.api;
 import io.swagger.model.dbTransaction;
 import io.swagger.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,9 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -24,6 +23,7 @@ import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 @RestController
+@RequestMapping(value = "transactions")
 public class TransactionsApiController implements TransactionsApi {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionsApiController.class);
@@ -39,6 +39,7 @@ public class TransactionsApiController implements TransactionsApi {
         this.transactionService = transactionService;
     }
 
+    @RequestMapping(value = "",method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<dbTransaction>> getTransactions(@NotNull @DecimalMin("1") @Parameter(in = ParameterIn.QUERY, description = "" , required=true, schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true)
                                                                String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false)
             OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
@@ -83,10 +84,11 @@ public class TransactionsApiController implements TransactionsApi {
 //        return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
 //    }
 
-    public ResponseEntity<Void> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body) {
-        //TODO: finish this
+    @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction transaction) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        transactionService.createTransaction(transaction);
+        return new ResponseEntity<dbTransaction>(transaction,HttpStatus.CREATED);
     }
     //COPY
 //    public ResponseEntity<Void> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body) {

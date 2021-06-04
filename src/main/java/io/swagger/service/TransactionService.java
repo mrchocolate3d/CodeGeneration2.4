@@ -1,6 +1,5 @@
 package io.swagger.service;
 
-import io.swagger.model.Transaction;
 import io.swagger.model.dbTransaction;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
@@ -39,6 +38,7 @@ public class TransactionService {
         return (List<dbTransaction>)transactionRepository.findAll();
 
     }
+
     //post transaction
     public dbTransaction createTransaction(dbTransaction transaction){
         transactionRepository.save(transaction); //saves to the db
