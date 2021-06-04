@@ -20,7 +20,7 @@ public class TransactionService {
     @Autowired
     UserRepository userRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) { //TODO: add account repository
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) { //TODO: add account repository to constructor
         this.transactionRepository = transactionRepository;
         //this.accountRepository = accountRepository;
         this.userRepository = userRepository;
