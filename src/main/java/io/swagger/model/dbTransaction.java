@@ -10,27 +10,34 @@ import org.threeten.bp.OffsetDateTime;
 import javax.persistence.*;
 
 @Entity
-//@Table(name="dbtransaction")
+
 @NoArgsConstructor
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class dbTransaction {
     @Id
     @GeneratedValue
-    @Column(name="ID" , updatable = false, nullable = false)
-    private long ID;
-//    @OneToMany
-//    @JsonBackReference
-//    private dbAccount account;
+    @Column(name="transactionID" , updatable = false, nullable = false)
+    private long transactionID;
     private String IBAN;
-    private OffsetDateTime fromDate;
-    private OffsetDateTime toDate;
-    private Integer transactionLimit;
+    private String userPerforming;
+    //private String ibanFrom;
+    private String ibanTo;
+    private double amount;
+    private OffsetDateTime time;
 
-    public dbTransaction(String IBAN, OffsetDateTime fromDate, OffsetDateTime toDate, Integer transactionLimit) {
+    public dbTransaction(long transactionID, String userPerforming, String IBAN, String ibanTo, double amount, OffsetDateTime time) {
+        this.transactionID = transactionID;
+        this.userPerforming = userPerforming;
         this.IBAN = IBAN;
-        this.fromDate = fromDate;
-        this.toDate = toDate;
-        this.transactionLimit = transactionLimit;
+        this.ibanTo = ibanTo;
+        this.amount = amount;
+        this.time = time;
     }
+
+
+
+
+
+
 }

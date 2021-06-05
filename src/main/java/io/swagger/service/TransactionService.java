@@ -19,9 +19,9 @@ public class TransactionService {
     @Autowired
     UserRepository userRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository,AccountRepository accountRepository) {
         this.transactionRepository = transactionRepository;
-        //this.accountRepository = accountRepository;
+        this.accountRepository = accountRepository;
         this.userRepository = userRepository;
     }
 
@@ -45,8 +45,7 @@ public class TransactionService {
         return transaction;
     }
     public Integer CountAllTransactions(){
-        //return transactionRepository.CountAllTransactions();
-
+//        return transactionRepository.CountAllTransactions();
         return 0;
     }
 

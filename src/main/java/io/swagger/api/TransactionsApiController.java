@@ -57,7 +57,8 @@ public class TransactionsApiController implements TransactionsApi {
             limit = transactionService.CountAllTransactions();
         }
 
-        List<dbTransaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
+        //List<dbTransaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
+        List<dbTransaction> transactions = transactionService.getTransactionByIBAN(IBAN);
         List<Transaction> transactionsList = new ArrayList<>();
         for(dbTransaction i : transactions){
             Transaction tr = new Transaction(i.getIBAN());
