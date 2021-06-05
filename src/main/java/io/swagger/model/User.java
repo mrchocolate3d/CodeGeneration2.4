@@ -64,6 +64,7 @@ public class User   {
     return this;
   }
 
+
   /**
    * Get username
    * @return username

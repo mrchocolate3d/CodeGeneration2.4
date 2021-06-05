@@ -25,7 +25,7 @@ public class TransactionService {
         this.userRepository = userRepository;
     }
 
-    //getting transaction by iban
+//    getting transaction by iban
     public List<dbTransaction>getTransactionByIBAN(String IBAN){
         return (List<dbTransaction>)transactionRepository.getTransactionsByIBAN(IBAN);
     }
@@ -44,6 +44,12 @@ public class TransactionService {
         transactionRepository.save(transaction); //saves to the db
         return transaction;
     }
+    public Integer CountAllTransactions(){
+        //return transactionRepository.CountAllTransactions();
+
+        return 0;
+    }
+
 
 
 
