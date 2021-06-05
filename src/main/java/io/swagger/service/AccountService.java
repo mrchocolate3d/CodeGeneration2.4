@@ -4,6 +4,7 @@ import io.swagger.model.Account;
 import io.swagger.model.dbAccount;
 import io.swagger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +23,21 @@ public class AccountService {
     }
 
     public dbAccount getAccountByIBAN(String IBAN){
-        return accountRepository.findAccountByIban(IBAN);
+        dbAccount account = accountRepository.findAccountByIban(IBAN);
+        if (account == null) {
+            throw new NullPointerException();
+        }
+        return account;
     }
 
-    public dbAccount addAccounts(dbAccount account){
-        return accountRepository.save(account);
+    // create account
+    public void createAccounts(dbAccount account){
+        accountRepository.save(account);
     }
 
-
-
+    // close account
+    @Modifying
+    public void closeAccount(dbAccount account){
+        accountRepository.save(account);
+    }
 }
