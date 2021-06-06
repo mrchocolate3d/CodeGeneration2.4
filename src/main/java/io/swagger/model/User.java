@@ -2,11 +2,9 @@ package io.swagger.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * User personal information
@@ -15,8 +13,18 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 
-
+@Data
 public class User   {
+  public User(Long id, String username, String firstName, String lastName, String email, String phone, Double transactionLimit) {
+    this.id = id;
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.transactionLimit = transactionLimit;
+  }
+
   @JsonProperty("id")
   private Long id = null;
 
@@ -37,17 +45,9 @@ public class User   {
 
 
   @JsonProperty("transactionLimit")
-  private Integer transactionLimit = null;
+  private Double transactionLimit = null;
 
-  public User(Long id, String username, String firstName, String lastName, String email, String phone, Integer transactionLimit) {
-    this.id = id;
-    this.username = username;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.phone = phone;
-    this.transactionLimit = transactionLimit;
-  }
+
 
   public User id(Long id) {
     this.id = id;
@@ -168,7 +168,7 @@ public class User   {
 
 
 
-  public User transactionLimit(Integer transactionLimit) {
+  public User transactionLimit(Double transactionLimit) {
     this.transactionLimit = transactionLimit;
     return this;
   }
@@ -179,11 +179,11 @@ public class User   {
    **/
   @Schema(example = "10000", description = "")
   
-    public Integer getTransactionLimit() {
+    public Double getTransactionLimit() {
     return transactionLimit;
   }
 
-  public void setTransactionLimit(Integer transactionLimit) {
+  public void setTransactionLimit(Double transactionLimit) {
     this.transactionLimit = transactionLimit;
   }
 

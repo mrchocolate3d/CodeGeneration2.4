@@ -80,7 +80,7 @@ public class UsersApiController implements UsersApi {
         List<dbUser> dbUsers = userService.getUsers();
         List<User> user = new ArrayList<>();
         for (dbUser x : dbUsers) {
-            int transInt = (int)x.getTransactionLimit();
+            Double transInt = (Double)x.getTransactionLimit();
             User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),transInt);
             user.add(u);
         }
@@ -123,7 +123,7 @@ public class UsersApiController implements UsersApi {
             List<dbUser> dbUsers = userService.getUsers();
             List<User> user = new ArrayList<>();
             for (dbUser x : dbUsers) {
-                int transInt = (int)x.getTransactionLimit();
+                Double transInt = (Double)x.getTransactionLimit();
                 User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),transInt);
                 user.add(u);
             }

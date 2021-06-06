@@ -2,10 +2,7 @@ package io.swagger.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -17,18 +14,18 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Table(name="DB_ACCOUNT")
 public class dbAccount {
     @Id
     @GeneratedValue
     private long id;
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<AccountType> accountTypes;
+    AccountType accountType;
     private double balance;
     private String iban;
 
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="userId")
     @JsonBackReference
     private dbUser user;
