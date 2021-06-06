@@ -1,6 +1,8 @@
 package io.swagger.api;
 
+import io.swagger.model.User;
 import io.swagger.model.dbTransaction;
+import io.swagger.model.dbUser;
 import io.swagger.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -64,7 +66,9 @@ public class TransactionsApiController implements TransactionsApi {
             Transaction tr = new Transaction(i.getIBAN());
             transactionsList.add(tr);
         }
-        return ResponseEntity.status(200).body(transactionsList);
+        return new ResponseEntity<List<Transaction>>(transactionsList,HttpStatus.OK);
+
+
     }
 
     //COPY
