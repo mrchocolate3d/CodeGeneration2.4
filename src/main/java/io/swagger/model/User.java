@@ -35,14 +35,19 @@ public class User   {
   @JsonProperty("phone")
   private String phone = null;
 
-  @JsonProperty("CurrentIBAN")
-  private String currentIBAN = null;
-
-  @JsonProperty("SavingIBAN")
-  private String savingIBAN = null;
 
   @JsonProperty("transactionLimit")
   private Integer transactionLimit = null;
+
+  public User(Long id, String username, String firstName, String lastName, String email, String phone, Integer transactionLimit) {
+    this.id = id;
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.transactionLimit = transactionLimit;
+  }
 
   public User id(Long id) {
     this.id = id;
@@ -67,6 +72,7 @@ public class User   {
     this.username = username;
     return this;
   }
+
 
   /**
    * Get username
@@ -158,43 +164,9 @@ public class User   {
     this.phone = phone;
   }
 
-  public User currentIBAN(String currentIBAN) {
-    this.currentIBAN = currentIBAN;
-    return this;
-  }
 
-  /**
-   * Get currentIBAN
-   * @return currentIBAN
-   **/
-  @Schema(example = "NL*INH!@##$%&^&", description = "")
-  
-    public String getCurrentIBAN() {
-    return currentIBAN;
-  }
 
-  public void setCurrentIBAN(String currentIBAN) {
-    this.currentIBAN = currentIBAN;
-  }
 
-  public User savingIBAN(String savingIBAN) {
-    this.savingIBAN = savingIBAN;
-    return this;
-  }
-
-  /**
-   * Get savingIBAN
-   * @return savingIBAN
-   **/
-  @Schema(example = "NL*INH!@##$%&^&", description = "")
-  
-    public String getSavingIBAN() {
-    return savingIBAN;
-  }
-
-  public void setSavingIBAN(String savingIBAN) {
-    this.savingIBAN = savingIBAN;
-  }
 
   public User transactionLimit(Integer transactionLimit) {
     this.transactionLimit = transactionLimit;
@@ -231,14 +203,12 @@ public class User   {
         Objects.equals(this.lastName, user.lastName) &&
         Objects.equals(this.email, user.email) &&
         Objects.equals(this.phone, user.phone) &&
-        Objects.equals(this.currentIBAN, user.currentIBAN) &&
-        Objects.equals(this.savingIBAN, user.savingIBAN) &&
         Objects.equals(this.transactionLimit, user.transactionLimit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, username, firstName, lastName, email, phone, currentIBAN, savingIBAN, transactionLimit);
+    return Objects.hash(id, username, firstName, lastName, email, phone, transactionLimit);
   }
 
   @Override
@@ -252,8 +222,6 @@ public class User   {
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
-    sb.append("    currentIBAN: ").append(toIndentedString(currentIBAN)).append("\n");
-    sb.append("    savingIBAN: ").append(toIndentedString(savingIBAN)).append("\n");
     sb.append("    transactionLimit: ").append(toIndentedString(transactionLimit)).append("\n");
     sb.append("}");
     return sb.toString();

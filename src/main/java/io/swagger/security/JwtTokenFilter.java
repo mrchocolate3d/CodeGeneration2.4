@@ -29,7 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }catch(ResponseStatusException rse){
             SecurityContextHolder.clearContext();
             response.sendError(rse.getRawStatusCode(), rse.getMessage());
-
+            return;
         }
         chain.doFilter(request, response);
     }

@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.model.dbTransaction;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,8 +49,12 @@ public interface TransactionsApi {
     @RequestMapping(value = "/Transactions",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Transaction> getTransactions(@NotNull @DecimalMin("1")@Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true) String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false) OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false) OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" ,schema=@Schema(allowableValues={  }, maximum="50"
+    ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1")@Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true) String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false) OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false) OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" ,schema=@Schema(allowableValues={  }, maximum="50"
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit);
+
+    //COPY
+//    ResponseEntity<Transaction> getTransactions(@NotNull @DecimalMin("1")@Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true) String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false) OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false) OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" ,schema=@Schema(allowableValues={  }, maximum="50"
+//            , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit);
 
 
     @Operation(summary = "Making a new transaction", description = "Making a new transaction using an IBAN", security = {
@@ -63,7 +68,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/Transactions",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
+    ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction body);
 
 }
 

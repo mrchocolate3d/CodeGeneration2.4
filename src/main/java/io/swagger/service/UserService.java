@@ -1,7 +1,6 @@
 package io.swagger.service;
 
 import io.swagger.model.UserRole;
-import io.swagger.model.dbAccount;
 import io.swagger.model.dbUser;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -36,12 +35,11 @@ public class UserService {
             );
             if (roles.size() == 0) {
                 user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
-
             } else {
                 user.setRoles(roles);
             }
-
             userRepository.save(user);
+
             return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
         }
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");

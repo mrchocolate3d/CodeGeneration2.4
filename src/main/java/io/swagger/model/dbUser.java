@@ -1,15 +1,7 @@
 package io.swagger.model;
-
 import lombok.*;
-import lombok.extern.java.Log;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 
 @Entity
 @NoArgsConstructor
@@ -21,7 +13,9 @@ import java.util.Set;
 public class dbUser {
     @Id
     @GeneratedValue
+    @Column(name="userId")
     private long id;
+
     private String firstName;
     private String lastName;
     private String username;
@@ -44,9 +38,11 @@ public class dbUser {
     List<UserRole> roles;
     private double transactionLimit;
 
+  //  @OneToMany(mappedBy = "user")
+    //@JsonManagedReference
+   // private Set<dbAccount> accounts;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy="user")
-    private Set<dbAccount> accounts = new HashSet<>();
+
 
 
 }
