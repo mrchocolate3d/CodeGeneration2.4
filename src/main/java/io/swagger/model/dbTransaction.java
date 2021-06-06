@@ -11,33 +11,23 @@ import javax.persistence.*;
 
 @Entity
 
-@NoArgsConstructor
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class dbTransaction {
     @Id
     @GeneratedValue
-    @Column(name="transactionID" , updatable = false, nullable = false)
-    private long transactionID;
+    @Column(name="ID" , updatable = false, nullable = false)
+    private long id;
+    private int tLimit;
+    private OffsetDateTime fromDate;
+    private OffsetDateTime toDate;
     private String IBAN;
-    private String userPerforming;
-    //private String ibanFrom;
-    private String ibanTo;
-    private double amount;
-    private OffsetDateTime time;
 
-    public dbTransaction(long transactionID, String userPerforming, String IBAN, String ibanTo, double amount, OffsetDateTime time) {
-        this.transactionID = transactionID;
-        this.userPerforming = userPerforming;
+
+    public dbTransaction(int tLimit, OffsetDateTime fromDate, OffsetDateTime toDate, String IBAN) {
+        this.tLimit = tLimit;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
         this.IBAN = IBAN;
-        this.ibanTo = ibanTo;
-        this.amount = amount;
-        this.time = time;
     }
-
-
-
-
-
-
 }
