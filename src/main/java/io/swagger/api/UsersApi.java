@@ -7,6 +7,7 @@ package io.swagger.api;
 
 import io.swagger.model.InsertUser;
 import io.swagger.model.User;
+import io.swagger.model.dbUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -42,8 +43,8 @@ public interface UsersApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "user created", content = @Content(schema = @Schema(implementation = User.class))) })
     @RequestMapping(value = "/Users",
-        produces = { "application/json", "application/xml" }, 
-        consumes = { "application/json", "application/xml" }, 
+        produces = { "application/json"},
+        consumes = { "application/json"},
         method = RequestMethod.POST)
     ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema=@Schema()) @Valid @RequestBody InsertUser body);
 
@@ -80,7 +81,7 @@ public interface UsersApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))) })
     @RequestMapping(value = "/Users",
-        produces = { "application/json", "application/xml" }, 
+        produces = { "application/json"},
         method = RequestMethod.GET)
     ResponseEntity<List<User>> getUser(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "get User by name" ,schema=@Schema()) @Valid @RequestParam(value = "name", required = false) String name);

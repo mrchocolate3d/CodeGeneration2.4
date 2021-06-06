@@ -39,6 +39,15 @@ public class User   {
   @JsonProperty("transactionLimit")
   private Integer transactionLimit = null;
 
+  public User(Long id, String username, String firstName, String lastName, String email, String phone, Integer transactionLimit) {
+    this.id = id;
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.transactionLimit = transactionLimit;
+  }
 
   public User id(Long id) {
     this.id = id;

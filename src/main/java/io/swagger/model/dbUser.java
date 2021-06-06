@@ -46,14 +46,13 @@ public class dbUser {
         this.transactionLimit = transactionLimit;
     }
 
-    //TODO: List role -> role
     @ElementCollection(fetch = FetchType.EAGER)
     List<UserRole> roles;
     private double transactionLimit;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private Set<dbAccount> accounts;
+  //  @OneToMany(mappedBy = "user")
+    //@JsonManagedReference
+   // private Set<dbAccount> accounts;
 
 
 
