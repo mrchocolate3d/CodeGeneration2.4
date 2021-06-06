@@ -1,7 +1,10 @@
 package io.swagger.service;
 
+import io.swagger.model.AccountType;
 import io.swagger.model.UserRole;
+import io.swagger.model.dbAccount;
 import io.swagger.model.dbUser;
+import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 @Service
+@Transactional
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -34,23 +45,22 @@ public class UserService {
                     firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
             );
             if (roles.size() == 0) {
-                user.setRoles(List.of(UserRole.ROLE_CUSTOMER));
+                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
             } else {
                 user.setRoles(roles);
             }
+
+
+
             userRepository.save(user);
+
+
 
             return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
         }
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
     }
 
-    public dbUser findUserByUsername(String username){
-        if (userRepository.findUserByUsername(username) != null){
-            return userRepository.findUserByUsername(username);
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found");
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -71,8 +81,15 @@ public class UserService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             return jwtTokenProvider.createToken(username, userRepository.findUserByUsername(username).getRoles());
         }catch(AuthenticationException ae){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invallid credentials");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid credentials");
         }
+    }
+
+    public dbUser findUserByUsername(String username) {
+        if (userRepository.findUserByUsername(username) != null){
+            return userRepository.findUserByUsername(username);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found");
     }
 }
 

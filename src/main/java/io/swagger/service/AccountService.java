@@ -1,10 +1,7 @@
 package io.swagger.service;
 
-import io.swagger.model.Account;
+import io.swagger.model.*;
 /*import io.swagger.Repository.AccountRepository;*/
-import io.swagger.model.AccountType;
-import io.swagger.model.dbAccount;
-import io.swagger.model.dbUser;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service
+@Transactional()
 public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
@@ -25,7 +23,8 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
+
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public dbAccount add(dbUser user, AccountType type){
         if(userRepository.findUserByUsername(user.getUsername()) != null){
             dbAccount account;

@@ -1,9 +1,6 @@
 package io.swagger.configuration;
 
-import io.swagger.model.AccountType;
-import io.swagger.model.UserRole;
-import io.swagger.model.dbAccount;
-import io.swagger.model.dbUser;
+import io.swagger.model.*;
 import io.swagger.repository.UserRepository;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
@@ -13,6 +10,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -41,7 +39,8 @@ public class BankApplicationRunner implements ApplicationRunner {
         dbAccount account = accountService.add(testUser, AccountType.TYPE_CURRENT);
 
 
-        System.out.println(testUser);
+//        System.out.println(testUser);
+
 
 
 

@@ -55,7 +55,6 @@ public class TransactionsApiController implements TransactionsApi {
         if (accept != null && accept.contains("application/json")) {
             try {
                 return new ResponseEntity<Transaction>(objectMapper.readValue("{\n  \"amount\" : 0.8008281904610115,\n  \"IBANTo\" : \"NL44INGB556677\",\n  \"IBANFrom\" : \"NL11INGB223345\",\n  \"time\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"userPerform\" : \"username\",\n  \"token\" : \"a1b2c3b4d5e6\"\n}", Transaction.class), HttpStatus.NOT_IMPLEMENTED);
-                //does transactionservice go here???
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Transaction>(HttpStatus.INTERNAL_SERVER_ERROR);
