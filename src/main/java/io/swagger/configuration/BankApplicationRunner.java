@@ -21,10 +21,6 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Autowired
     private UserRepository userRepository;
 
-    public BankApplicationRunner(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
         dbUser user = new dbUser("test", "test", "test", "test", "test", "test", List.of(UserRole.ROLE_EMPLOYEE), 2500);
@@ -40,9 +36,7 @@ public class BankApplicationRunner implements ApplicationRunner {
         System.out.println("Token login: " + tokenLogin);
 
 
-        //userRepository.findAll().forEach(System.out::println);
-
-        //userService.getUsers().forEach(System.out::println);
+        userRepository.findAll().forEach(System.out::println);
 
     }
 }
