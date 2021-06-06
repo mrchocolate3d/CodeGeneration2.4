@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,9 @@ public class TransactionsApiController implements TransactionsApi {
             OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
             Integer limit) {
 
+        String accept = request.getHeader("Accept");
+        List<dbTransaction> transactions = transactionService.getTransactionByIBAN(IBAN);
+        List<Transaction> transactionsList = new ArrayList<>();
         if(fromDate == null){
             fromDate = OffsetDateTime.parse(fromDate + "T00:00:00.001+02:00");
         }
@@ -58,17 +62,13 @@ public class TransactionsApiController implements TransactionsApi {
         if(limit == null){
             limit = transactionService.CountAllTransactions();
         }
-
         //List<dbTransaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
-        List<dbTransaction> transactions = transactionService.getTransactionByIBAN(IBAN);
-        List<Transaction> transactionsList = new ArrayList<>();
-        for(dbTransaction i : transactions){
-            Transaction tr = new Transaction(i.getIBAN());
+        for(dbTransaction i : transactions) {
+            Transaction tr = new Transaction(i.getIBAN()); //add iban or all??
             transactionsList.add(tr);
         }
+
         return new ResponseEntity<List<Transaction>>(transactionsList,HttpStatus.OK);
-
-
     }
 
     //COPY
