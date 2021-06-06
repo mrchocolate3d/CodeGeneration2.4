@@ -18,8 +18,10 @@ import javax.validation.constraints.*;
 
 
 public class Account   {
+
+
   @JsonProperty("UserId")
-  private Integer userId = null;
+  private User user = null;
 
   /**
    * Gets or Sets accountType
@@ -54,8 +56,8 @@ public class Account   {
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
-  public Account userId(Integer userId) {
-    this.userId = userId;
+  public Account user(User user) {
+    this.user = user;
     return this;
   }
 
@@ -66,12 +68,12 @@ public class Account   {
   @Schema(example = "1", required = true, description = "")
       @NotNull
 
-    public Integer getUserId() {
-    return userId;
+    public User getUser() {
+    return user;
   }
 
-  public void setUserId(Integer userId) {
-    this.userId = userId;
+  public void setUserId(User user) {
+    this.user = user;
   }
 
   public Account accountType(AccountTypeEnum accountType) {
@@ -104,13 +106,13 @@ public class Account   {
       return false;
     }
     Account account = (Account) o;
-    return Objects.equals(this.userId, account.userId) &&
+    return Objects.equals(this.user, account.user) &&
         Objects.equals(this.accountType, account.accountType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId, accountType);
+    return Objects.hash(user, accountType);
   }
 
   @Override
@@ -118,7 +120,7 @@ public class Account   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Account {\n");
     
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    user: ").append(toIndentedString(user.toString())).append("\n");
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("}");
     return sb.toString();
