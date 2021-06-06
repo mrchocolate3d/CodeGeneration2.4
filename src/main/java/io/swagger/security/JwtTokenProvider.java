@@ -24,6 +24,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @Component
@@ -85,7 +86,7 @@ public class JwtTokenProvider {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            throw new IllegalArgumentException("Expired or invalid JWT token");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Expired or invalid JWT token");
         }
     }
 

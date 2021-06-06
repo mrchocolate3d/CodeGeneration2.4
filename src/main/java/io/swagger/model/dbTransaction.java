@@ -1,21 +1,43 @@
 package io.swagger.model;
 
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import lombok.NoArgsConstructor;
+import org.threeten.bp.OffsetDateTime;
+
+import javax.persistence.*;
 
 @Entity
+
+@NoArgsConstructor
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class dbTransaction {
     @Id
     @GeneratedValue
-    private long ID;
+    @Column(name="transactionID" , updatable = false, nullable = false)
+    private long transactionID;
     private String IBAN;
+    private String userPerforming;
+    //private String ibanFrom;
+    private String ibanTo;
+    private double amount;
+    private OffsetDateTime time;
 
-    public dbTransaction(long ID,String IBAN) {
+    public dbTransaction(long transactionID, String userPerforming, String IBAN, String ibanTo, double amount, OffsetDateTime time) {
+        this.transactionID = transactionID;
+        this.userPerforming = userPerforming;
         this.IBAN = IBAN;
-        this.ID = ID;
+        this.ibanTo = ibanTo;
+        this.amount = amount;
+        this.time = time;
     }
+
+
+
+
+
 
 }

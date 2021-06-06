@@ -41,6 +41,10 @@ public class Transaction   {
     return this;
   }
 
+
+  public Transaction(String ibANFrom){
+    this.ibANFrom = ibANFrom;
+  }
   /**
    * Get userPerform
    * @return userPerform

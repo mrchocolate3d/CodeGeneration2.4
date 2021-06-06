@@ -30,7 +30,13 @@ public class SwaggerDocumentationConfig {
                 .directModelSubstitute(org.threeten.bp.LocalDate.class, java.sql.Date.class)
                 .directModelSubstitute(org.threeten.bp.OffsetDateTime.class, java.util.Date.class)
                 .apiInfo(apiInfo())
-                .securitySchemes(Arrays.asList(apiKey()));
+                .securityContexts(Arrays.asList(securityContext()))
+                .securitySchemes(Arrays.asList(apiKey()))
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build()
+                ;
     }
 
     ApiInfo apiInfo() {
@@ -61,7 +67,7 @@ public class SwaggerDocumentationConfig {
     }
 
     private ApiKey apiKey(){
-        return new ApiKey("JWT", "Authorization", "header");
+        return new ApiKey("Bearer", "Authorization", "header");
     }
 
     private SecurityContext securityContext(){
@@ -70,7 +76,7 @@ public class SwaggerDocumentationConfig {
 
     private List<SecurityReference> defaultAuth(){
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        return Arrays.asList(new SecurityReference("JWT", new AuthorizationScope[] {authorizationScope}));
+        return Arrays.asList(new SecurityReference("Bearer", new AuthorizationScope[] {authorizationScope}));
     }
 
 
