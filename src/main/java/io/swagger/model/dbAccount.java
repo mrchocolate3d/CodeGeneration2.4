@@ -22,8 +22,7 @@ public class dbAccount {
     @Id
     @GeneratedValue
     private long id;
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<AccountType> accountTypes;
+    AccountType accountType;
     private double balance;
     private String iban;
 

@@ -34,7 +34,7 @@ public class UserService {
                     firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
             );
             if (roles.size() == 0) {
-                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
+                user.setRoles(List.of(UserRole.ROLE_CUSTOMER));
             } else {
                 user.setRoles(roles);
             }
@@ -43,6 +43,13 @@ public class UserService {
             return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
         }
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
+    }
+
+    public dbUser findUserByUsername(String username){
+        if (userRepository.findUserByUsername(username) != null){
+            return userRepository.findUserByUsername(username);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found");
     }
 
     @Bean
