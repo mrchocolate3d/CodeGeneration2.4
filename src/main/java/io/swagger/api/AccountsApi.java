@@ -8,7 +8,7 @@ package io.swagger.api;
 import io.swagger.model.Account;
 import io.swagger.model.Deposit;
 import io.swagger.model.ReturnAccount;
-import io.swagger.model.ReturnBalance;
+import io.swagger.model.Balance;
 import io.swagger.model.Withdrawal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,18 +23,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 @Validated
@@ -112,11 +107,11 @@ public interface AccountsApi {
     @Operation(summary = "Get balance of an account using IBAN", description = "Get balance of account using IBAN", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Balance is showed", content = @Content(schema = @Schema(implementation = ReturnBalance.class))) })
+        @ApiResponse(responseCode = "200", description = "Balance is showed", content = @Content(schema = @Schema(implementation = Balance.class))) })
     @RequestMapping(value = "/Accounts/{IBAN}/balance",
         produces = { "application/json", "application/xml" }, 
         method = RequestMethod.GET)
-    ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<Balance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 
     @Operation(summary = "Withdraw from an account using IBAN", description = "Customers withdraw money from their accounts", security = {

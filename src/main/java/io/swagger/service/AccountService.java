@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 
@@ -23,6 +24,8 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BalanceRepository balanceRepository;
 
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public dbAccount add(dbUser user, AccountType type){
@@ -80,7 +83,7 @@ public class AccountService {
 
     public dbAccount createAccount(dbUser user){
         dbAccount account = new dbAccount();
-        account.setBalance(0);
+        account.setBalance(0.00);
         account.setUser(user);
         String iban = generateIban();
         Boolean duplicatedIban = true;
@@ -98,5 +101,28 @@ public class AccountService {
     }
     public List<dbAccount> getAllAccounts() {
         return (List<dbAccount>) accountRepository.findAll();
+    }
+
+    public dbAccount getSpecificAccountByIban(String iban) {
+        return accountRepository.findAccountByIban(iban);
+    }
+
+    public dbAccount closeAccount(dbAccount account){
+        return accountRepository.deleteAccountByUserID(account.getUser().getId());
+    }
+
+    public dbAccount getBalance(dbAccount account){
+        return accountRepository.getBalanceByIBAN(account.getIban());
+    }
+    public dbAccount withdraw(dbAccount account, Double amount) throws Exception {
+        accountRepository.findAccountByIban(account.getIban());
+        BigDecimal withdrawAmount = BigDecimal.valueOf(account.getBalance()).subtract(BigDecimal.valueOf(amount));
+        if (withdrawAmount.compareTo(BigDecimal.ZERO) < 0){
+            throw new Exception("The amount to be withdrawed is higher than the balance");
+        }
+        else {
+            accountRepository.updateBalance(amount, account.getIban());
+            return accountRepository.findAccountByIban(account.getIban());
+        }
     }
 }

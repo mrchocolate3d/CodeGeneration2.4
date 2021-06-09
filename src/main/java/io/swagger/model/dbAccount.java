@@ -7,6 +7,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -21,7 +22,7 @@ public class dbAccount {
     @GeneratedValue
     private long id;
     AccountType accountType;
-    private double balance;
+    private Double balance;
     private String iban;
 
 
