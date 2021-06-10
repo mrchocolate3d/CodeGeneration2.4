@@ -19,9 +19,16 @@ import javax.validation.constraints.*;
 
 public class Account   {
 
-
   @JsonProperty("UserId")
-  private User user = null;
+  private User user;
+
+  @JsonProperty("accountType")
+  private AccountType accountType = null;
+
+  public Account(Long userId, AccountType accountType) {
+    userId = user.getId();
+    this.accountType = accountType;
+  }
 
   /**
    * Gets or Sets accountType
@@ -53,8 +60,7 @@ public class Account   {
       return null;
     }
   }
-  @JsonProperty("accountType")
-  private AccountTypeEnum accountType = null;
+
 
   public Account user(User user) {
     this.user = user;
@@ -76,7 +82,7 @@ public class Account   {
     this.user = user;
   }
 
-  public Account accountType(AccountTypeEnum accountType) {
+  public Account accountType(AccountType accountType) {
     this.accountType = accountType;
     return this;
   }
@@ -88,11 +94,11 @@ public class Account   {
   @Schema(required = true, description = "")
       @NotNull
 
-    public AccountTypeEnum getAccountType() {
+    public AccountType getAccountType() {
     return accountType;
   }
 
-  public void setAccountType(AccountTypeEnum accountType) {
+  public void setAccountType(AccountType accountType) {
     this.accountType = accountType;
   }
 

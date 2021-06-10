@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Balance of the IBAN account
@@ -17,7 +15,7 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 
 
-public class ReturnBalance   {
+public class Balance {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
@@ -57,7 +55,7 @@ public class ReturnBalance   {
   @JsonProperty("balance")
   private Double balance = null;
 
-  public ReturnBalance IBAN(String IBAN) {
+  public Balance IBAN(String IBAN) {
     this.IBAN = IBAN;
     return this;
   }
@@ -76,7 +74,7 @@ public class ReturnBalance   {
     this.IBAN = IBAN;
   }
 
-  public ReturnBalance accountType(AccountTypeEnum accountType) {
+  public Balance accountType(AccountTypeEnum accountType) {
     this.accountType = accountType;
     return this;
   }
@@ -95,7 +93,7 @@ public class ReturnBalance   {
     this.accountType = accountType;
   }
 
-  public ReturnBalance balance(Double balance) {
+  public Balance balance(Double balance) {
     this.balance = balance;
     return this;
   }
@@ -123,7 +121,7 @@ public class ReturnBalance   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ReturnBalance returnBalance = (ReturnBalance) o;
+    Balance returnBalance = (Balance) o;
     return Objects.equals(this.IBAN, returnBalance.IBAN) &&
         Objects.equals(this.accountType, returnBalance.accountType) &&
         Objects.equals(this.balance, returnBalance.balance);
