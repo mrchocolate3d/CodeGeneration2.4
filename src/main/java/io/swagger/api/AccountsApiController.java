@@ -141,9 +141,4 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<Withdrawal>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    //get all accounts
-//    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<dbAccount>> getAllAccounts(){
-//        return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
-//    }
 }
