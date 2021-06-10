@@ -105,13 +105,14 @@ public class AccountService {
     }
 
     public dbAccount closeAccount(dbAccount account){
-        return accountRepository.deleteAccountByUserID(account.getUser().getId());
+        return accountRepository.deleteAccountByUserId(account.getUser().getId());
     }
 
     public dbAccount getBalance(dbAccount account){
-        return accountRepository.getBalanceByIBAN(account.getIban());
+        return accountRepository.getBalanceByIban(account.getIban());
     }
-    public dbAccount withdraw(dbAccount account, Double amount) throws Exception {
+
+    public void withdraw(dbAccount account, Double amount) throws Exception {
         accountRepository.findAccountByIban(account.getIban());
         BigDecimal withdrawAmount = BigDecimal.valueOf(account.getBalance()).subtract(BigDecimal.valueOf(amount));
         if (withdrawAmount.compareTo(BigDecimal.ZERO) < 0){
@@ -119,7 +120,7 @@ public class AccountService {
         }
         else {
             accountRepository.updateBalance(amount, account.getIban());
-            return accountRepository.findAccountByIban(account.getIban());
+//            return accountRepository.findAccountByIban(account.getIban());
         }
     }
 }

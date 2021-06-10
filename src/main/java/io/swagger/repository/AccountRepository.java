@@ -14,9 +14,9 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     @Query("SELECT iban FROM dbAccount ")
     List<String> getAllIban();
     dbAccount findAccountByIban(String IBAN);
-    dbAccount deleteAccountByUserID(Long id);
-    dbAccount getBalanceByIBAN(String iban);
+    dbAccount deleteAccountByUserId(Long id);
+    dbAccount getBalanceByIban(String IBAN);
     @Modifying
-    @Query("update Account a set balance = ?1 where iban = ?2")
-    void updateBalance(Double amount, String iban);
+    //@Query("update Account a set balance = ?1 where iban = ?2")
+    void updateBalance(Double amount, String IBAN);
 }
