@@ -63,7 +63,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/Transactions",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction body);
+    ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
 
 }
 

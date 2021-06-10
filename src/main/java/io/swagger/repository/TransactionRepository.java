@@ -9,12 +9,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Iterator;
 
 @Repository
-public interface TransactionRepository extends CrudRepository<dbTransaction,Long> {
+public interface TransactionRepository extends CrudRepository<Transaction,Long> {
 
-    Iterable<dbTransaction>getTransactionsByIBAN(String IBAN);
+    Transaction getTransactionsByIBAN(String IBAN);
     //Iterable<dbTransaction>getTransactionsByID(long id);
-//    @Query("SELECT COUNT(*) FROM dbTransactions")
-//    Integer CountAllTransactions();
+    @Query("SELECT COUNT(*) FROM dbTransactions")
+    Integer CountAllTransactions();
 
 
 }

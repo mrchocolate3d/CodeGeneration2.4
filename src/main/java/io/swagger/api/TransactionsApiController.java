@@ -4,6 +4,7 @@ import io.swagger.model.User;
 import io.swagger.model.dbTransaction;
 import io.swagger.model.dbUser;
 import io.swagger.service.TransactionService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
+@Log
 @RestController
 @RequestMapping(value = "transactions")
 public class TransactionsApiController implements TransactionsApi {
@@ -49,33 +51,34 @@ public class TransactionsApiController implements TransactionsApi {
             OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
             OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
             Integer limit) {
+        try{
+            if(fromDate == null){
+                fromDate = OffsetDateTime.parse(fromDate + "T00:00:00.001+02:00");
+            }
+            if(toDate == null){
+                toDate =  OffsetDateTime.parse(toDate + "T23:59:59.999+02:00");
+            }
 
-        String accept = request.getHeader("Accept");
-        List<dbTransaction> transactions = transactionService.getTransactionByIBAN(IBAN);
-        List<Transaction> transactionsList = new ArrayList<>();
-        if(fromDate == null){
-            fromDate = OffsetDateTime.parse(fromDate + "T00:00:00.001+02:00");
+            if(limit == 0){
+//                limit = transactionRepository.CountAllTransactions();
+                limit = 50;
+            }
+            List<Transaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
+            return new ResponseEntity<List<Transaction>>(transactions,HttpStatus.OK);
         }
-        if(toDate == null){
-            toDate = OffsetDateTime.parse(toDate + "T23:59:59.999+02:00");
+        catch(Exception e){
+            log.warn(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        if(limit == null){
-            limit = transactionService.CountAllTransactions();
-        }
-        //List<dbTransaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
-        for(dbTransaction i : transactions) {
-            Transaction tr = new Transaction(i.getIBAN()); //add iban or all??
-            transactionsList.add(tr);
-        }
-
-        return new ResponseEntity<List<Transaction>>(transactionsList,HttpStatus.OK);
     }
 
 
     @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction transaction) {
+    public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
         transactionService.createTransaction(transaction);
-        return new ResponseEntity<dbTransaction>(transaction,HttpStatus.CREATED);
+        return new ResponseEntity<Transaction>(transaction,HttpStatus.CREATED);
+
+
     }
 }
