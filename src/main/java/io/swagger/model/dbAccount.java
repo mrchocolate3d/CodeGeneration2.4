@@ -31,4 +31,10 @@ public class dbAccount {
     @JsonBackReference
     private dbUser user;
 
+    public dbAccount(long id, AccountType accountType, Double balance, String iban){
+        this.id = id;
+        this.accountType = accountType;
+        this.balance = balance;
+        this.iban = iban;
+    }
 }

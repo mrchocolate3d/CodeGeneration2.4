@@ -18,6 +18,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
@@ -89,20 +90,27 @@ public class AccountsApiController implements AccountsApi {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<List<Account>> getAccounts(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                List<dbAccount> accounts = accountService.getAllAccounts();
-                return new ResponseEntity<List<Account>>(objectMapper.readValue("[ {\n  \"UserId\" : 1,\n  \"accountType\" : \"CurrentAccount\"\n}, {\n  \"UserId\" : 1,\n  \"accountType\" : \"CurrentAccount\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        List<dbAccount> dbAccounts = accountService.getAllAccounts();
+        List<Account> accounts = new ArrayList<>();
+        for (dbAccount acc : dbAccounts){
+            Account a = new Account(acc.getUser().getId(), acc.getAccountType());
+            accounts.add(a);
         }
-//        if (!username.isEmpty())
-//            username = "";
+        return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
 
-        return new ResponseEntity<List<Account>>(HttpStatus.UNAUTHORIZED);
+
+//        String accept = request.getHeader("Accept");
+//        if (accept != null && accept.contains("application/json")) {
+//            try {
+//                List<dbAccount> accounts = accountService.getAllAccounts();
+//                return new ResponseEntity<List<Account>>(objectMapper.readValue("[ {\n  \"UserId\" : 1,\n  \"accountType\" : \"CurrentAccount\"\n}, {\n  \"UserId\" : 1,\n  \"accountType\" : \"CurrentAccount\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
+//            } catch (IOException e) {
+//                log.error("Couldn't serialize response for content type application/json", e);
+//                return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        }
+//
+//        return new ResponseEntity<List<Account>>(HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity<Balance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {

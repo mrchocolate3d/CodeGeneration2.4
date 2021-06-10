@@ -24,9 +24,6 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private BalanceRepository balanceRepository;
-
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public dbAccount add(dbUser user, AccountType type){
         if(userRepository.findUserByUsername(user.getUsername()) != null){
