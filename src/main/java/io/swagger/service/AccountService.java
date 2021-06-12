@@ -112,19 +112,21 @@ public class AccountService {
         return accountRepository.getBalanceByIban(account.getIban());
     }
 
-//    public void withdraw(dbAccount account, Double amount) throws Exception {
-//        accountRepository.findAccountByIban(account.getIban());
-//        BigDecimal withdrawAmount = BigDecimal.valueOf(account.getBalance()).subtract(BigDecimal.valueOf(amount));
-//        if (withdrawAmount.compareTo(BigDecimal.ZERO) < 0){
-//            throw new Exception("The amount to be withdrawed is higher than the balance");
-//        }
-//        else {
-//            accountRepository.updateBalance(amount, account.getIban());
-//            return accountRepository.findAccountByIban(account.getIban());
-//        }
-//    }
+    public void withdraw(String iban, double amount) throws Exception {
+        dbAccount dbAccount = getSpecificAccountByIban(iban);
+        double newBalance;
+        if (dbAccount.getBalance() > amount){
+            newBalance = dbAccount.getBalance() - amount;
+            accountRepository.updateBalance(newBalance, iban);
+        }
+        else{
+            throw new Exception("Insufficient balance");
+        }
+    }
 
-    public void deposit(dbAccount account, Double amount) throws Exception{
-
+    public void deposit(String iban, double amount) throws Exception{
+        dbAccount dbAccount = getSpecificAccountByIban(iban);
+        double newBalance = dbAccount.getBalance() + amount;
+        accountRepository.updateBalance(newBalance, dbAccount.getIban());
     }
 }

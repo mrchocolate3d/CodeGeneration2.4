@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
@@ -16,6 +17,9 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     dbAccount findAccountByIban(String IBAN);
     dbAccount deleteAccountByUserId(Long id);
     dbAccount getBalanceByIban(String IBAN);
-//    @Query("update Account a set balance = ?1 where iban = ?2")
-//    void updateBalance(Double amount, String IBAN);
+
+    @Transactional
+    @Modifying
+    @Query("update dbAccount a set balance = ?1 where iban = ?2")
+    void updateBalance(Double amount, String IBAN);
 }
