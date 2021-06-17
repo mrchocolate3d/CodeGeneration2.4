@@ -34,32 +34,15 @@ public class TransactionService {
     }
 
 //    getting transaction by iban
-    public List<Transaction>getTransactionByIBAN(String IBAN){
-        return (List<Transaction>)transactionRepository.getTransactionsByIBAN(IBAN);
+    public List<dbTransaction>getTransactionByIBAN(String IBAN){
+        return (List<dbTransaction>)transactionRepository.getTransactionsByIBAN(IBAN);
     }
 
 
     //TODO: complete this
     //getting all transactions
-    public List<Transaction> getTransactions(String IBAN, OffsetDateTime fromDate, OffsetDateTime toDate, int limit){
-        List<Transaction> transactions = new ArrayList<>();
-        List<dbTransaction> dbTransactions = new ArrayList<>();
-
-        transactionRepository.getTransactionsByIBAN(IBAN);
-        transactionRepository.CountAllTransactions();
-
-
-        for (Transaction t : transactions){
-
-           if(fromDate == null){
-               fromDate = OffsetDateTime.parse(fromDate + "T00:00:00.001+02:00");
-           }
-           if(toDate == null){
-               toDate =  OffsetDateTime.parse(toDate + "T23:59:59.999+02:00");
-           }
-
-        }
-        return transactions;
+    public List<dbTransaction> getTransactions(){
+        return (List<dbTransaction>) transactionRepository.findAll();
 
     }
 
@@ -72,7 +55,7 @@ public class TransactionService {
 
 
     //post transaction
-    public Transaction createTransaction(Transaction transaction){
+    public dbTransaction createTransaction(dbTransaction transaction){
         transactionRepository.save(transaction); //saves to the db
         return transaction;
     }

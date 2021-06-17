@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Iterator;
 
 @Repository
-public interface TransactionRepository extends CrudRepository<Transaction,Long> {
+public interface TransactionRepository extends CrudRepository<dbTransaction,Long> {
 
     Transaction getTransactionsByIBAN(String IBAN);
     //Iterable<dbTransaction>getTransactionsByID(long id);

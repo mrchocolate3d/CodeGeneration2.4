@@ -52,19 +52,11 @@ public class TransactionsApiController implements TransactionsApi {
             OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
             Integer limit) {
         try{
-            if(fromDate == null){
-                fromDate = OffsetDateTime.parse(fromDate + "T00:00:00.001+02:00");
-            }
-            if(toDate == null){
-                toDate =  OffsetDateTime.parse(toDate + "T23:59:59.999+02:00");
-            }
+            List<dbTransaction> transactions = transactionService.getTransactions();
+            List<Transaction> transactionList = new ArrayList<>();
+            //needs finishing
 
-            if(limit == 0){
-//                limit = transactionRepository.CountAllTransactions();
-                limit = 50;
-            }
-            List<Transaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
-            return new ResponseEntity<List<Transaction>>(transactions,HttpStatus.OK);
+            return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
         }
         catch(Exception e){
             log.warn(e.getMessage());
@@ -76,7 +68,8 @@ public class TransactionsApiController implements TransactionsApi {
     @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
-        transactionService.createTransaction(transaction);
+        //transactionService.createTransaction(transaction);
+
         return new ResponseEntity<Transaction>(transaction,HttpStatus.CREATED);
 
 
