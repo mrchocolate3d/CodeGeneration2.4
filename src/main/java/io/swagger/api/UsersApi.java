@@ -39,7 +39,7 @@ import java.util.Map;
 public interface UsersApi {
 
     @Operation(summary = "Create User", description = "This can be done by a new customer", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employee" })
+        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "user created", content = @Content(schema = @Schema(implementation = User.class))) })
     @RequestMapping(value = "/Users",
@@ -50,7 +50,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Delete User Info", description = "Deleting customer information using the id", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employee" })
+        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation"),
         
@@ -63,7 +63,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Edit User Info", description = "Editing specific user information using id", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employee" })
+        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Information changed"),
         
@@ -77,7 +77,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Get all users", description = "This can be done by Employees", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employee" })
+        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))) })
     @RequestMapping(value = "/Users",
@@ -88,7 +88,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Get user by ID", description = "This can be done by Employees", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employee" })
+        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
         
