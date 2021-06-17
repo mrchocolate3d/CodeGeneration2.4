@@ -11,10 +11,10 @@ import java.util.Iterator;
 @Repository
 public interface TransactionRepository extends CrudRepository<dbTransaction,Long> {
 
-    Transaction getTransactionsByIBAN(String IBAN);
-    //Iterable<dbTransaction>getTransactionsByID(long id);
-    @Query("SELECT COUNT(*) FROM dbTransactions")
-    Integer CountAllTransactions();
+//    dbTransaction getTransactionsByIBAN(String IBANto);
+//    Iterable<dbTransaction>getTransactionsByID(long id);
+//    @Query("SELECT COUNT(*) FROM dbTransactions")
+//    Integer CountAllTransactions();
 
 
 }

@@ -52,7 +52,7 @@ public class TransactionsApiController implements TransactionsApi {
             OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
             Integer limit) {
         try{
-            List<dbTransaction> transactions = transactionService.getTransactions();
+            List<dbTransaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
             List<Transaction> transactionList = new ArrayList<>();
             //needs finishing
 

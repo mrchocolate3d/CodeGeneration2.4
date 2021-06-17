@@ -41,15 +41,6 @@ public class Transaction   {
     return this;
   }
 
-
-  public Transaction(String ibANFrom,String ibANTo,String userPerform,Double amount,OffsetDateTime time){
-    this.ibANFrom = ibANFrom;
-    this.ibANTo = ibANTo;
-    this.userPerform= userPerform;
-    this.amount = amount;
-    this.time = time;
-
-  }
   /**
    * Get userPerform
    * @return userPerform
