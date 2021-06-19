@@ -6,8 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * Creating a new user
@@ -15,9 +20,11 @@ import org.springframework.validation.annotation.Validated;
 @Schema(description = "Creating a new user")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
-
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class InsertUser   {
+
   @JsonProperty("username")
   private String username = null;
 
@@ -44,7 +51,7 @@ public class InsertUser   {
    */
   public enum RoleEnum {
     EMPLOYEE("Employee"),
-    
+
     CUSTOMER("Customer");
 
     private String value;

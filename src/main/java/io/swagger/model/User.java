@@ -1,8 +1,10 @@
 package io.swagger.model;
 
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.dto.UserDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -37,9 +39,9 @@ public class User   {
 
 
   @JsonProperty("transactionLimit")
-  private Integer transactionLimit = null;
+  private Double transactionLimit = null;
 
-  public User(Long id, String username, String firstName, String lastName, String email, String phone, Integer transactionLimit) {
+  public User(Long id, String username, String firstName, String lastName, String email, String phone, Double transactionLimit) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -167,7 +169,7 @@ public class User   {
 
 
 
-  public User transactionLimit(Integer transactionLimit) {
+  public User transactionLimit(Double transactionLimit) {
     this.transactionLimit = transactionLimit;
     return this;
   }
@@ -178,11 +180,11 @@ public class User   {
    **/
   @Schema(example = "10000", description = "")
   
-    public Integer getTransactionLimit() {
+    public Double getTransactionLimit() {
     return transactionLimit;
   }
 
-  public void setTransactionLimit(Integer transactionLimit) {
+  public void setTransactionLimit(Double transactionLimit) {
     this.transactionLimit = transactionLimit;
   }
 
@@ -235,5 +237,9 @@ public class User   {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public UserDTO toUserDTO(){
+    return new UserDTO(this);
   }
 }

@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.dto.UserDTO;
 import io.swagger.model.InsertUser;
 import io.swagger.model.User;
 import io.swagger.model.dbUser;
@@ -46,7 +47,7 @@ public interface UsersApi {
         produces = { "application/json"},
         consumes = { "application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema=@Schema()) @Valid @RequestBody InsertUser body);
+    ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema=@Schema()) @Valid @RequestBody InsertUser body);
 
 
     @Operation(summary = "Delete User Info", description = "Deleting customer information using the id", security = {

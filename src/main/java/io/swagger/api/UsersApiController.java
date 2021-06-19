@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.dto.UserDTO;
 import io.swagger.model.InsertUser;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 @Controller
@@ -42,7 +44,7 @@ public class UsersApiController implements UsersApi {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping(value = "add")
+   /* @PostMapping(value = "add")
     public ResponseEntity<String> addUser(@RequestBody dbUser user){
             String token = userService.add(user.getFirstName(), user.getLastName(), user.getUsername(),
                 user.getEmail(), user.getPhone(), user.getPassword(), user.getRoles(), user.getTransactionLimit());
@@ -53,7 +55,7 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<List<dbUser>> getUser(){
         return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
 
-    }
+    }*/
 //    @RequestMapping(value="/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<dbUser> editUserInfo(@PathVariable Long id, @RequestBody dbUser changedInfoUser){
 //        dbUser user = userServiceImplement.getUserById(id);
@@ -80,30 +82,31 @@ public class UsersApiController implements UsersApi {
         List<dbUser> dbUsers = userService.getUsers();
         List<User> user = new ArrayList<>();
         for (dbUser x : dbUsers) {
-            int transInt = (int)x.getTransactionLimit();
+            Double transInt = (Double)x.getTransactionLimit();
             User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),transInt);
             user.add(u);
         }
         return user;
     }
 
-    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema=@Schema()) @Valid @RequestBody InsertUser body) {
+    public ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema=@Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             List<User> userList = getUserFromDB();
 
             if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))){
-                return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<UserDTO>(HttpStatus.NOT_ACCEPTABLE);
             } else {
+               InsertUser user = new InsertUser(body.getUsername(),body.getPassword(), body.getUsername(), body.getLastName(),body.getEmail(), body.getPhone(), body.getTransactionLimit(), body.getRoles());
 
-                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), body.getPassword(), body.getPhone(), List.of(UserRole.ROLE_EMPLOYEE) ,body.getTransactionLimit());
-                userService.addUser(user);
+                return new ResponseEntity<InsertUser>(new UserDTO(body), HttpStatus.CREATED);
+
             }
-            return  new ResponseEntity<User>(HttpStatus.OK);
+            return  new ResponseEntity<UserDTO>(HttpStatus.OK);
             //return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"James\",\n  \"lastName\" : \"Brown\",\n  \"phone\" : \"3138348173799\",\n  \"CurrentIBAN\" : \"NL*INH!@##$%&^&\",\n  \"SavingIBAN\" : \"NL*INH!@##$%&^&\",\n  \"id\" : 1,\n  \"transactionLimit\" : 10000,\n  \"email\" : \"jamesBrown120@outlook.com\",\n  \"username\" : \"jamesB\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
         }
 
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Void> deleteUserById(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("id") Integer id) {
@@ -121,6 +124,7 @@ public class UsersApiController implements UsersApi {
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "get User by name" ,schema=@Schema()) @Valid @RequestParam(value = "name", required = false) String name) {
 
             List<dbUser> dbUsers = userService.getUsers();
+            User u =
             List<User> user = new ArrayList<>();
             for (dbUser x : dbUsers) {
                 int transInt = (int)x.getTransactionLimit();
@@ -128,27 +132,6 @@ public class UsersApiController implements UsersApi {
                 user.add(u);
             }
             return new ResponseEntity<List<User>> (user,HttpStatus.OK);
-
-            //return ResponseEntity.status(200).body(user);
-
-
-
-//        for (int i = 0; i<3; i++){
-//            dbUser user = new dbUser();
-//            user.setFirstName("seyi");
-//            user.setLastName("gandonu");
-//            user.setEmail("seyifunmig75@outlook.com");
-//
-//            userList.add(user);
-//
-//        }
-
-
-
-
-       // return ResponseEntity.status(200).body(userList);
-
-
 
         /*String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -167,7 +150,9 @@ public class UsersApiController implements UsersApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"James\",\n  \"lastName\" : \"Brown\",\n  \"phone\" : \"3138348173799\",\n  \"CurrentIBAN\" : \"NL*INH!@##$%&^&\",\n  \"SavingIBAN\" : \"NL*INH!@##$%&^&\",\n  \"id\" : 1,\n  \"transactionLimit\" : 10000,\n  \"email\" : \"jamesBrown120@outlook.com\",\n  \"username\" : \"jamesB\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
+                User user
+                return new ResponseEntity<User> (user);
+                //return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"James\",\n  \"lastName\" : \"Brown\",\n  \"phone\" : \"3138348173799\",\n  \"CurrentIBAN\" : \"NL*INH!@##$%&^&\",\n  \"SavingIBAN\" : \"NL*INH!@##$%&^&\",\n  \"id\" : 1,\n  \"transactionLimit\" : 10000,\n  \"email\" : \"jamesBrown120@outlook.com\",\n  \"username\" : \"jamesB\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);

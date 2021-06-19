@@ -1,6 +1,7 @@
 package io.swagger.service;
 
-import io.swagger.model.UserRole;
+import io.swagger.dto.UserDTO;
+import io.swagger.model.User;
 import io.swagger.model.dbUser;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -28,21 +30,9 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public String add(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit) {
-        if (userRepository.findUserByUsername(username) == null) {
-            dbUser user = new dbUser(
-                    firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
-            );
-            if (roles.size() == 0) {
-                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
-            } else {
-                user.setRoles(roles);
-            }
-            userRepository.save(user);
-
-            return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
-        }
-        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
+    public User addUser(User user) {
+        userRepository.save(user);
+        return user;
     }
 
     @Bean
@@ -50,10 +40,10 @@ public class UserService {
         return new BCryptPasswordEncoder(12);
     }
 
-    public dbUser addUser(dbUser user) {
-        userRepository.save(user);
-        return user;
+    public Optional<UserDTO> getUser(long id){
+        return userRepository.findById(id);
     }
+
 
     public List<dbUser> getUsers() {
         return (List<dbUser>) userRepository.findAll();
