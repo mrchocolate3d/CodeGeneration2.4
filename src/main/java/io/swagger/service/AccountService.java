@@ -24,17 +24,18 @@ public class AccountService {
     private UserRepository userRepository;
 
 
-    @Transactional(propagation=Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
+
     public dbAccount add(dbUser user, AccountType type){
-        if(userRepository.findUserByUsername(user.getUsername()) != null){
+        dbUser userDb = userRepository.findUserByUsername(user.getUsername());
+        if(userDb != null){
             dbAccount account;
             if(type == AccountType.TYPE_CURRENT){
-                account = createCurrentAccount(user);
-                accountRepository.save(account);
+                account = createCurrentAccount(userDb);
+                account = accountRepository.save(account);
                 return account;
             }else if(type == AccountType.TYPE_SAVING){
-                account = createSavingAccount(user);
-                accountRepository.save(account);
+                account = createSavingAccount(userDb);
+                account = accountRepository.save(account);
                 return account;
 
             }
@@ -42,6 +43,10 @@ public class AccountService {
 
         }
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "something is wrong idk");
+    }
+
+    public dbAccount getAccountByIban(String iban){
+        return accountRepository.findAccountByIban(iban);
     }
 
     public String generateIban(){

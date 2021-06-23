@@ -3,7 +3,9 @@ package io.swagger.model;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -14,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 
 @Data
+@NoArgsConstructor
 public class User   {
   public User(Long id, String username, String firstName, String lastName, String email, String phone, Double transactionLimit) {
     this.id = id;
@@ -59,8 +62,8 @@ public class User   {
    * @return id
    **/
   @Schema(example = "1", description = "")
-  
-    public Long getId() {
+
+  public Long getId() {
     return id;
   }
 
@@ -77,11 +80,12 @@ public class User   {
   /**
    * Get username
    * @return username
-   **/
+   *
+   * @param username*/
   @Schema(example = "jamesB", description = "")
-  
-    public String getUsername() {
-    return username;
+
+  public String getUsername(String username) {
+    return this.username;
   }
 
   public void setUsername(String username) {
@@ -98,8 +102,8 @@ public class User   {
    * @return firstName
    **/
   @Schema(example = "James", description = "")
-  
-    public String getFirstName() {
+
+  public String getFirstName() {
     return firstName;
   }
 
@@ -117,8 +121,8 @@ public class User   {
    * @return lastName
    **/
   @Schema(example = "Brown", description = "")
-  
-    public String getLastName() {
+
+  public String getLastName() {
     return lastName;
   }
 
@@ -136,8 +140,8 @@ public class User   {
    * @return email
    **/
   @Schema(example = "jamesBrown120@outlook.com", description = "")
-  
-    public String getEmail() {
+
+  public String getEmail() {
     return email;
   }
 
@@ -155,8 +159,8 @@ public class User   {
    * @return phone
    **/
   @Schema(example = "3138348173799", description = "")
-  
-    public String getPhone() {
+
+  public String getPhone() {
     return phone;
   }
 
@@ -178,8 +182,8 @@ public class User   {
    * @return transactionLimit
    **/
   @Schema(example = "10000", description = "")
-  
-    public Double getTransactionLimit() {
+
+  public Double getTransactionLimit() {
     return transactionLimit;
   }
 
@@ -198,12 +202,12 @@ public class User   {
     }
     User user = (User) o;
     return Objects.equals(this.id, user.id) &&
-        Objects.equals(this.username, user.username) &&
-        Objects.equals(this.firstName, user.firstName) &&
-        Objects.equals(this.lastName, user.lastName) &&
-        Objects.equals(this.email, user.email) &&
-        Objects.equals(this.phone, user.phone) &&
-        Objects.equals(this.transactionLimit, user.transactionLimit);
+            Objects.equals(this.username, user.username) &&
+            Objects.equals(this.firstName, user.firstName) &&
+            Objects.equals(this.lastName, user.lastName) &&
+            Objects.equals(this.email, user.email) &&
+            Objects.equals(this.phone, user.phone) &&
+            Objects.equals(this.transactionLimit, user.transactionLimit);
   }
 
   @Override
@@ -215,7 +219,7 @@ public class User   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class User {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");

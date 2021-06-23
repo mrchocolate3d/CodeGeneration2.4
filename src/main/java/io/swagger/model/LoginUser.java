@@ -33,8 +33,8 @@ public class LoginUser   {
    * @return username
    **/
   @Schema(example = "username", description = "")
-  
-    public String getUsername() {
+
+  public String getUsername() {
     return username;
   }
 
@@ -52,8 +52,8 @@ public class LoginUser   {
    * @return password
    **/
   @Schema(example = "password", description = "")
-  
-    public String getPassword() {
+
+  public String getPassword() {
     return password;
   }
 
@@ -72,7 +72,7 @@ public class LoginUser   {
     }
     LoginUser loginUser = (LoginUser) o;
     return Objects.equals(this.username, loginUser.username) &&
-        Objects.equals(this.password, loginUser.password);
+            Objects.equals(this.password, loginUser.password);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class LoginUser   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class LoginUser {\n");
-    
+
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("}");

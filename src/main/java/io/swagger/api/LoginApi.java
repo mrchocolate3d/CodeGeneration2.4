@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.annotations.Api;
 import io.swagger.model.LoggedIn;
 import io.swagger.model.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,20 +34,19 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
-@Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-11T10:53:42.048Z[GMT]")
+@Api(value="Login")
 public interface LoginApi {
 
-    @Operation(summary = "Log into the banking system", description = "This can only be done if you are a employee or customer", security = {
-        @SecurityRequirement(name = "Authorization")    }, tags={ "User" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = LoggedIn.class))),
-        
-        @ApiResponse(responseCode = "400", description = "login detail incorrect") })
+    @Operation(summary = "Log into the banking system", description = "This can only be done if you are a employee or customer", tags={ "User" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = LoggedIn.class))),
+
+            @ApiResponse(responseCode = "400", description = "login detail incorrect") })
     @RequestMapping(value = "/Login",
-        produces = { "application/json", "application/xml" }, 
-        consumes = { "application/json", "application/xml" }, 
-        method = RequestMethod.POST)
+            produces = { "application/json", "application/xml" },
+            consumes = { "application/json", "application/xml" },
+            method = RequestMethod.POST)
     ResponseEntity<LoggedIn> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "Logged into the system", schema=@Schema()) @Valid @RequestBody LoginUser body);
 
 }

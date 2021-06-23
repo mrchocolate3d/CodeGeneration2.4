@@ -39,10 +39,13 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public String add(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit) {
         if (userRepository.findUserByUsername(username) == null) {
             dbUser user = new dbUser(
-                    firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
+                    firstName, lastName, username, email, phone, passwordEncoder.encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
             );
             if (roles.size() == 0) {
                 user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
@@ -62,14 +65,19 @@ public class UserService {
     }
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder(12);
-    }
+
 
     public dbUser addUser(dbUser user) {
         userRepository.save(user);
         return user;
+    }
+
+    public dbUser getUserById(Long id){
+        return userRepository.findUserById(id);
+    }
+
+    public dbUser getUserByUsername(String username){
+        return userRepository.findUserByUsername(username);
     }
 
     public List<dbUser> getUsers() {
@@ -83,13 +91,6 @@ public class UserService {
         }catch(AuthenticationException ae){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid credentials");
         }
-    }
-
-    public dbUser findUserByUsername(String username) {
-        if (userRepository.findUserByUsername(username) != null){
-            return userRepository.findUserByUsername(username);
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found");
     }
 }
 
