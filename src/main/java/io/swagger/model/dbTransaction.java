@@ -27,8 +27,6 @@ public class dbTransaction {
     private OffsetDateTime time;
     private OffsetDateTime dateFrom;
     private OffsetDateTime dateTo;
-//    private Withdrawal withdrawal;
-//    private Deposit deposit;
 
     public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime time) {
         this.userPerform = userPerform;

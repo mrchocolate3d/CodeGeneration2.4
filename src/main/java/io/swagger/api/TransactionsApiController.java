@@ -51,27 +51,53 @@ public class TransactionsApiController implements TransactionsApi {
             OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
             OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
             Integer limit) {
-        try{
-            List<dbTransaction> transactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
-            List<Transaction> transactionList = new ArrayList<>();
-            //needs finishing
 
+        String accept = request.getHeader("Accept");
+        if(accept!=null && accept.contains("application/json")){
+
+            OffsetDateTime from = null;
+            OffsetDateTime to = null;
+            int gLimit = 0;
+
+            if(fromDate == null || toDate ==null){
+                from = OffsetDateTime.parse("T00:00:01.001+02:00");
+                to = OffsetDateTime.parse("T00:00:01.001+02:00");
+            }
+            if(limit ==null){
+                gLimit = 0;
+            }
+            else{
+                //get total transaction limit
+            }
+            List<dbTransaction> transactions = transactionService.getTransactions(IBAN,from,to,gLimit);
+            List<Transaction> transactionList = new ArrayList<>();
+
+            for(dbTransaction dbTransactions : transactions){
+                Transaction t = new Transaction();
+                t.setIbANFrom(dbTransactions.getIBANfrom());
+//                t.setTime(dbTransactions.setTime(from));
+
+                //set limit
+                transactionList.add(t);
+            }
             return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
+
         }
-        catch(Exception e){
-            log.warn(e.getMessage());
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        else{
+            return new ResponseEntity<List<Transaction>>(HttpStatus.BAD_REQUEST);
         }
     }
 
 
     @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
+    public ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction transaction) {
         String accept = request.getHeader("Accept");
-        //transactionService.createTransaction(transaction);
-
-        return new ResponseEntity<Transaction>(transaction,HttpStatus.CREATED);
-
-
+        if(accept!=null && accept.contains("application/json")){
+           transactionService.createTransaction(transaction);
+            return new ResponseEntity<dbTransaction>(transaction,HttpStatus.CREATED); //complete
+        }
+        else{
+            return new ResponseEntity<dbTransaction>(HttpStatus.BAD_REQUEST);
+        }
     }
 }
