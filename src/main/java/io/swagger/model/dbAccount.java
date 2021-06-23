@@ -10,24 +10,29 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Data
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
+@AllArgsConstructor
 @Table(name="DB_ACCOUNT")
 public class dbAccount {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(initialValue = 1, name="account_seq")
+    @GeneratedValue(generator = "account_seq", strategy = GenerationType.SEQUENCE)
     private long id;
     AccountType accountType;
     private double balance;
     private String iban;
 
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name="userId")
+    @ManyToOne
     @JsonBackReference
     private dbUser user;
 
+    public dbAccount(AccountType accountType, double balance, dbUser user) {
+        this.accountType = accountType;
+        this.balance = balance;
+        this.user = user;
+    }
 }

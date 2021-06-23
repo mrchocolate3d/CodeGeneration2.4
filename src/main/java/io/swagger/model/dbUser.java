@@ -16,15 +16,16 @@ import java.util.Set;
 
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
+@ToString
 @Getter
 @Setter
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "DB_USER")
 public class dbUser {
     @Id
     @GeneratedValue
+    @SequenceGenerator(name = "userId", initialValue = 1)
     @Column(name="userId")
     private long id;
 
@@ -44,6 +45,7 @@ public class dbUser {
         this.password = password;
         this.roles = roles;
         this.transactionLimit = transactionLimit;
+        accounts = new ArrayList<>();
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -52,8 +54,7 @@ public class dbUser {
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
-    private Set<dbAccount> accounts;
-
+    private List<dbAccount> accounts;
 
 
 
