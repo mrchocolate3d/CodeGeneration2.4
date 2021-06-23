@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.threeten.bp.OffsetDateTime;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class dbTransaction {
     private OffsetDateTime time;
     private OffsetDateTime dateFrom;
     private OffsetDateTime dateTo;
+    private Integer dayLimit; //day limit
 
     public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime time) {
         this.userPerform = userPerform;

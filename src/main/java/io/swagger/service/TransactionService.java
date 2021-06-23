@@ -9,6 +9,8 @@ import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
@@ -48,24 +50,26 @@ public class TransactionService {
     //post transaction
     public dbTransaction createTransaction(dbTransaction transaction){
         // TODO: 17/06/2021
-        //checking if its the right user
+        //getting the right user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = userRepository.findUserByUsername(authentication.getName());
 
         //check if user has the right to access accounts
-        dbUser user = null;
         if(user.getRoles().contains(UserRole.ROLE_EMPLOYEE) ){
             return (dbTransaction) ResponseEntity.status(HttpStatus.UNAUTHORIZED);
         }
         //check daily or transaction limit
 
-        //check if its savings or current account
+
+
+        //check if its savings or current account and
         AccountType accountType;
-
-
-
         //make sure no one can transfer from savings to another user' current account
+        dbAccount accontfrom;
+        dbAccount accountTo;
 
 
-        //getting account from and account to
+        //getting IBANS from and to
         dbAccount IBANfrom = accountRepository.getBalanceByIban(transaction.getIBANfrom());
         dbAccount IBANto = accountRepository.getBalanceByIban(transaction.getIBANto());
 
