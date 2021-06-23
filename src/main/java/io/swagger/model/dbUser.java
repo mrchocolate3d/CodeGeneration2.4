@@ -48,6 +48,7 @@ public class dbUser {
         accounts = new ArrayList<>();
     }
 
+
     @ElementCollection(fetch = FetchType.EAGER)
     List<UserRole> roles;
     private double transactionLimit;
