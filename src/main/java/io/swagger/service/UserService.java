@@ -1,8 +1,7 @@
 package io.swagger.service;
 
-import io.swagger.dto.UserDTO;
-import io.swagger.model.User;
-import io.swagger.model.dbUser;
+import io.swagger.model.InsertUser;
+import io.swagger.model.UserRole;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -30,24 +28,35 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public User addUser(User user) {
-        userRepository.save(user);
-        return user;
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(12);
     }
 
-    public Optional<UserDTO> getUser(long id){
-        return userRepository.findById(id);
+    public List<InsertUser> getUsers() {
+        return (List<InsertUser>) userRepository.findAll();
     }
 
 
-    public List<dbUser> getUsers() {
-        return (List<dbUser>) userRepository.findAll();
+    public InsertUser addUser(InsertUser user) {
+        if (userRepository.findUserByUsername(user.getUsername()) == null) {
+            InsertUser u = new InsertUser(
+                    user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getPhone(), passwordEncoder().encode(user.getPassword()), user.getTransactionLimit(),List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER)
+            );
+
+            if (user.getRoles().size() == 0) {
+                u.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
+            } else {
+                u.setRoles(user.getRoles());
+            }
+
+            userRepository.save(u);
+            return u;
+        }
+        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
     }
+
 
     public String login(String username, String password) {
         try{

@@ -1,18 +1,15 @@
 package io.swagger.repository;
 
-import io.swagger.dto.UserDTO;
 import io.swagger.model.InsertUser;
-import io.swagger.model.User;
-import io.swagger.model.UserRole;
-import io.swagger.model.dbUser;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface UserRepository extends CrudRepository<InsertUser, Long>{
-    dbUser findUserByUsername(String username);
+    InsertUser findUserByUsername(String username);
+
+    //@Query("SELECT u FROM users u")
+    //List<InsertUser> getUsers();
     //dbUser findUserById(Long id);
     //dbUser deletedbUserBy(Long id);
 }

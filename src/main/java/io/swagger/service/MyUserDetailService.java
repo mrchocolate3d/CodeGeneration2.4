@@ -1,7 +1,9 @@
 package io.swagger.service;
 
+import io.swagger.model.InsertUser;
 import io.swagger.model.dbUser;
 import io.swagger.repository.UserRepository;
+import org.hibernate.sql.Insert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +17,7 @@ public class MyUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final dbUser user = userRepository.findUserByUsername(username);
+        final InsertUser user = userRepository.findUserByUsername(username);
 
         if(user == null){
             throw new UsernameNotFoundException(String.format("Username %s not found", username));

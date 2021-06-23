@@ -2,29 +2,36 @@ package io.swagger.model;
 
 import java.util.List;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Creating a new user
  */
+@Entity
 @Schema(description = "Creating a new user")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Table(name= "users")
 public class InsertUser   {
-
+  @JsonProperty("id")
+  @Id
+  @GeneratedValue
+  private Long id = null;
   @JsonProperty("username")
   private String username = null;
 
@@ -46,13 +53,35 @@ public class InsertUser   {
   @JsonProperty("transactionLimit")
   private Double transactionLimit = null;
 
+  public InsertUser(String username, String password, String firstName, String lastName, String email, String phone, Double transactionLimit, List<UserRole> roles) {
+    this.username = username;
+    this.password = password;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.transactionLimit = transactionLimit;
+    this.roles = roles;
+  }
+
+  @Schema(example = "1", required = true, description = "")
+  @NotNull
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   /**
    * Gets or Sets role
    */
   public enum RoleEnum {
-    EMPLOYEE("Employee"),
+    ROLE_EMPLOYEE("ROLE_EMPLOYEE"),
 
-    CUSTOMER("Customer");
+    ROLE_CUSTOMER("ROLE_CUSTOMER");
 
     private String value;
 
@@ -76,7 +105,9 @@ public class InsertUser   {
       return null;
     }
   }
+
   @JsonProperty("role")
+  @ElementCollection(fetch = FetchType.EAGER)
   private List<UserRole> roles = null;
 
   public InsertUser username(String username) {
@@ -235,7 +266,8 @@ public class InsertUser   {
       return false;
     }
     InsertUser insertUser = (InsertUser) o;
-    return Objects.equals(this.username, insertUser.username) &&
+    return  Objects.equals(this.id, insertUser.id) &&
+        Objects.equals(this.username, insertUser.username) &&
         Objects.equals(this.password, insertUser.password) &&
         Objects.equals(this.firstName, insertUser.firstName) &&
         Objects.equals(this.lastName, insertUser.lastName) &&
@@ -254,7 +286,8 @@ public class InsertUser   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class InsertUser {\n");
-    
+
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
@@ -277,4 +310,5 @@ public class InsertUser   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
 }
