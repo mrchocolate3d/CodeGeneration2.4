@@ -139,29 +139,70 @@ public class AccountsApiController implements AccountsApi {
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
         List<dbAccount> dbAccounts = accountService.getAllAccounts();
         List<Account> accounts = new ArrayList<>();
-        for(dbAccount dbAccount : dbAccounts){
-            User user = new User();
-            dbUser dbUser = dbAccount.getUser();
-            user.setEmail(dbUser.getEmail());
-            user.setFirstName(dbUser.getFirstName());
-            user.setId(dbUser.getId());
-            user.setLastName(dbUser.getLastName());
-            user.setPhone(dbUser.getPhone());
-            user.setTransactionLimit(dbUser.getTransactionLimit());
-            user.setUsername(dbUser.getUsername());
+        if(limit == null && username == null) {
+            for (dbAccount dbAccount : dbAccounts) {
+                User user = setUserFromDTO(dbAccount);
+
+                Account account = setAccountFromDb(dbAccount, user);
+
+                accounts.add(account);
+            }
+        }else if(limit != null){
+            int count = 0;
+
+            for (dbAccount dbAccount : dbAccounts) {
+                if (count > limit){
+                    break;
+                }
+                User user = setUserFromDTO(dbAccount);
+
+                Account account = setAccountFromDb(dbAccount, user);
+
+                accounts.add(account);
 
 
-            log.info(dbUser.getUsername());
+                count++;
 
-            Account account = new Account();
-            account.setAccountType(dbAccount.getAccountType());
-            account.setUser(user);
-            account.setIban(dbAccount.getIban());
-            accounts.add(account);
+            }
+        }else if(username != null){
+            for(dbAccount dbAccount : dbAccounts){
+                if(dbAccount.getUser().getUsername().equals(username)){
+                    User user = setUserFromDTO(dbAccount);
+
+                    Account account = setAccountFromDb(dbAccount, user);
+
+                    accounts.add(account);
+                }
+            }
         }
 
         return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
     }
+
+    public User setUserFromDTO(dbAccount dbAccount){
+        User user = new User();
+        dbUser dbUser = dbAccount.getUser();
+        user.setEmail(dbUser.getEmail());
+        user.setFirstName(dbUser.getFirstName());
+        user.setId(dbUser.getId());
+        user.setLastName(dbUser.getLastName());
+        user.setPhone(dbUser.getPhone());
+        user.setTransactionLimit(dbUser.getTransactionLimit());
+        user.setUsername(dbUser.getUsername());
+
+        return user;
+    }
+
+    public Account setAccountFromDb(dbAccount dbAccount, User user){
+        Account account = new Account();
+        account.setAccountType(dbAccount.getAccountType());
+        account.setUser(user);
+        account.setIban(dbAccount.getIban());
+
+        return account;
+    }
+
+
 
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         String accept = request.getHeader("Accept");
