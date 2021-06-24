@@ -42,28 +42,6 @@ public class UsersApiController implements UsersApi {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping(value = "add")
-    public ResponseEntity<String> addUser(@RequestBody dbUser user){
-            String token = userService.add(user.getFirstName(), user.getLastName(), user.getUsername(),
-                user.getEmail(), user.getPhone(), user.getPassword(), user.getRoles(), user.getTransactionLimit());
-        return ResponseEntity.ok(token);
-    }
-
-    @RequestMapping(value="", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<dbUser>> getUser(){
-        return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
-
-    }
-//    @RequestMapping(value="/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<dbUser> editUserInfo(@PathVariable Long id, @RequestBody dbUser changedInfoUser){
-//        dbUser user = userServiceImplement.getUserById(id);
-//
-//
-//    }
-
-
-
-
     private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
 
     private final ObjectMapper objectMapper;
@@ -76,21 +54,10 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    public List<User> getUserFromDB(){
-        List<dbUser> dbUsers = userService.getUsers();
-        List<User> user = new ArrayList<>();
-        for (dbUser x : dbUsers) {
-            Double transInt = (Double)x.getTransactionLimit();
-            User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),transInt);
-            user.add(u);
-        }
-        return user;
-    }
-
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema=@Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
-            List<User> userList = getUserFromDB();
+            List<User> userList = userService.getUsers();
 
             if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))){
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
@@ -120,14 +87,7 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<List<User>> getUser(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "get User by name" ,schema=@Schema()) @Valid @RequestParam(value = "name", required = false) String name) {
 
-            List<dbUser> dbUsers = userService.getUsers();
-            List<User> user = new ArrayList<>();
-            for (dbUser x : dbUsers) {
-                Double transInt = (Double)x.getTransactionLimit();
-                User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),transInt);
-                user.add(u);
-            }
-            return new ResponseEntity<List<User>> (user,HttpStatus.OK);
+            return new ResponseEntity<List<User>> (userService.getUsers(),HttpStatus.OK);
 
             //return ResponseEntity.status(200).body(user);
 

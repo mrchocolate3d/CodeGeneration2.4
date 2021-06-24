@@ -1,9 +1,6 @@
 package io.swagger.service;
 
-import io.swagger.model.AccountType;
-import io.swagger.model.UserRole;
-import io.swagger.model.dbAccount;
-import io.swagger.model.dbUser;
+import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -19,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -42,30 +36,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String add(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit) {
-        if (userRepository.findUserByUsername(username) == null) {
-            dbUser user = new dbUser(
-                    firstName, lastName, username, email, phone, passwordEncoder.encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
-            );
-            if (roles.size() == 0) {
-                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
-            } else {
-                user.setRoles(roles);
-            }
-
-
-
-            userRepository.save(user);
-
-
-
-            return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
-        }
-        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
-    }
-
-
-
 
     public dbUser addUser(dbUser user) {
         userRepository.save(user);
@@ -80,8 +50,15 @@ public class UserService {
         return userRepository.findUserByUsername(username);
     }
 
-    public List<dbUser> getUsers() {
-        return (List<dbUser>) userRepository.findAll();
+    public List<User> getUsers() {
+        List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+        List<User> allUsers = new ArrayList<>();
+        for (dbUser x : dbUsers) {
+            User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
+            allUsers.add(u);
+        }
+
+        return allUsers;
     }
 
     public String login(String username, String password) {
@@ -92,5 +69,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid credentials");
         }
     }
+
 }
 
