@@ -59,17 +59,26 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Deposit>(objectMapper.readValue("{\n  \"IBAN\" : \"NL40INGB778321\",\n  \"Amount\" : 0.8008281904610115\n}", Deposit.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Deposit>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        try{
+            accountService.deposit(IBAN, amount);
+            return new ResponseEntity<Deposit>(HttpStatus.OK);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
         }
 
-        return new ResponseEntity<Deposit>(HttpStatus.NOT_IMPLEMENTED);
+
+//        String accept = request.getHeader("Accept");
+//        if (accept != null && accept.contains("application/json")) {
+//            try {
+//                return new ResponseEntity<Deposit>(objectMapper.readValue("{\n  \"IBAN\" : \"NL40INGB778321\",\n  \"Amount\" : 0.8008281904610115\n}", Deposit.class), HttpStatus.NOT_IMPLEMENTED);
+//            } catch (IOException e) {
+//                log.error("Couldn't serialize response for content type application/json", e);
+//                return new ResponseEntity<Deposit>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        }
+//
+//        return new ResponseEntity<Deposit>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
@@ -128,17 +137,28 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Withdrawal>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34567763\",\n  \"Amount\" : 0.8008281904610115\n}", Withdrawal.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Withdrawal>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        try{
+            accountService.withdraw(IBAN, amount);
+            return new ResponseEntity<Withdrawal>(HttpStatus.OK);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
         }
 
-        return new ResponseEntity<Withdrawal>(HttpStatus.NOT_IMPLEMENTED);
+
+
+
+//        String accept = request.getHeader("Accept");
+//        if (accept != null && accept.contains("application/json")) {
+//            try {
+//                return new ResponseEntity<Withdrawal>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34567763\",\n  \"Amount\" : 0.8008281904610115\n}", Withdrawal.class), HttpStatus.NOT_IMPLEMENTED);
+//            } catch (IOException e) {
+//                log.error("Couldn't serialize response for content type application/json", e);
+//                return new ResponseEntity<Withdrawal>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        }
+//
+//        return new ResponseEntity<Withdrawal>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 }

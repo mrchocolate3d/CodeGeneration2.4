@@ -117,7 +117,8 @@ public class AccountService {
         double newBalance;
         if (dbAccount.getBalance() > amount){
             newBalance = dbAccount.getBalance() - amount;
-            accountRepository.updateBalance(newBalance, iban);
+            dbAccount.setBalance(newBalance);
+            accountRepository.updateBalance(dbAccount.getBalance(), iban);
         }
         else{
             throw new Exception("Insufficient balance");
@@ -127,6 +128,7 @@ public class AccountService {
     public void deposit(String iban, double amount) throws Exception{
         dbAccount dbAccount = getSpecificAccountByIban(iban);
         double newBalance = dbAccount.getBalance() + amount;
-        accountRepository.updateBalance(newBalance, dbAccount.getIban());
+        dbAccount.setBalance(newBalance);
+        accountRepository.updateBalance(dbAccount.getBalance(), dbAccount.getIban());
     }
 }
