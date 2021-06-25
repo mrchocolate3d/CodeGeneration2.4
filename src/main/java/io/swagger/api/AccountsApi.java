@@ -5,11 +5,7 @@
  */
 package io.swagger.api;
 
-import io.swagger.model.Account;
-import io.swagger.model.Deposit;
-import io.swagger.model.ReturnAccount;
-import io.swagger.model.ReturnBalance;
-import io.swagger.model.Withdrawal;
+import io.swagger.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -19,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.hibernate.sql.Insert;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,7 +62,7 @@ public interface AccountsApi {
         produces = { "application/json", "application/xml" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount body);
 
 
     @Operation(summary = "Depositing money to an account using IBAN", description = "Depositing money into a customer account", security = {

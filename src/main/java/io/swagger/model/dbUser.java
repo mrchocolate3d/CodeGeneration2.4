@@ -16,7 +16,6 @@ import java.util.Set;
 
 
 @Entity
-@ToString
 @Getter
 @Setter
 @NoArgsConstructor

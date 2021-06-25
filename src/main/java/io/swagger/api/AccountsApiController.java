@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -67,20 +68,23 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-    public ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody Account account) {
+//    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
 
-
-
-
-        dbUser user = userService.getUserById(account.getUser().getId());
+        dbUser user = userService.getUserById(account.getUserId());
 
         if(user != null){
 
             dbAccount dbAccount = new dbAccount();
             dbAccount.setUser(user);
-            dbAccount.setAccountType(account.getAccountType());
-
-            dbAccount accountAdded = accountService.add(dbAccount.getUser(), dbAccount.getAccountType());
+            if(account.getAccountType().equals("TYPE_CURRENT")) {
+                AccountType accountType = AccountType.TYPE_CURRENT;
+                dbAccount.setAccountType(accountType);
+            }else if(account.getAccountType().equals("TYPE_SAVING")){
+                AccountType accountType = AccountType.TYPE_SAVING;
+                dbAccount.setAccountType(accountType);
+            }
+            dbAccount accountAdded = accountService.add(user, account.getAccountType());
 
             ReturnAccount returnAccount = new ReturnAccount();
             returnAccount.setAccountType(accountAdded.getAccountType());
@@ -88,7 +92,7 @@ public class AccountsApiController implements AccountsApi {
             returnAccount.setUserId(accountAdded.getUser().getId());
 
 
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(returnAccount);
+            return new ResponseEntity<ReturnAccount>(HttpStatus.OK);
         }
 
 
@@ -109,6 +113,7 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<Deposit>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         dbAccount dbAccount = accountService.getAccountByIban(IBAN);
         if(dbAccount != null){
@@ -135,6 +140,7 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<Account>(HttpStatus.NOT_FOUND);
     }
 
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<List<Account>> getAccounts(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
         List<dbAccount> dbAccounts = accountService.getAllAccounts();
