@@ -29,6 +29,13 @@ public class dbAccount {
     @JsonBackReference
     private dbUser user;
 
+    public void setBalance(double balance){
+        if(balance < 0.00){
+            throw  new IllegalArgumentException("Balance can not be negative");
+        }
+        this.balance = balance;
+    }
+
     public dbAccount(AccountType accountType, double balance, dbUser user) {
         this.accountType = accountType;
         this.balance = balance;

@@ -24,7 +24,6 @@ public class AccountService {
     private UserRepository userRepository;
 
 
-
     public dbAccount add(dbUser user, AccountType type){
         dbUser userDb = userRepository.findUserByUsername(user.getUsername());
         if(userDb != null){
