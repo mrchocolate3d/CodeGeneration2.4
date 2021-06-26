@@ -5,6 +5,8 @@ import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,18 +33,45 @@ public class TransactionService {
 
     //TODO: complete this
     //getting all transactions
-    public List<dbTransaction> getTransactions(String IBAN,OffsetDateTime from,OffsetDateTime to,int limit){
+    public List<dbTransaction> getTransactions(String IBAN,OffsetDateTime from,OffsetDateTime to,int dayLimit){
+        //implementing the limit //has to be pageable
+        Integer page = 1;
+        Pageable p = PageRequest.of(page, dayLimit);
 
-        //implementing the limit
+        dbUser user = null;
+        user = userRepository.findUserByUsername(user.getUsername());
         List<dbTransaction> transactions = new ArrayList<>();
-        List<dbAccount> accounts = new ArrayList<>();
 
+        List<dbAccount> accounts = findAccountByUserId(user);
         dbAccount account = accountRepository.findAccountByIban(IBAN);
         accounts.add(account);
 
         for (dbAccount a : accounts){
-            transactions.addAll(getAllTransactionsFromAnAccount(IBAN,from,to));
+            transactions.addAll((Collection<? extends dbTransaction>) transactionRepository.getTransactionsByIBANto(a.getIban()));
         }
+
+//        List<dbTransaction> allTransactions = transactionRepository.findAll();
+//        allTransactions.removeAll(transactions);
+//        transactions.add((dbTransaction) allTransactions);
+//
+//        OffsetDateTime newFromDate;
+//        OffsetDateTime newToDate;
+//
+//        if(from == null){
+//            newFromDate = OffsetDateTime.MIN;
+//        }
+//        else{
+//            newFromDate = OffsetDateTime.parse("T00:00:00.001+02:00");
+//        }
+//        if(to == null){
+//            newToDate = OffsetDateTime.MAX;
+//        }
+//        else{
+//            newToDate = OffsetDateTime.parse("T00:00:00.001+02:00");
+//        }
+//        if(newFromDate != null && newFromDate != null && dayLimit != 0){
+            //transactions = transactionRepository.getTransactionsByLimitAndDate(newFromDate,newToDate,p);
+//        }
         return transactions;
     }
 
@@ -115,23 +144,15 @@ public class TransactionService {
     List<dbTransaction> getAllTransactionsFromAnAccount(String IBAN, OffsetDateTime from, OffsetDateTime to){
         List<dbTransaction> transactions = new ArrayList<>();
 
-        if(from == null){
-            from = OffsetDateTime.MIN;
-        }
-        else{
-            from = OffsetDateTime.parse("T00:00:00.001+02:00");
-        }
-        if(to == null){
-            to = OffsetDateTime.MAX;
-        }
-        else{
-            to = OffsetDateTime.parse("T00:00:00.001+02:00");
-        }
+
 //        dbTransaction transaction = transactionRepository.getTransactionsByIBAN(IBAN);
         dbTransaction transaction = null;
         transactions.add(transaction);
         return transactions;
 
+    }
+    List<dbAccount> findAccountByUserId(dbUser user){
+        return accountRepository.findAccountById(user.getId());
     }
 
 

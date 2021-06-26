@@ -21,11 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +56,7 @@ public class TransactionsApiController implements TransactionsApi {
 
         String accept = request.getHeader("Accept");
         if(accept!=null && accept.contains("application/json")){
+
             List<Transaction> transactionList = new ArrayList<>();
             List<dbTransaction> dbTransactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
             //Transaction transaction = setTransactionsFromDb(dbTransactions);

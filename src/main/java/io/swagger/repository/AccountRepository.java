@@ -18,4 +18,5 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     dbAccount getBalanceByIban(String IBAN);
 //    @Query("update Account a set balance = ?1 where iban = ?2")
 //    void updateBalance(Double amount, String IBAN);
+    List<dbAccount> findAccountById(Long id);
 }
