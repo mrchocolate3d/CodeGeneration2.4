@@ -36,11 +36,12 @@ public class Transaction   {
   @JsonProperty("time")
   private OffsetDateTime time = null;
 
+//  private Integer limit;
+
   public Transaction userPerform(String userPerform) {
     this.userPerform = userPerform;
     return this;
   }
-
   /**
    * Get userPerform
    * @return userPerform

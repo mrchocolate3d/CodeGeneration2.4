@@ -124,7 +124,10 @@ public class AccountService {
 //        }
 //    }
 
-    public void deposit(dbAccount account, Double amount) throws Exception{
+    public void deposit(dbTransaction transaction, Double amount) {
+
+    }
+    public void Withdraw(dbTransaction transaction, Double amount){
 
     }
 }

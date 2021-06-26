@@ -7,6 +7,7 @@ import io.swagger.service.TransactionService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
@@ -45,7 +46,8 @@ public class TransactionsApiController implements TransactionsApi {
         this.transactionService = transactionService;
     }
 
-    @RequestMapping(value = "",method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
+    //@PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
+//    @RequestMapping(value = "",method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1") @Parameter(in = ParameterIn.QUERY, description = "" , required=true, schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true)
                                                                String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false)
             OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
@@ -54,31 +56,12 @@ public class TransactionsApiController implements TransactionsApi {
 
         String accept = request.getHeader("Accept");
         if(accept!=null && accept.contains("application/json")){
-
-            OffsetDateTime from = null;
-            OffsetDateTime to = null;
-            int gLimit = 0;
-
-            if(fromDate == null || toDate ==null){
-                from = OffsetDateTime.parse("T00:00:01.001+02:00");
-                to = OffsetDateTime.parse("T00:00:01.001+02:00");
-            }
-            if(limit ==null){
-                gLimit = 0;
-            }
-            else{
-                //get total transaction limit
-            }
-            List<dbTransaction> transactions = transactionService.getTransactions(IBAN,from,to,gLimit);
             List<Transaction> transactionList = new ArrayList<>();
-
-            for(dbTransaction dbTransactions : transactions){
-                Transaction t = new Transaction();
-                t.setIbANFrom(dbTransactions.getIBANfrom());
-//                t.setTime(dbTransactions.setTime(from));
-
-                //set limit
-                transactionList.add(t);
+            List<dbTransaction> dbTransactions = transactionService.getTransactions(IBAN,fromDate,toDate,limit);
+            //Transaction transaction = setTransactionsFromDb(dbTransactions);
+            for (dbTransaction tr : dbTransactions){
+                Transaction transaction = setTransactionsFromDb(tr);
+                transactionList.add(transaction);
             }
             return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
 
@@ -88,8 +71,8 @@ public class TransactionsApiController implements TransactionsApi {
         }
     }
 
-
-    @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+//    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
+//    @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction transaction) {
         String accept = request.getHeader("Accept");
         if(accept!=null && accept.contains("application/json")){
@@ -99,5 +82,12 @@ public class TransactionsApiController implements TransactionsApi {
         else{
             return new ResponseEntity<dbTransaction>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public Transaction setTransactionsFromDb(dbTransaction dbTransaction){
+        Transaction transaction = new Transaction();
+        transaction.setTime(dbTransaction.getTimestamp());
+        transaction.setIbANFrom(dbTransaction.getIBANfrom());
+        return transaction;
     }
 }

@@ -25,16 +25,14 @@ public class dbTransaction {
     private String IBANfrom;
     private String IBANto;
     private Double amount;
-    private OffsetDateTime time;
-    private OffsetDateTime dateFrom;
-    private OffsetDateTime dateTo;
-    private Integer dayLimit; //day limit
+    private OffsetDateTime timestamp;
+    private Integer dayLimit; //day limit //not sure entirely
 
-    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime time) {
+    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime timestamp) {
         this.userPerform = userPerform;
         this.IBANfrom = IBANfrom;
         this.IBANto = IBANto;
         this.amount = amount;
-        this.time = time;
+        this.timestamp = timestamp;
     }
 }
