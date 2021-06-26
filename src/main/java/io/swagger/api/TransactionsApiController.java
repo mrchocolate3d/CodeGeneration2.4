@@ -8,6 +8,8 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
@@ -64,7 +66,6 @@ public class TransactionsApiController implements TransactionsApi {
                 transactionList.add(transaction);
             }
             return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
-
         }
         else{
             return new ResponseEntity<List<Transaction>>(HttpStatus.BAD_REQUEST);
@@ -76,6 +77,8 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<dbTransaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody dbTransaction transaction) {
         String accept = request.getHeader("Accept");
         if(accept!=null && accept.contains("application/json")){
+           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
            transactionService.createTransaction(transaction);
             return new ResponseEntity<dbTransaction>(transaction,HttpStatus.CREATED); //complete
         }

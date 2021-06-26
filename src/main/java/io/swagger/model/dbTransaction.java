@@ -26,7 +26,7 @@ public class dbTransaction {
     private String IBANto;
     private Double amount;
     private OffsetDateTime timestamp;
-    private Integer dayLimit; //day limit //not sure entirely
+    //private Integer dayLimit; //day limit //not sure entirely
 
     public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime timestamp) {
         this.userPerform = userPerform;
