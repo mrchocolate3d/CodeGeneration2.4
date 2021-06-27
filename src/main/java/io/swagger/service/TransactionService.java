@@ -42,15 +42,6 @@ public class TransactionService {
         dbUser user = null;
         user = userRepository.findUserByUsername(user.getUsername());
         List<dbTransaction> transactions = new ArrayList<>();
-
-//        List<dbAccount> accounts = findAccountByUserId(user);
-//        dbAccount account = accountRepository.findAccountByIban(IBAN);
-//        accounts.add(account);
-//
-//        for (dbAccount a : accounts){
-//            transactions.addAll((Collection<? extends dbTransaction>) transactionRepository.getTransactionsByIBANfrom(a.getIban()));
-//        }
-
         return transactions;
     }
 
@@ -93,58 +84,6 @@ public class TransactionService {
             }
         }
 
-
-//        if(userPerforming == null){
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
-//        }
-//        //account for account
-//        List<dbAccount> accounts = accountRepository.findAccountByUserId(userPerforming.getId());
-//        if(accounts == null){
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Account does not exist");
-//        }
-//        // ....
-//        transaction.setUserPerform(userPerforming.getUsername());
-//        Boolean exists = false;
-//        for(dbAccount account : accounts){
-//            if(account.getIban().contains(transaction.getIBANfrom())){
-//                exists = true;
-//            }
-//            if(!exists){
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"You cannot make a transaction with this account");
-//            }
-//            dbUser userToTransferTo = null;
-//            if(userRepository.findById(accountTo.getId()).isPresent()){
-//                userToTransferTo = userRepository.findById(accountTo.getId()).get();
-//            }
-//            if(userToTransferTo == null){
-//                if(accountTo.getAccountType() == AccountType.TYPE_SAVING && userToTransferTo.getId() !=userPerforming.getId()){
-//                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You cannot transfer from the savings of another user");
-//                }
-//                if(account.getAccountType() == AccountType.TYPE_SAVING && userToTransferTo.getId() != userPerforming.getId()){
-//                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You cannot transfer from your savings account to someone else's account");
-//                }
-//            }
-//            else{
-//
-//            }
-//            UpdateBalanceFrom(transaction);
-//            UpdateBalanceTo(transaction);
-//        }
-
-
-
-
-
-        //check ibans and throw if its in incorrect format
-        //check if iban exists
-
-        //now checks
-        //get ibans from accountrepo
-        //make sure only the right people can make the transactioons
-        //check if its savings or current
-        //getting remaining balance of both from and to IBANS
-
-
         setTransactionsFromDb(transaction);
         transactionRepository.save(transaction); //saves to the db
         return transaction;
@@ -171,9 +110,6 @@ public class TransactionService {
         return transactions;
 
     }
-//    public List<dbAccount> findAccountByUserId(dbUser user){
-//        return accountRepository.findAccountById(user.getId());
-//    }
     public List<dbTransaction> getAllTransactions(){
         return (List<dbTransaction>)transactionRepository.findAll();
     }
@@ -187,10 +123,6 @@ public class TransactionService {
         return (List<dbTransaction>) transactions;
     }
 
-    //check if its savings or current account
-    //make sure no one can transfer from savings to another user's current account
-    //saving the amount//not sure
-    //check if user has the right to access accounts //not sure if its the employee or customer who dont have access to make a transaction
     public Integer CountAllTransactions(){
         return transactionRepository.CountAllTransactions();
     }

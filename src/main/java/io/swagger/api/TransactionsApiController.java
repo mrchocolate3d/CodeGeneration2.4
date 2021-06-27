@@ -60,7 +60,6 @@ public class TransactionsApiController implements TransactionsApi {
                     transactionList.add(transaction);
                 }
             }
-
             OffsetDateTime dateFrom;
             OffsetDateTime dateTo;
 
