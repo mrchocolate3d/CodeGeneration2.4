@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest {
     private User user;
-    private Account account;
-    private User x = null;
 
 
     @BeforeEach
@@ -23,7 +21,6 @@ public class UserTest {
         user.setEmail("Seyi@email.com");
         user.setTransactionLimit(102.90);
         user.setId(399333333L);
-
     }
 
 

@@ -105,6 +105,14 @@ public class UserService {
 
     }
 
+
+
+    public List<dbUser> getUsersOfDb() {
+        return (List<dbUser>) userRepository.findAll();
+    }
+
+
+
     public void editUser(dbUser oldUser ,InsertUser newUser){
         oldUser.setFirstName(newUser.getFirstName());
         oldUser.setLastName(newUser.getLastName());

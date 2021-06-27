@@ -27,8 +27,8 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AccountService accountService;
+   // @Autowired
+   // private AccountService accountService;
 
     @Autowired
     private UserRepository userRepository;
@@ -51,7 +51,8 @@ public class BankApplicationRunner implements ApplicationRunner {
         dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
                 "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
                 2500));
-        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
+
+       // dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
 
         dbTransaction dbTransaction = new dbTransaction("Test","NL10INH0000000000","NL20INH0000000000",700.00, OffsetDateTime.now());
         dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, OffsetDateTime.now());
