@@ -63,6 +63,7 @@ public class UserService {
         return userRepository.findUserByUsername(username);
     }
 
+
     public List<User> getUsersWithParameters(String name, Integer limit ) {
         List <User> users = new ArrayList<>();
         int count;

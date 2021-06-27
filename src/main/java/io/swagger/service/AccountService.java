@@ -116,31 +116,31 @@ public class AccountService {
         return accountRepository.getBalanceByIban(IBAN);
     }
 
-    public dbAccount withdraw(String iban, double amount) throws Exception {
-        dbAccount account = getAccountByIban(iban);
+    public Withdrawal withdraw(String IBAN, double amount) throws Exception {
+        dbAccount account = getAccountByIban(IBAN);
         double newBalance = account.getBalance() - amount;
         if (newBalance < 0){
             throw new Exception("Insufficient balance");
         }
         else{
-            account.setIban(iban);
+            account.setIban(IBAN);
             account.setBalance(newBalance);
-            accountRepository.updateBalance(newBalance, iban);
+            accountRepository.updateBalance(newBalance, IBAN);
+            return new Withdrawal(IBAN, newBalance);
         }
-        return account;
     }
 
-    public dbAccount deposit(String iban, double amount) throws Exception{
-        dbAccount account = getAccountByIban(iban);
+    public Deposit deposit(String IBAN, double amount) throws Exception{
+        dbAccount account = getAccountByIban(IBAN);
         double newBalance = account.getBalance() + amount;
         if (account.getAccountType() != AccountType.TYPE_CURRENT){
             throw new Exception("Account must be type current");
         }
         else{
-            account.setIban(iban);
+            account.setIban(IBAN);
             account.setBalance(newBalance);
-            accountRepository.updateBalance(newBalance, iban);
+            accountRepository.updateBalance(newBalance, IBAN);
+            return new Deposit(IBAN, newBalance);
         }
-        return account;
     }
 }

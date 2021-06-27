@@ -74,7 +74,7 @@ public interface AccountsApi {
         
         @ApiResponse(responseCode = "405", description = "Unauthorized") })
     @RequestMapping(value = "/Accounts/{IBAN}/deposit",
-        produces = { "application/json", "application/xml" }, 
+        produces = { "application/json" },
         method = RequestMethod.POST)
     ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception;
 
@@ -111,7 +111,7 @@ public interface AccountsApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Balance is showed", content = @Content(schema = @Schema(implementation = ReturnBalance.class))) })
     @RequestMapping(value = "/Accounts/{IBAN}/balance",
-        produces = { "application/json", "application/xml" }, 
+        produces = { "application/json"},
         method = RequestMethod.GET)
     ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
