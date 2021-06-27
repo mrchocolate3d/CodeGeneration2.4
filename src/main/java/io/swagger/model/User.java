@@ -28,6 +28,8 @@ public class User   {
     this.transactionLimit = transactionLimit;
   }
 
+
+
   @JsonProperty("id")
   private Long id = null;
 
