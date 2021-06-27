@@ -29,5 +29,6 @@ public class dbTransaction {
         this.fromDate = fromDate;
         this.toDate = toDate;
         this.IBAN = IBAN;
+        //
     }
 }

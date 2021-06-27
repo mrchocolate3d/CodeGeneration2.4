@@ -1,9 +1,8 @@
 package io.swagger.service;
 
-import io.swagger.model.AccountType;
-import io.swagger.model.UserRole;
-import io.swagger.model.dbAccount;
-import io.swagger.model.dbUser;
+import io.swagger.api.ApiException;
+import io.swagger.api.NotFoundException;
+import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -19,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -39,41 +35,91 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public String add(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit) {
-        if (userRepository.findUserByUsername(username) == null) {
-            dbUser user = new dbUser(
-                    firstName, lastName, username, email, phone, passwordEncoder().encode(password), List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER), transactionLimit
-            );
-            if (roles.size() == 0) {
-                user.setRoles(List.of(UserRole.ROLE_EMPLOYEE, UserRole.ROLE_CUSTOMER));
-            } else {
-                user.setRoles(roles);
-            }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-
-
-            userRepository.save(user);
-
-
-
-            return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
-        }
-        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
-    }
-
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder(12);
-    }
 
     public dbUser addUser(dbUser user) {
         userRepository.save(user);
         return user;
     }
 
-    public List<dbUser> getUsers() {
-        return (List<dbUser>) userRepository.findAll();
+    public dbUser getUserById(Long id){
+        Optional<dbUser> user = userRepository.findById(id);
+        if (user.isPresent()){
+            return user.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No user in the db");
+        }
+
+    }
+
+    public User convertDbUserToUser(dbUser x){
+        return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
+    }
+
+
+    public dbUser getUserByUsername(String username){
+        return userRepository.findUserByUsername(username);
+    }
+
+    public List<User> getUsersWithParameters(String name, Integer limit ) {
+        List <User> users = new ArrayList<>();
+        int count;
+        if (name != null && limit == null){
+            users.add(convertDbUserToUser(getUserByUsername(name)));
+            return users;
+        } else if (name == null && limit != null){
+            count = 0;
+            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            for (dbUser x : dbUsers) {
+                users.add(convertDbUserToUser(x));
+                count++;
+                if (limit == count){
+                    break;
+                }
+            }
+            return users;
+        } else {
+            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            for (dbUser x : dbUsers) {
+                users.add(convertDbUserToUser(x));
+            }
+            return users;
+        }
+
+    }
+
+    public List<User> getUsers() {
+            List <User> users = new ArrayList<>();
+            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            for (dbUser x : dbUsers) {
+                users.add(convertDbUserToUser(x));
+            }
+            return users;
+
+    }
+
+    public void editUser(dbUser oldUser ,InsertUser newUser){
+        oldUser.setFirstName(newUser.getFirstName());
+        oldUser.setLastName(newUser.getLastName());
+        oldUser.setUsername(newUser.getUsername());
+        oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        oldUser.setEmail(newUser.getEmail());
+        oldUser.setPhone(newUser.getPhone());
+        oldUser.setTransactionLimit(newUser.getTransactionLimit());
+
+        userRepository.save(oldUser);
+
+    }
+
+    public void deleteUser(long id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No User with that id in the database");
+        }
+
     }
 
     public String login(String username, String password) {
@@ -85,11 +131,5 @@ public class UserService {
         }
     }
 
-    public dbUser findUserByUsername(String username) {
-        if (userRepository.findUserByUsername(username) != null){
-            return userRepository.findUserByUsername(username);
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found");
-    }
 }
 

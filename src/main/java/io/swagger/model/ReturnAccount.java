@@ -19,7 +19,7 @@ import javax.validation.constraints.*;
 
 public class ReturnAccount   {
   @JsonProperty("userId")
-  private Integer userId = null;
+  private Long userId = null;
 
   @JsonProperty("IBAN")
   private String IBAN = null;
@@ -27,37 +27,11 @@ public class ReturnAccount   {
   /**
    * Gets or Sets accountType
    */
-  public enum AccountTypeEnum {
-    CURRENTACCOUNT("CurrentAccount"),
-    
-    SAVINGSACCOUNT("SavingsAccount");
 
-    private String value;
-
-    AccountTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static AccountTypeEnum fromValue(String text) {
-      for (AccountTypeEnum b : AccountTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
   @JsonProperty("accountType")
-  private AccountTypeEnum accountType = null;
+  private AccountType accountType = null;
 
-  public ReturnAccount userId(Integer userId) {
+  public ReturnAccount userId(Long userId) {
     this.userId = userId;
     return this;
   }
@@ -67,13 +41,13 @@ public class ReturnAccount   {
    * @return userId
    **/
   @Schema(example = "1", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Integer getUserId() {
+  public Long getUserId() {
     return userId;
   }
 
-  public void setUserId(Integer userId) {
+  public void setUserId(Long userId) {
     this.userId = userId;
   }
 
@@ -87,9 +61,9 @@ public class ReturnAccount   {
    * @return IBAN
    **/
   @Schema(example = "NL07RABO0258798420", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getIBAN() {
+  public String getIBAN() {
     return IBAN;
   }
 
@@ -97,7 +71,7 @@ public class ReturnAccount   {
     this.IBAN = IBAN;
   }
 
-  public ReturnAccount accountType(AccountTypeEnum accountType) {
+  public ReturnAccount accountType(AccountType accountType) {
     this.accountType = accountType;
     return this;
   }
@@ -107,13 +81,13 @@ public class ReturnAccount   {
    * @return accountType
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public AccountTypeEnum getAccountType() {
+  public AccountType getAccountType() {
     return accountType;
   }
 
-  public void setAccountType(AccountTypeEnum accountType) {
+  public void setAccountType(AccountType accountType) {
     this.accountType = accountType;
   }
 
@@ -128,8 +102,8 @@ public class ReturnAccount   {
     }
     ReturnAccount returnAccount = (ReturnAccount) o;
     return Objects.equals(this.userId, returnAccount.userId) &&
-        Objects.equals(this.IBAN, returnAccount.IBAN) &&
-        Objects.equals(this.accountType, returnAccount.accountType);
+            Objects.equals(this.IBAN, returnAccount.IBAN) &&
+            Objects.equals(this.accountType, returnAccount.accountType);
   }
 
   @Override
@@ -141,7 +115,7 @@ public class ReturnAccount   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ReturnAccount {\n");
-    
+
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
