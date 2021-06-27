@@ -11,7 +11,6 @@ import java.util.List;
 
 @Repository
 public interface AccountRepository extends CrudRepository<dbAccount, Long> {
-
     @Query("SELECT iban FROM dbAccount ")
     List<String> getAllIban();
     dbAccount deleteAccountByUserId(Long id);
