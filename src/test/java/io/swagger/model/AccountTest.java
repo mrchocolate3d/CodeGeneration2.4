@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class AccountTest {
 
@@ -25,6 +27,8 @@ public class AccountTest {
     @Test
     public void accountBalanceLessThanZeroThrowsIllegalArgumentException(){
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, ()-> dbAccount.setBalance(-2));
+
+        assertEquals("Balance cannot be below zero", exception.getMessage());
 
     }
 
