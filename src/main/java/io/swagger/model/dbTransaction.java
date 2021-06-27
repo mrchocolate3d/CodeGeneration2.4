@@ -31,4 +31,8 @@ public class dbTransaction {
         this.IBAN = IBAN;
         //
     }
+
+    public dbTransaction() {
+
+    }
 }
