@@ -15,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 
 
-public class Balance {
+public class ReturnBalance {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
@@ -55,7 +55,7 @@ public class Balance {
   @JsonProperty("balance")
   private Double balance = null;
 
-  public Balance IBAN(String IBAN) {
+  public ReturnBalance IBAN(String IBAN) {
     this.IBAN = IBAN;
     return this;
   }
@@ -74,7 +74,7 @@ public class Balance {
     this.IBAN = IBAN;
   }
 
-  public Balance accountType(AccountTypeEnum accountType) {
+  public ReturnBalance accountType(AccountTypeEnum accountType) {
     this.accountType = accountType;
     return this;
   }
@@ -93,7 +93,7 @@ public class Balance {
     this.accountType = accountType;
   }
 
-  public Balance balance(Double balance) {
+  public ReturnBalance balance(Double balance) {
     this.balance = balance;
     return this;
   }
@@ -121,7 +121,7 @@ public class Balance {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Balance returnBalance = (Balance) o;
+    ReturnBalance returnBalance = (ReturnBalance) o;
     return Objects.equals(this.IBAN, returnBalance.IBAN) &&
         Objects.equals(this.accountType, returnBalance.accountType) &&
         Objects.equals(this.balance, returnBalance.balance);
