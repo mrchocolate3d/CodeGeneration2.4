@@ -58,9 +58,8 @@ public class TransactionsApiController implements TransactionsApi {
         if(accept.contains("application/json")){
 
             List<Transaction> transactionList = new ArrayList<>();
-            List<dbTransaction> dbTransactions = null;
-            if(fromDate == null && toDate == null &&limit !=0 ){
-                dbTransactions = transactionService.getTransactionByIBAN(IBAN);
+            if(fromDate == null && toDate == null && limit !=0 ){
+                List<dbTransaction> dbTransactions = transactionService.getTransactionByIBAN(IBAN);
                 for (dbTransaction dbt : dbTransactions) {
                     Transaction transaction = transactionService.setTransactionsFromDb(dbt);
                     transactionList.add(transaction);
@@ -96,12 +95,19 @@ public class TransactionsApiController implements TransactionsApi {
     //    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
-        dbTransaction tr = new dbTransaction(
-                transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),OffsetDateTime.now()
-        );
-        transactionService.createTransaction(tr);
-        Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
-        return new ResponseEntity<Transaction>(transaction1,HttpStatus.CREATED);
+        if(accept.contains("application/json")){
+            dbTransaction tr = new dbTransaction(
+                    transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),OffsetDateTime.now()
+            );
+            transactionService.createTransaction(tr);
+            Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
+            return new ResponseEntity<Transaction>(transaction1,HttpStatus.CREATED);
+        }
+        else{
+            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST);
+
+        }
+
 
     }
 

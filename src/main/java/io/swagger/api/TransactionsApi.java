@@ -39,7 +39,7 @@ import java.util.Map;
 public interface TransactionsApi {
 
     @Operation(summary = "Getting all transactions of a specific IBAN", description = "Get transaction information of a specific IBAN", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+            @SecurityRequirement(name = "Authorization")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Transaction.class))),
 
@@ -52,8 +52,13 @@ public interface TransactionsApi {
     ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1")@Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true) String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false) OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false) OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" ,schema=@Schema(allowableValues={  }, maximum="50"
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit);
 
+    //COPY
+//    ResponseEntity<Transaction> getTransactions(@NotNull @DecimalMin("1")@Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true) String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false) OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false) OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" ,schema=@Schema(allowableValues={  }, maximum="50"
+//            , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit);
+
+
     @Operation(summary = "Making a new transaction", description = "Making a new transaction using an IBAN", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+            @SecurityRequirement(name = "Authorization")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
 
