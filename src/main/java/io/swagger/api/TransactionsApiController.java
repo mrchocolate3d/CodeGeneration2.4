@@ -102,6 +102,7 @@ public class TransactionsApiController implements TransactionsApi {
         transactionService.createTransaction(tr);
         Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
         return new ResponseEntity<Transaction>(transaction1,HttpStatus.CREATED);
+
     }
 
 }

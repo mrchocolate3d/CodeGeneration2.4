@@ -14,6 +14,7 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     List<String> getAllIban();
 
     dbAccount findAccountByIban(String iban);
+    List<dbAccount> findAccountByUserId(long id);
 
 
 }
