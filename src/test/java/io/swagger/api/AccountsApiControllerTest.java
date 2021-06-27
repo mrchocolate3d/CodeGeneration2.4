@@ -51,7 +51,7 @@ class AccountsApiControllerTest {
         ));
 
     }
-    
+
     @Test
     public void getAccountsShouldReturnAJsonArray() throws Exception{
         given(accountService.getAllAccounts()).willReturn(List.of(dbAccount));
@@ -65,6 +65,11 @@ class AccountsApiControllerTest {
                 .andExpect(jsonPath("$", hasSize(1))
                 );
 
+
+    }
+
+    @Test
+    public void createAnAccountShouldReturnStatusCodeCreated201() throws Exception{
 
     }
 
