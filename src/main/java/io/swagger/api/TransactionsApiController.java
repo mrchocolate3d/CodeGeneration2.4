@@ -1,15 +1,10 @@
 package io.swagger.api;
 
-import io.swagger.model.User;
 import io.swagger.model.dbTransaction;
-import io.swagger.model.dbUser;
 import io.swagger.service.TransactionService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.web.bind.annotation.*;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
