@@ -55,7 +55,7 @@ public class BankApplicationRunner implements ApplicationRunner {
 //        userService.getUsers().forEach(System.out::println);
 //        accountService.getAllAccounts().forEach(System.out::println);
 
-        dbUser userDb = userRepository.findUserById((long) 1);
+        dbUser userDb = userService.getUserById((long) 1);
 //
         System.out.println(userDb);
 
@@ -65,7 +65,7 @@ public class BankApplicationRunner implements ApplicationRunner {
 
 //        dbUser user1 = userService.getUserByUsername("test");
 //        System.out.println("User test: "+ user1);
-//
+
 
 
 //        System.out.println(user.getUsername()+ " " + user.getPassword());
