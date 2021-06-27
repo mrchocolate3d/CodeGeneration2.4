@@ -54,6 +54,10 @@ public class UserService {
 
     }
 
+    public List<dbUser> getAlldbUsers(){
+        return (List<dbUser>) userRepository.findAll();
+    }
+
     public User convertDbUserToUser(dbUser x){
         return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
     }
