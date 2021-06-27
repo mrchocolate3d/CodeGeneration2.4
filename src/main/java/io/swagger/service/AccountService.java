@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 
@@ -23,18 +24,17 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public dbAccount add(dbUser user, AccountType type){
-        dbUser userDb = userRepository.findUserByUsername(user.getUsername());
-        if(userDb != null){
+        if(userRepository.findUserByUsername(user.getUsername()) != null){
             dbAccount account;
             if(type == AccountType.TYPE_CURRENT){
-                account = createCurrentAccount(userDb);
-                account = accountRepository.save(account);
+                account = createCurrentAccount(user);
+                accountRepository.save(account);
                 return account;
             }else if(type == AccountType.TYPE_SAVING){
-                account = createSavingAccount(userDb);
-                account = accountRepository.save(account);
+                account = createSavingAccount(user);
+                accountRepository.save(account);
                 return account;
 
             }
@@ -43,12 +43,6 @@ public class AccountService {
         }
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "something is wrong idk");
     }
-
-    public dbAccount getAccountByIban(String iban){
-        return accountRepository.findAccountByIban(iban);
-    }
-
-
 
     public String generateIban(){
         Random rand = new Random();
@@ -86,7 +80,7 @@ public class AccountService {
 
     public dbAccount createAccount(dbUser user){
         dbAccount account = new dbAccount();
-        account.setBalance(0);
+        account.setBalance(0.00);
         account.setUser(user);
         String iban = generateIban();
         Boolean duplicatedIban = true;
@@ -104,5 +98,37 @@ public class AccountService {
     }
     public List<dbAccount> getAllAccounts() {
         return (List<dbAccount>) accountRepository.findAll();
+    }
+
+    public dbAccount getSpecificAccountByIban(String iban) {
+        return accountRepository.findAccountByIban(iban);
+    }
+
+    public dbAccount closeAccount(dbAccount dbAccount){
+        return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
+    }
+
+    public dbAccount getBalance(dbAccount dbAccount){
+        return accountRepository.getBalanceByIban(dbAccount.getIban());
+    }
+
+    public void withdraw(String iban, double amount) throws Exception {
+        dbAccount dbAccount = getSpecificAccountByIban(iban);
+        double newBalance;
+        if (dbAccount.getBalance() > amount){
+            newBalance = dbAccount.getBalance() - amount;
+            dbAccount.setBalance(newBalance);
+            accountRepository.updateBalance(dbAccount.getBalance(), iban);
+        }
+        else{
+            throw new Exception("Insufficient balance");
+        }
+    }
+
+    public void deposit(String iban, double amount) throws Exception{
+        dbAccount dbAccount = getSpecificAccountByIban(iban);
+        double newBalance = dbAccount.getBalance() + amount;
+        dbAccount.setBalance(newBalance);
+        accountRepository.updateBalance(dbAccount.getBalance(), dbAccount.getIban());
     }
 }

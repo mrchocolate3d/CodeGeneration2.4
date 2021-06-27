@@ -39,7 +39,7 @@ import java.util.Map;
 public interface TransactionsApi {
 
     @Operation(summary = "Getting all transactions of a specific IBAN", description = "Get transaction information of a specific IBAN", security = {
-        @SecurityRequirement(name = "Authorization")    }, tags={ "Transactions" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Transaction.class))),
         
@@ -58,7 +58,7 @@ public interface TransactionsApi {
 
 
     @Operation(summary = "Making a new transaction", description = "Making a new transaction using an IBAN", security = {
-        @SecurityRequirement(name = "Authorization")    }, tags={ "Transactions" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "OK"),
         

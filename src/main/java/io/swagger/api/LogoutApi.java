@@ -36,7 +36,7 @@ import java.util.Map;
 public interface LogoutApi {
 
     @Operation(summary = "Log out of the system", description = "This can only be accessed if you are logged in", security = {
-        @SecurityRequirement(name = "Authorization")    }, tags={ "User" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation") })
     @RequestMapping(value = "/Logout",

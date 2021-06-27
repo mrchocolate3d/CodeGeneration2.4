@@ -36,8 +36,8 @@ public class LoggedIn   {
    * @return id
    **/
   @Schema(example = "1", description = "")
-
-  public Long getId() {
+  
+    public Long getId() {
     return id;
   }
 
@@ -55,8 +55,8 @@ public class LoggedIn   {
    * @return username
    **/
   @Schema(example = "jamesB", description = "")
-
-  public String getUsername() {
+  
+    public String getUsername() {
     return username;
   }
 
@@ -74,8 +74,8 @@ public class LoggedIn   {
    * @return token
    **/
   @Schema(example = "Hjd39tnGEJ2DSmfb24vf", description = "")
-
-  public String getToken() {
+  
+    public String getToken() {
     return token;
   }
 
@@ -94,8 +94,8 @@ public class LoggedIn   {
     }
     LoggedIn loggedIn = (LoggedIn) o;
     return Objects.equals(this.id, loggedIn.id) &&
-            Objects.equals(this.username, loggedIn.username) &&
-            Objects.equals(this.token, loggedIn.token);
+        Objects.equals(this.username, loggedIn.username) &&
+        Objects.equals(this.token, loggedIn.token);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class LoggedIn   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class LoggedIn {\n");
-
+    
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    token: ").append(toIndentedString(token)).append("\n");
