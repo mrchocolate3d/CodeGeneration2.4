@@ -10,6 +10,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <springfox-version>3.0.0</springfox-version>
+        <cucumber-java.version>6.10.4</cucumber-java.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -135,6 +136,19 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber-java.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber-java.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
