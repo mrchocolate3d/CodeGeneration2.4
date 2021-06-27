@@ -14,12 +14,12 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
 
     @Query("SELECT iban FROM dbAccount ")
     List<String> getAllIban();
-    dbAccount findAccountByIban(String IBAN);
     dbAccount deleteAccountByUserId(Long id);
     dbAccount getBalanceByIban(String IBAN);
 
+    dbAccount findAccountByIban(String IBAN);
     @Transactional
     @Modifying
-    @Query("update dbAccount a set dbAccount.balance = ?1 where dbAccount.iban = ?2")
+    @Query("update dbAccount a set a.balance = ?1 where a.iban = ?2")
     void updateBalance(Double amount, String IBAN);
 }
