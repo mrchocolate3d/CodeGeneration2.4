@@ -13,7 +13,7 @@ import java.util.List;
 public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     @Query("SELECT iban FROM dbAccount ")
     List<String> getAllIban();
-    dbAccount deleteAccountByUserId(Long id);
+    dbAccount deleteAccountByIban(String IBAN);
     dbAccount getBalanceByIban(String IBAN);
 
     dbAccount findAccountByIban(String IBAN);

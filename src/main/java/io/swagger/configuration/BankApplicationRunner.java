@@ -48,12 +48,5 @@ public class BankApplicationRunner implements ApplicationRunner {
 
        // dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
 
-
-
-
-
-
-
-
     }
 }

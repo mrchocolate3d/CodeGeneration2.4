@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,5 +36,19 @@ public class AccountTest {
 
     }
 
-    
+    @Test
+    public void ibanNotContainNLWillThrowIllegalArgumentException(){
+        Assertions.assertThrows(ResponseStatusException.class, () -> {
+            dbAccount.setIban("NL");
+        });
+    }
+
+    @Test
+    public void ibanNotContainINHOWillThrowIllegalArgumentException(){
+        Assertions.assertThrows(ResponseStatusException.class, () -> {
+            dbAccount.setIban("INHO");
+        });
+    }
+
+
 }
