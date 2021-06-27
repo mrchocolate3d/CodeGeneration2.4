@@ -58,18 +58,46 @@ public class UserService {
         return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
     }
 
+
     public dbUser getUserByUsername(String username){
         return userRepository.findUserByUsername(username);
     }
 
-    public List<User> getUsers() {
-        List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
-        List<User> allUsers = new ArrayList<>();
-        for (dbUser x : dbUsers) {
-            allUsers.add(convertDbUserToUser(x));
+    public List<User> getUsersWithParameters(String name, Integer limit ) {
+        List <User> users = new ArrayList<>();
+        int count;
+        if (name != null && limit == null){
+            users.add(convertDbUserToUser(getUserByUsername(name)));
+            return users;
+        } else if (name == null && limit != null){
+            count = 0;
+            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            for (dbUser x : dbUsers) {
+                users.add(convertDbUserToUser(x));
+                count++;
+                if (limit == count){
+                    break;
+                }
+            }
+            return users;
+        } else {
+            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            for (dbUser x : dbUsers) {
+                users.add(convertDbUserToUser(x));
+            }
+            return users;
         }
 
-        return allUsers;
+    }
+
+    public List<User> getUsers() {
+            List <User> users = new ArrayList<>();
+            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            for (dbUser x : dbUsers) {
+                users.add(convertDbUserToUser(x));
+            }
+            return users;
+
     }
 
     public void editUser(dbUser oldUser ,InsertUser newUser){

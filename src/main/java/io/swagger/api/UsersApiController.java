@@ -59,6 +59,7 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -72,12 +73,12 @@ public class UsersApiController implements UsersApi {
                 userService.addUser(user);
             }
             return new ResponseEntity<User>(HttpStatus.OK);
-            //return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"James\",\n  \"lastName\" : \"Brown\",\n  \"phone\" : \"3138348173799\",\n  \"CurrentIBAN\" : \"NL*INH!@##$%&^&\",\n  \"SavingIBAN\" : \"NL*INH!@##$%&^&\",\n  \"id\" : 1,\n  \"transactionLimit\" : 10000,\n  \"email\" : \"jamesBrown120@outlook.com\",\n  \"username\" : \"jamesB\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
         }
 
         return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Void> deleteUserById(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         String accept = request.getHeader("Accept");
 
@@ -85,6 +86,7 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
     }
 
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
     public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = false, schema = @Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
 
@@ -101,14 +103,13 @@ public class UsersApiController implements UsersApi {
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<List<User>> getUser(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, maximum = "50"
             , defaultValue = "50")) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "get User by name", schema = @Schema()) @Valid @RequestParam(value = "name", required = false) String name) {
-
-        return new ResponseEntity<List<User>>(userService.getUsers(), HttpStatus.OK);
+        return new ResponseEntity<List<User>>(userService.getUsersWithParameters(name,limit), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "50"
             , defaultValue = "50")) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
         String accept = request.getHeader("Accept");
-
         return new ResponseEntity<User>(userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))), HttpStatus.OK);
 
     }
