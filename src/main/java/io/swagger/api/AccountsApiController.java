@@ -100,13 +100,11 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
-        dbAccount account = new dbAccount();
-        account = accountService.deposit(IBAN, amount);
+        dbAccount account = accountService.deposit(IBAN, amount);
 
         Deposit updatedAccount = new Deposit();
         updatedAccount.setIBAN(account.getIban());
         updatedAccount.setAmount(account.getBalance());
-
         return new ResponseEntity<Deposit>(HttpStatus.OK);
     }
 
@@ -212,17 +210,14 @@ public class AccountsApiController implements AccountsApi {
 
 
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<ReturnBalance>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34\",\n  \"balance\" : 500,\n  \"accountType\" : \"CurrentAccount\"\n}", ReturnBalance.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ReturnBalance>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+        dbAccount account = accountService.getBalance(IBAN);
 
-        return new ResponseEntity<ReturnBalance>(HttpStatus.NOT_IMPLEMENTED);
+        ReturnBalance balance = new ReturnBalance();
+        balance.setIBAN(account.getIban());
+//        balance.setAccountType(account.getAccountType());
+        balance.setBalance(account.getBalance());
+
+        return new ResponseEntity<ReturnBalance>(balance, HttpStatus.OK);
     }
 
     public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {

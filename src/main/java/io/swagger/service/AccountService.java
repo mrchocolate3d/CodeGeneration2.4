@@ -112,8 +112,8 @@ public class AccountService {
         return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
     }
 
-    public dbAccount getBalance(dbAccount dbAccount){
-        return accountRepository.getBalanceByIban(dbAccount.getIban());
+    public dbAccount getBalance(String IBAN){
+        return accountRepository.getBalanceByIban(IBAN);
     }
 
     public dbAccount withdraw(String iban, double amount) throws Exception {
