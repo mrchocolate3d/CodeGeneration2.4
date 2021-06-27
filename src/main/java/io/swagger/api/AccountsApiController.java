@@ -61,7 +61,7 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
         try{
             accountService.deposit(IBAN, amount);
-            return new ResponseEntity<Deposit>(HttpStatus.OK);
+            return new ResponseEntity<Deposit>(HttpStatus.ACCEPTED);
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
@@ -139,7 +139,7 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
         try{
             accountService.withdraw(IBAN, amount);
-            return new ResponseEntity<Withdrawal>(HttpStatus.OK);
+            return new ResponseEntity<Withdrawal>(HttpStatus.ACCEPTED);
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
