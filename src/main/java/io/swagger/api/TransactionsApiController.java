@@ -48,7 +48,6 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     //@PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
-//    @RequestMapping(value = "",method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1") @Parameter(in = ParameterIn.QUERY, description = "" , required=true, schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true)
                                                                      String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false)
                                                                      OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
@@ -56,7 +55,7 @@ public class TransactionsApiController implements TransactionsApi {
                                                                      Integer limit) {
 
         String accept = request.getHeader("Accept");
-        if(accept!=null && accept.contains("application/json")){
+        if(accept.contains("application/json")){
 
             List<Transaction> transactionList = new ArrayList<>();
             List<dbTransaction> dbTransactions = null;
@@ -95,20 +94,14 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     //    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
-//    @RequestMapping(value = "" ,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
-        if(accept!=null && accept.contains("application/json")){
-            dbTransaction tr = new dbTransaction(
-                    transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),transaction.getTime()
-            );
-            transactionService.createTransaction(tr);
-
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED); //complete
-        }
-        else{
-            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST);
-        }
+        dbTransaction tr = new dbTransaction(
+                transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),OffsetDateTime.now()
+        );
+        transactionService.createTransaction(tr);
+        Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
+        return new ResponseEntity<Transaction>(transaction1,HttpStatus.CREATED);
     }
 
 }

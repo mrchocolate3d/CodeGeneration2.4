@@ -58,13 +58,19 @@ public class TransactionService {
     //post transaction
     public dbTransaction createTransaction(dbTransaction transaction){
         setTransactionsFromDb(transaction);
+
+        //now checks
+        //get ibans from accountrepo
+        //make sure only the right people can make the transactioons
+        //check if its savings or current
+        //
         transactionRepository.save(transaction); //saves to the db
         return transaction;
     }
 
     public Transaction setTransactionsFromDb(dbTransaction dbTransaction){
         Transaction transaction = new Transaction();
-        transaction.setTime(dbTransaction.getTimestamp());
+        transaction.setTime(dbTransaction.getTimestamp().toString());
         transaction.setIbANFrom(dbTransaction.getIBANfrom());
         transaction.setIbANTo(dbTransaction.getIBANto());
         transaction.setAmount(dbTransaction.getAmount());

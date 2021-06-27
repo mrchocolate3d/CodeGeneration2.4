@@ -34,7 +34,7 @@ public class Transaction   {
   private Double amount = null;
 
   @JsonProperty("time")
-  private OffsetDateTime time = null;
+  private String time = null;
 
   public Transaction userPerform(String userPerform) {
     this.userPerform = userPerform;
@@ -132,7 +132,7 @@ public class Transaction   {
     this.amount = amount;
   }
 
-  public Transaction time(OffsetDateTime time) {
+  public Transaction time(String time) {
     this.time = time;
     return this;
   }
@@ -144,11 +144,11 @@ public class Transaction   {
   @Schema(description = "")
 
   @Valid
-  public OffsetDateTime getTime() {
+  public String getTime() {
     return time;
   }
 
-  public void setTime(OffsetDateTime time) {
+  public void setTime(String time) {
     this.time = time;
   }
 
