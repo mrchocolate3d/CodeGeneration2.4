@@ -47,12 +47,5 @@ public class BankApplicationRunner implements ApplicationRunner {
                 2500));
         dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
 
-
-
-
-
-
-
-
     }
 }

@@ -108,45 +108,39 @@ public class AccountService {
         return (List<dbAccount>) accountRepository.findAll();
     }
 
-    public dbAccount getSpecificAccountByIban(String iban) {
-        return accountRepository.findAccountByIban(iban);
-    }
-
     public dbAccount closeAccount(dbAccount dbAccount){
         return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
     }
 
-    public dbAccount getBalance(dbAccount dbAccount){
-        return accountRepository.getBalanceByIban(dbAccount.getIban());
+    public dbAccount getBalance(String IBAN){
+        return accountRepository.getBalanceByIban(IBAN);
     }
 
-    public void withdraw(String iban, double amount) throws Exception {
-        dbAccount dbAccount = getSpecificAccountByIban(iban);
-        double newBalance;
-        if (dbAccount.getBalance() > amount){
-            newBalance = dbAccount.getBalance() - amount;
-            dbAccount.setBalance(newBalance);
-            accountRepository.updateBalance(dbAccount.getBalance(), iban);
-        }
-        else{
+    public Withdrawal withdraw(String IBAN, double amount) throws Exception {
+        dbAccount account = getAccountByIban(IBAN);
+        double newBalance = account.getBalance() - amount;
+        if (newBalance < 0){
             throw new Exception("Insufficient balance");
         }
+        else{
+            account.setIban(IBAN);
+            account.setBalance(newBalance);
+            accountRepository.updateBalance(newBalance, IBAN);
+            return new Withdrawal(IBAN, newBalance);
+        }
     }
 
-    public void deposit(String iban, double amount) throws Exception{
-        dbAccount dbAccount = getSpecificAccountByIban(iban);
-        double newBalance = dbAccount.getBalance() + amount;
-        if (dbAccount.getAccountType() == AccountType.TYPE_CURRENT){
-            dbTransaction transaction = new dbTransaction();
-            transaction.setIBAN(dbAccount.getIban());
-//            transaction.setFromDate(OffsetDateTime.now());
-//            transaction.set
-            transaction.setTLimit(transaction.getTLimit());
-            dbAccount.setBalance(newBalance);
-            accountRepository.updateBalance(newBalance, dbAccount.getIban());
+    public Deposit deposit(String IBAN, double amount) throws Exception{
+        dbAccount account = getAccountByIban(IBAN);
+        double newBalance = account.getBalance() + amount;
+        if (account.getAccountType() != AccountType.TYPE_CURRENT){
+            throw new Exception("Account must be type current");
         }
         else{
-            throw new Exception("Account must be type current");
+            account.setIban(IBAN);
+            account.setBalance(newBalance);
+            accountRepository.updateBalance(newBalance, IBAN);
+            return new Deposit(IBAN, newBalance);
         }
     }
 }

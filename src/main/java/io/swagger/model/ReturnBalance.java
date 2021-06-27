@@ -19,38 +19,9 @@ public class ReturnBalance {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
-  /**
-   * Gets or Sets accountType
-   */
-  public enum AccountTypeEnum {
-    CURRENTACCOUNT("CurrentAccount"),
-    
-    SAVINGSACCOUNT("SavingsAccount");
 
-    private String value;
-
-    AccountTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static AccountTypeEnum fromValue(String text) {
-      for (AccountTypeEnum b : AccountTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
   @JsonProperty("accountType")
-  private AccountTypeEnum accountType = null;
+  private AccountType accountType = null;
 
   @JsonProperty("balance")
   private Double balance = null;
@@ -74,7 +45,7 @@ public class ReturnBalance {
     this.IBAN = IBAN;
   }
 
-  public ReturnBalance accountType(AccountTypeEnum accountType) {
+  public ReturnBalance accountType(AccountType accountType) {
     this.accountType = accountType;
     return this;
   }
@@ -85,11 +56,11 @@ public class ReturnBalance {
    **/
   @Schema(description = "")
   
-    public AccountTypeEnum getAccountType() {
+    public AccountType getAccountType() {
     return accountType;
   }
 
-  public void setAccountType(AccountTypeEnum accountType) {
+  public void setAccountType(AccountType accountType) {
     this.accountType = accountType;
   }
 
