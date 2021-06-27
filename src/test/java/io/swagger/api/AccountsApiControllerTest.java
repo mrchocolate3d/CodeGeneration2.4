@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
 import io.swagger.service.AccountService;
-import io.swagger.service.UserService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,10 +35,7 @@ class AccountsApiControllerTest {
     @MockBean
     private AccountService accountService;
 
-    @MockBean
-    private UserService userService;
-
-
+    private Account account;
 
     private dbAccount dbAccount;
 
@@ -50,20 +46,14 @@ class AccountsApiControllerTest {
 
     @BeforeEach
     public void init() throws Exception {
-        dbUser dbUser = userService.addUser(new dbUser("test", "test", "test", "test",
-                "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
-                2500));
-        dbAccount = accountService.add(dbUser, AccountType.TYPE_CURRENT);
+        dbAccount = new dbAccount(AccountType.TYPE_CURRENT, 0, new dbUser(
+                "test", "test", "test", "test", "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE), 2500
+        ));
 
     }
-
+    
     @Test
-    public void getAccountByIBANShouldReturnOnlyOneObject() throws Exception{
-
-    }
-
-    @Test
-    public void getAllAccountsShouldReturnAJsonArray() throws Exception{
+    public void getAccountsShouldReturnAJsonArray() throws Exception{
         given(accountService.getAllAccounts()).willReturn(List.of(dbAccount));
 
         String token = getTokenWhenLoggingIn();

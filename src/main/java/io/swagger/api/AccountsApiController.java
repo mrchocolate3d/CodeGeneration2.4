@@ -86,11 +86,6 @@ public class AccountsApiController implements AccountsApi {
             }
             dbAccount accountAdded = accountService.add(user, account.getAccountType());
 
-            ReturnAccount returnAccount = new ReturnAccount();
-            returnAccount.setAccountType(accountAdded.getAccountType());
-            returnAccount.setIBAN(accountAdded.getIban());
-            returnAccount.setUserId(accountAdded.getUser().getId());
-
 
             return new ResponseEntity<ReturnAccount>(HttpStatus.OK);
         }
