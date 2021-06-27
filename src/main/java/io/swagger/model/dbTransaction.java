@@ -36,4 +36,8 @@ public class dbTransaction {
         this.amount = amount;
         this.timestamp = timestamp;
     }
+
+    public dbTransaction() {
+
+    }
 }

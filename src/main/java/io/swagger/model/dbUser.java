@@ -52,7 +52,7 @@ public class dbUser {
     List<UserRole> roles;
     private double transactionLimit;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<dbAccount> accounts;
 

@@ -68,7 +68,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-//    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
 
         dbUser user = userService.getUserById(account.getUserId());
@@ -86,13 +86,8 @@ public class AccountsApiController implements AccountsApi {
             }
             dbAccount accountAdded = accountService.add(user, account.getAccountType());
 
-            ReturnAccount returnAccount = new ReturnAccount();
-            returnAccount.setAccountType(accountAdded.getAccountType());
-            returnAccount.setIBAN(accountAdded.getIban());
-            returnAccount.setUserId(accountAdded.getUser().getId());
 
-
-            return new ResponseEntity<ReturnAccount>(HttpStatus.OK);
+            return new ResponseEntity<ReturnAccount>(HttpStatus.CREATED);
         }
 
 
@@ -100,20 +95,18 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Deposit>(objectMapper.readValue("{\n  \"IBAN\" : \"NL40INGB778321\",\n  \"Amount\" : 0.8008281904610115\n}", Deposit.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Deposit>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        try{
+            accountService.deposit(IBAN, amount);
+            return new ResponseEntity<Deposit>(HttpStatus.ACCEPTED);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
         }
 
-        return new ResponseEntity<Deposit>(HttpStatus.NOT_IMPLEMENTED);
+
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         dbAccount dbAccount = accountService.getAccountByIban(IBAN);
         if(dbAccount != null){
@@ -140,7 +133,7 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<Account>(HttpStatus.NOT_FOUND);
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<List<Account>> getAccounts(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
         List<dbAccount> dbAccounts = accountService.getAllAccounts();
@@ -213,7 +206,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -229,17 +222,26 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Withdrawal>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34567763\",\n  \"Amount\" : 0.8008281904610115\n}", Withdrawal.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Withdrawal>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        try{
+            accountService.withdraw(IBAN, amount);
+            return new ResponseEntity<Withdrawal>(HttpStatus.ACCEPTED);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
         }
 
-        return new ResponseEntity<Withdrawal>(HttpStatus.NOT_IMPLEMENTED);
+
+//        String accept = request.getHeader("Accept");
+//        if (accept != null && accept.contains("application/json")) {
+//            try {
+//                return new ResponseEntity<Withdrawal>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34567763\",\n  \"Amount\" : 0.8008281904610115\n}", Withdrawal.class), HttpStatus.NOT_IMPLEMENTED);
+//            } catch (IOException e) {
+//                log.error("Couldn't serialize response for content type application/json", e);
+//                return new ResponseEntity<Withdrawal>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        }
+//
+//        return new ResponseEntity<Withdrawal>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 }

@@ -32,7 +32,7 @@ public class LoginUser   {
    * Get username
    * @return username
    **/
-  @Schema(example = "username", description = "")
+  @Schema(example = "test", description = "")
 
   public String getUsername() {
     return username;
@@ -51,7 +51,7 @@ public class LoginUser   {
    * Get password
    * @return password
    **/
-  @Schema(example = "password", description = "")
+  @Schema(example = "test", description = "")
 
   public String getPassword() {
     return password;

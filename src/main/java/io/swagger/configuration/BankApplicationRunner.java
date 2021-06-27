@@ -2,7 +2,6 @@ package io.swagger.configuration;
 
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
-import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
@@ -15,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.threeten.bp.OffsetDateTime;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -38,14 +36,11 @@ public class BankApplicationRunner implements ApplicationRunner {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-    @Autowired
-    TransactionRepository transactionRepository;
 
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-//        dbUser user = userRepository.save(new dbUser("test", "test", "test", "test", "test", , List.of(UserRole.ROLE_EMPLOYEE), 2500));
 
         dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
                 "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
@@ -53,48 +48,11 @@ public class BankApplicationRunner implements ApplicationRunner {
         dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
 
 
-        userRepository.findAll().forEach(System.out::println);
-        accountRepository.findAll().forEach(System.out::println);
-//
-//        userService.getUsers().forEach(System.out::println);
-//        accountService.getAllAccounts().forEach(System.out::println);
-
-        dbUser userDb = userRepository.findUserById((long) 1);
-//
-        System.out.println(userDb);
-
-        dbAccount account1 = accountService.getAccountByIban(account.getIban());
-        System.out.println(account1.getIban());
 
 
-//        dbUser user1 = userService.getUserByUsername("test");
-//        System.out.println("User test: "+ user1);
-//
 
 
-//        System.out.println(user.getUsername()+ " " + user.getPassword());
-        String token = userService.login(userDb.getUsername(), "test");
-        System.out.println(token);
-
-//        User userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String username = userDetails.getUsername();
-//        System.out.println(username);
-
-        dbUser user1 = userService.getUserByUsername("test");
-        System.out.println(user1);
-
-        String iban = account1.getIban();
-
-        dbAccount account2 = accountService.getAccountByIban(iban);
-
-        System.out.println(account2);
 
 
-        dbTransaction dbTransaction = new dbTransaction("Test","NL10INH0000000000","NL20INH0000000000",700.00, OffsetDateTime.now());
-        dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, OffsetDateTime.now());
-        transactionRepository.save(dbTransaction);
-        transactionRepository.save(dbTransaction2);
-        System.out.println(dbTransaction);
-        System.out.println(dbTransaction2);
     }
 }

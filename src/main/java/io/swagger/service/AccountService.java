@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.threeten.bp.OffsetDateTime;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -104,5 +106,47 @@ public class AccountService {
     }
     public List<dbAccount> getAllAccounts() {
         return (List<dbAccount>) accountRepository.findAll();
+    }
+
+    public dbAccount getSpecificAccountByIban(String iban) {
+        return accountRepository.findAccountByIban(iban);
+    }
+
+    public dbAccount closeAccount(dbAccount dbAccount){
+        return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
+    }
+
+    public dbAccount getBalance(dbAccount dbAccount){
+        return accountRepository.getBalanceByIban(dbAccount.getIban());
+    }
+
+    public void withdraw(String iban, double amount) throws Exception {
+        dbAccount dbAccount = getSpecificAccountByIban(iban);
+        double newBalance;
+        if (dbAccount.getBalance() > amount){
+            newBalance = dbAccount.getBalance() - amount;
+            dbAccount.setBalance(newBalance);
+            accountRepository.updateBalance(dbAccount.getBalance(), iban);
+        }
+        else{
+            throw new Exception("Insufficient balance");
+        }
+    }
+
+    public void deposit(String iban, double amount) throws Exception{
+        dbAccount dbAccount = getSpecificAccountByIban(iban);
+        double newBalance = dbAccount.getBalance() + amount;
+        if (dbAccount.getAccountType() == AccountType.TYPE_CURRENT){
+            dbTransaction transaction = new dbTransaction();
+            transaction.setIBAN(dbAccount.getIban());
+//            transaction.setFromDate(OffsetDateTime.now());
+//            transaction.set
+            transaction.setTLimit(transaction.getTLimit());
+            dbAccount.setBalance(newBalance);
+            accountRepository.updateBalance(newBalance, dbAccount.getIban());
+        }
+        else{
+            throw new Exception("Account must be type current");
+        }
     }
 }
