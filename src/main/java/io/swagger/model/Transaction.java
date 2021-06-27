@@ -42,16 +42,13 @@ public class Transaction   {
   }
 
 
-  public Transaction(String ibANFrom){
-    this.ibANFrom = ibANFrom;
-  }
   /**
    * Get userPerform
    * @return userPerform
    **/
   @Schema(example = "username", description = "")
-  
-    public String getUserPerform() {
+
+  public String getUserPerform() {
     return userPerform;
   }
 
@@ -69,8 +66,8 @@ public class Transaction   {
    * @return token
    **/
   @Schema(example = "a1b2c3b4d5e6", description = "")
-  
-    public String getToken() {
+
+  public String getToken() {
     return token;
   }
 
@@ -88,8 +85,8 @@ public class Transaction   {
    * @return ibANFrom
    **/
   @Schema(example = "NL11INGB223345", description = "")
-  
-    public String getIbANFrom() {
+
+  public String getIbANFrom() {
     return ibANFrom;
   }
 
@@ -107,8 +104,8 @@ public class Transaction   {
    * @return ibANTo
    **/
   @Schema(example = "NL44INGB556677", description = "")
-  
-    public String getIbANTo() {
+
+  public String getIbANTo() {
     return ibANTo;
   }
 
@@ -126,8 +123,8 @@ public class Transaction   {
    * @return amount
    **/
   @Schema(description = "")
-  
-    public Double getAmount() {
+
+  public Double getAmount() {
     return amount;
   }
 
@@ -145,9 +142,9 @@ public class Transaction   {
    * @return time
    **/
   @Schema(description = "")
-  
-    @Valid
-    public OffsetDateTime getTime() {
+
+  @Valid
+  public OffsetDateTime getTime() {
     return time;
   }
 
@@ -166,11 +163,11 @@ public class Transaction   {
     }
     Transaction transaction = (Transaction) o;
     return Objects.equals(this.userPerform, transaction.userPerform) &&
-        Objects.equals(this.token, transaction.token) &&
-        Objects.equals(this.ibANFrom, transaction.ibANFrom) &&
-        Objects.equals(this.ibANTo, transaction.ibANTo) &&
-        Objects.equals(this.amount, transaction.amount) &&
-        Objects.equals(this.time, transaction.time);
+            Objects.equals(this.token, transaction.token) &&
+            Objects.equals(this.ibANFrom, transaction.ibANFrom) &&
+            Objects.equals(this.ibANTo, transaction.ibANTo) &&
+            Objects.equals(this.amount, transaction.amount) &&
+            Objects.equals(this.time, transaction.time);
   }
 
   @Override
@@ -182,7 +179,7 @@ public class Transaction   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-    
+
     sb.append("    userPerform: ").append(toIndentedString(userPerform)).append("\n");
     sb.append("    token: ").append(toIndentedString(token)).append("\n");
     sb.append("    ibANFrom: ").append(toIndentedString(ibANFrom)).append("\n");
