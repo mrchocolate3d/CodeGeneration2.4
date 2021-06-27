@@ -116,33 +116,31 @@ public class AccountService {
         return accountRepository.getBalanceByIban(dbAccount.getIban());
     }
 
-    public void withdraw(String iban, double amount) throws Exception {
-        dbAccount dbAccount = getAccountByIban(iban);
-        double newBalance;
-        if (dbAccount.getBalance() > amount){
-            newBalance = dbAccount.getBalance() - amount;
-            dbAccount.setBalance(newBalance);
-            accountRepository.updateBalance(newBalance, iban);
-        }
-        else{
+    public dbAccount withdraw(String iban, double amount) throws Exception {
+        dbAccount account = getAccountByIban(iban);
+        double newBalance = account.getBalance() - amount;
+        if (newBalance < 0){
             throw new Exception("Insufficient balance");
         }
-    }
-
-    public void deposit(String iban, double amount) throws Exception{
-        dbAccount dbAccount = getAccountByIban(iban);
-        double newBalance = dbAccount.getBalance() + amount;
-        if (dbAccount.getAccountType() == AccountType.TYPE_CURRENT){
-//            dbTransaction transaction = new dbTransaction();
-//            transaction.setIBAN(dbAccount.getIban());
-//            transaction.setFromDate(OffsetDateTime.now());
-//            transaction.set
-//            transaction.setTLimit(transaction.getTLimit());
-            dbAccount.setBalance(newBalance);
+        else{
+            account.setIban(iban);
+            account.setBalance(newBalance);
             accountRepository.updateBalance(newBalance, iban);
         }
-        else{
+        return account;
+    }
+
+    public dbAccount deposit(String iban, double amount) throws Exception{
+        dbAccount account = getAccountByIban(iban);
+        double newBalance = account.getBalance() + amount;
+        if (account.getAccountType() != AccountType.TYPE_CURRENT){
             throw new Exception("Account must be type current");
         }
+        else{
+            account.setIban(iban);
+            account.setBalance(newBalance);
+            accountRepository.updateBalance(newBalance, iban);
+        }
+        return account;
     }
 }

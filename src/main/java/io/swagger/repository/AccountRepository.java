@@ -20,7 +20,7 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     @Transactional
     @Modifying
     @Query("update dbAccount a set a.balance = ?1 where a.iban = ?2")
-    void updateBalance(Double amount, String IBAN);
+    dbAccount updateBalance(Double amount, String IBAN);
 
 
 }

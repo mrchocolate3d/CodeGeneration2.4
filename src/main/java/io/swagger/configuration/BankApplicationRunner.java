@@ -82,7 +82,6 @@ public class BankApplicationRunner implements ApplicationRunner {
         String iban = account1.getIban();
 
         dbAccount account2 = accountService.getAccountByIban(iban);
-
         System.out.println(account2);
     }
 }
