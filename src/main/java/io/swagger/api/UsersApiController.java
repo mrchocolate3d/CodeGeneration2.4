@@ -59,7 +59,7 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    //@PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -71,8 +71,8 @@ public class UsersApiController implements UsersApi {
 
                 dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_EMPLOYEE), body.getTransactionLimit());
                 userService.addUser(user);
+                return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
             }
-            return new ResponseEntity<User>(HttpStatus.OK);
         }
 
         return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
@@ -110,8 +110,8 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "50"
             , defaultValue = "50")) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<User>(userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))), HttpStatus.OK);
-
+        return new ResponseEntity<User>(userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))),HttpStatus.OK);
+        //userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))),
     }
 
 }
