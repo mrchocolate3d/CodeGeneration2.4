@@ -5,7 +5,6 @@ import io.cucumber.java.en.Then;
 import io.swagger.model.*;
 import io.swagger.model.User;
 import org.springframework.http.ResponseEntity;
-
 import java.net.URI;
 
 public class UserSteps {

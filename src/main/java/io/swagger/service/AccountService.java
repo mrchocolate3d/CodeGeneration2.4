@@ -138,10 +138,10 @@ public class AccountService {
         double newBalance = dbAccount.getBalance() + amount;
         if (dbAccount.getAccountType() == AccountType.TYPE_CURRENT){
             dbTransaction transaction = new dbTransaction();
-            transaction.setIBAN(dbAccount.getIban());
+//            transaction.setIBAN(dbAccount.getIban());
 //            transaction.setFromDate(OffsetDateTime.now());
-//            transaction.set
-            transaction.setTLimit(transaction.getTLimit());
+////            transaction.set
+//            transaction.setTLimit(transaction.getTLimit());
             dbAccount.setBalance(newBalance);
             accountRepository.updateBalance(newBalance, dbAccount.getIban());
         }
