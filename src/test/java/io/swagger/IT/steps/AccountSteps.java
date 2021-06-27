@@ -53,4 +53,12 @@ public class AccountSteps {
         responseEntity = template.exchange(uri, HttpMethod.GET, httpEntity, String.class);
 
     }
+
+    @Then("I delete account with Iban {string}")
+    public void iDeleteAccountWithIban(String IBAN) throws Exception{
+        URI uri = new URI(baseUrl+"Accounts");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        httpEntity = new HttpEntity<>(null, headers);
+        responseEntity = template.exchange(uri, HttpMethod.DELETE, httpEntity, String.class);
+    }
 }

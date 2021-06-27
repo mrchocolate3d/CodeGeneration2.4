@@ -48,6 +48,8 @@ class AccountsApiControllerTest {
     private Withdrawal withdrawal;
 
     private String IBAN;
+
+    private Double delta = 0.001;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -56,7 +58,7 @@ class AccountsApiControllerTest {
         dbAccount = new dbAccount(AccountType.TYPE_CURRENT, 0, new dbUser(
                 "test", "test", "test", "test", "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE), 2500
         ));
-
+        dbAccount.setIban("NL02INHO14665901");
     }
 
     @Test
@@ -127,15 +129,15 @@ class AccountsApiControllerTest {
     }
 
     @Test
-    public void depositShouldReturnStatusCode200() throws Exception{
-
+    public void depositTest() throws Exception{
+        accountService.deposit("NL01INHO1547654890", 500.00);
+        assertEquals(dbAccount.getBalance(), 5500.00, delta, "Deposit Test");
     }
 
+    @Test
+    public void withdrawTest() throws Exception{
+        accountService.withdraw("NL01INHO1547654890", 500.00);
+        assertEquals(dbAccount.getBalance(),4500.00, delta, "Withdrawal Test");
+    }
 
-    // check if result is equal given balance //// not working yet
-//    @Test
-//    public void updateBalance() throws Exception{
-//        dbAccount dbAccount1 = accountService.getBalance(IBAN);
-//        dbAccount1.setBalance(200.00);
-//    }
 }
