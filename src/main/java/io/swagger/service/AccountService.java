@@ -108,8 +108,9 @@ public class AccountService {
         return (List<dbAccount>) accountRepository.findAll();
     }
 
-    public dbAccount closeAccount(dbAccount dbAccount){
-        return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
+    public void closeAccount(String IBAN){
+        dbAccount dbAccount = accountRepository.findAccountByIban(IBAN);
+        accountRepository.delete(dbAccount);
     }
 
     public dbAccount getBalance(String IBAN){

@@ -42,12 +42,12 @@ public interface AccountsApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation"),
         
-        @ApiResponse(responseCode = "400", description = "Invalid UserID"),
+        @ApiResponse(responseCode = "400", description = "Invalid IBAN"),
         
-        @ApiResponse(responseCode = "404", description = "UserID not found") })
+        @ApiResponse(responseCode = "404", description = "IBAN not found") })
     @RequestMapping(value = "/Accounts/{UserID}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The UserID of the account required", required=true, schema=@Schema()) @PathVariable("UserID") String userID);
+    ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 
     @Operation(summary = "Create an account", description = "Can only be done by user", security = {
