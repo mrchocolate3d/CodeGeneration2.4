@@ -1,5 +1,7 @@
 package io.swagger.service;
 
+import io.swagger.api.ApiException;
+import io.swagger.api.NotFoundException;
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
@@ -43,7 +45,17 @@ public class UserService {
     }
 
     public dbUser getUserById(Long id){
-        return userRepository.findUserById(id);
+        Optional<dbUser> user = userRepository.findById(id);
+        if (user.isPresent()){
+            return user.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No user in the db");
+        }
+
+    }
+
+    public User convertDbUserToUser(dbUser x){
+        return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
     }
 
     public dbUser getUserByUsername(String username){
@@ -54,11 +66,32 @@ public class UserService {
         List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
         List<User> allUsers = new ArrayList<>();
         for (dbUser x : dbUsers) {
-            User u = new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
-            allUsers.add(u);
+            allUsers.add(convertDbUserToUser(x));
         }
 
         return allUsers;
+    }
+
+    public void editUser(dbUser oldUser ,InsertUser newUser){
+        oldUser.setFirstName(newUser.getFirstName());
+        oldUser.setLastName(newUser.getLastName());
+        oldUser.setUsername(newUser.getUsername());
+        oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        oldUser.setEmail(newUser.getEmail());
+        oldUser.setPhone(newUser.getPhone());
+        oldUser.setTransactionLimit(newUser.getTransactionLimit());
+
+        userRepository.save(oldUser);
+
+    }
+
+    public void deleteUser(long id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No User with that id in the database");
+        }
+
     }
 
     public String login(String username, String password) {
