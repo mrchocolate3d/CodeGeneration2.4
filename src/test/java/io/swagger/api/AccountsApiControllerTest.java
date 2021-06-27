@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
 import io.swagger.service.AccountService;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -41,6 +43,11 @@ class AccountsApiControllerTest {
 
     private dbUser dbUser;
 
+    private Deposit deposit;
+
+    private Withdrawal withdrawal;
+
+    private String IBAN;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -106,4 +113,29 @@ class AccountsApiControllerTest {
         JSONObject contentInJson = new JSONObject(content);
         return contentInJson.getString("Token");
     }
+
+    @Test
+    public void closedAccountShouldBeInactive() throws Exception{
+        accountService.closeAccount(IBAN);
+        assertEquals(accountService.getAccountByIban("NL02INHO14697882"), dbAccount);
+    }
+
+    @Test
+    public void getBalanceByIban() throws Exception{
+        accountService.createAccount(dbUser);
+        assertEquals(accountService.getBalance(IBAN), dbAccount);
+    }
+
+    @Test
+    public void depositShouldReturnStatusCode200() throws Exception{
+
+    }
+
+
+    // check if result is equal given balance //// not working yet
+//    @Test
+//    public void updateBalance() throws Exception{
+//        dbAccount dbAccount1 = accountService.getBalance(IBAN);
+//        dbAccount1.setBalance(200.00);
+//    }
 }
