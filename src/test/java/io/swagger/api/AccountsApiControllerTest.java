@@ -70,6 +70,18 @@ class AccountsApiControllerTest {
 
     @Test
     public void createAnAccountShouldReturnStatusCodeCreated201() throws Exception{
+        String token = getTokenWhenLoggingIn();
+        Object createAccount = new Object(){
+            public final int userId = 1;
+            public final String accountType = "TYPE_CURRENT";
+        };
+        ObjectMapper createAccountMapper = new ObjectMapper();
+        String json = createAccountMapper.writeValueAsString(createAccount);
+        this.mockMvc.perform(
+                post("/Accounts").header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
 
     }
 
