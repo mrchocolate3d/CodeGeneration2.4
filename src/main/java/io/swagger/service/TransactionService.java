@@ -52,40 +52,34 @@ public class TransactionService {
                 transaction.getIBANfrom() == null|| transaction.getUserPerform() == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Input field missing");
         }
-        dbUser userPerforming = userRepository.findUserByUsername(transaction.getUserPerform());
-
         dbAccount accountFrom = accountRepository.findAccountByIban(transaction.getIBANfrom());
         dbAccount accountTo = accountRepository.findAccountByIban(transaction.getIBANto());
-
-        accountFrom.getAccountType().equals(accountTo.getAccountType());
-        if(accountFrom.getUser().equals(accountTo.getUser())){
-            if(accountFrom.getAccountType() == AccountType.TYPE_SAVING && accountTo.getAccountType() == AccountType.TYPE_SAVING){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"you cannot transfer from savings to another savings account");
-            }
-            else{
-                if(accountFrom.getBalance() < transaction.getAmount()){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"not enough money to transfer");
-                }
-                else{
-                    accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
-                    accountRepository.save(accountFrom);
-                    accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
-                    accountRepository.save(accountTo);
-                }
-            }
-
+        dbUser user = userRepository.findUserByUsername(transaction.getUserPerform());
+        //...
+        if(accountFrom == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
+        }
+        else if(accountTo == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
+        }
+        dbUser userTo = userRepository.findById(accountTo.getId()).get();
+        if(accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId()!=user.getId()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
         }
         else{
-            if(accountFrom.getAccountType() == AccountType.TYPE_CURRENT && accountTo.getAccountType() == AccountType.TYPE_CURRENT){
-                accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
-                accountRepository.save(accountFrom);
-                accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
-                accountRepository.save(accountTo);
-            }
+            accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
+            accountRepository.save(accountFrom);
+
+            accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
+            accountRepository.save(accountTo);
+
+
         }
+//        UpdateBalanceFrom(transaction);
+//        UpdateBalanceTo(transaction);
 
         setTransactionsFromDb(transaction);
-        transactionRepository.save(transaction); //saves to the db
+        transactionRepository.save(transaction);
         return transaction;
     }
 
@@ -102,9 +96,6 @@ public class TransactionService {
 
     public List<dbTransaction> getAllTransactionsFromAnAccount(String IBAN, OffsetDateTime from, OffsetDateTime to){
         List<dbTransaction> transactions = new ArrayList<>();
-
-
-//        dbTransaction transaction = transactionRepository.getTransactionsByIBAN(IBAN);
         dbTransaction transaction = null;
         transactions.add(transaction);
         return transactions;
@@ -114,10 +105,18 @@ public class TransactionService {
         return (List<dbTransaction>)transactionRepository.findAll();
     }
 
-    public List<dbTransaction> getTransactionByIBAN(String IBAN){
+    public List<dbTransaction> getTransactionByIBANfrom(String IBAN){
         Iterable<dbTransaction> transactions = transactionRepository.getTransactionsByIBANfrom(IBAN);
 
-        if(IBAN.isEmpty() || IBAN==null){
+        if(IBAN.isEmpty() || IBAN == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"IBAN is not provided!");
+        }
+        return (List<dbTransaction>) transactions;
+    }
+    public List<dbTransaction> getTransactionByIBANto(String IBAN){
+        Iterable<dbTransaction> transactions = transactionRepository.getTransactionsByIBANto(IBAN);
+
+        if(IBAN.isEmpty() || IBAN == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"IBAN is not provided!");
         }
         return (List<dbTransaction>) transactions;

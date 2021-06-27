@@ -1,8 +1,10 @@
 package io.swagger.api;
 
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetTimeSerializer;
 import io.swagger.model.*;
 import io.swagger.models.Response;
 import io.swagger.service.TransactionService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.threeten.bp.OffsetDateTime;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.threeten.bp.ZoneOffset;
 
 import java.util.List;
@@ -25,40 +28,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TransactionsApiControllerTest {
-
     @Autowired
-    private MockMvc mockMvc;
+    private TransactionsApiController transactionsApiController;
+    private dbTransaction transaction;
+    List<dbTransaction> transactionList;
 
-
-    @MockBean
-    private TransactionService transactionService;
-
-
-    @Autowired
-    TransactionsApiController transactionsApiController;
-    List<dbTransaction>transactionList;
 
     @BeforeEach
-    public void init() throws Exception {
+    public void setup() throws Exception {
 
-        dbTransaction testuser = new dbTransaction();
-        testuser.setUserPerform("Testuser");
-        testuser.setTimestamp(OffsetDateTime.of(2021,5,1,10,20,40,0, ZoneOffset.UTC));
-        testuser.setIBANfrom("NL01INH0000000002");
-        testuser.setIBANto("NL01INH0000000001");
-        testuser.setAmount(400.00);
-
-        transactionList.add(testuser);
+        transaction = new dbTransaction(
+                "testuser","NL01INH0000000000","NL02INH0000000000",500.00,OffsetDateTime.of(2021,5,1,10,20,40,0, ZoneOffset.UTC)
+        );
 
     }
     @Test
-    public void getTransactionsShouldReturnJsonArray() throws Exception{
-        given(transactionService.getTransactionByIBAN(transactionList.get(2).toString())).willReturn(transactionList);
-
-        OffsetDateTime dateFrom = OffsetDateTime.of(2020,8,1,1,1,1,0,ZoneOffset.UTC);
-        OffsetDateTime dateTo = OffsetDateTime.of(2020,9,1,1,1,1,0,ZoneOffset.UTC);
-
-        List<dbTransaction> tr = (List<dbTransaction>) transactionsApiController.getTransactions(transactionList.get(2).toString(),dateFrom,dateTo,0);
+    public void getTransactionsByIBANShouldReturnJsonArray() throws Exception{
+//        OffsetDateTime today = OffsetDateTime.now();
+//        OffsetDateTime dateFrom = OffsetDateTime.parse(today + "T00:00:00.001+02:00");
+//        OffsetDateTime dateTo = OffsetDateTime.parse(today + "T23:59:59.999+02:00");
+//        List<dbTransaction> transactionList = (List<dbTransaction>) transactionsApiController.getTransactions(transaction.getIBANfrom(),dateFrom,dateTo,50);
+//        assertEquals(transactionList.get(0).getTimestamp(),today.getDayOfWeek());
 
     }
 

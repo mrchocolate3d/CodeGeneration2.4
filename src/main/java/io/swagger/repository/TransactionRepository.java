@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<dbTransaction,Long> {
 
     Iterable<dbTransaction>getTransactionsByIBANfrom(String IBAN);
+    Iterable<dbTransaction>getTransactionsByIBANto(String IBAN);
     @Query("SELECT COUNT(t) FROM dbTransaction t")
     Integer CountAllTransactions();
     @Query("SELECT t FROM dbTransaction t WHERE t.timestamp =?1 OR t.timestamp =?2 ORDER BY t.timestamp DESC")

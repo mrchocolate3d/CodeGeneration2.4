@@ -26,6 +26,7 @@ public class dbTransaction {
     private String IBANfrom;
     private String IBANto;
     private Double amount;
+
     private OffsetDateTime timestamp;
     //private Integer dayLimit; //day limit //not sure entirely
 
@@ -35,6 +36,10 @@ public class dbTransaction {
         this.IBANto = IBANto;
         this.amount = amount;
         this.timestamp = timestamp;
+
+        if (this.amount <=0){
+            throw new IllegalArgumentException("Invalid amount");
+        }
     }
 
 
