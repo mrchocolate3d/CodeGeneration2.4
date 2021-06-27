@@ -155,7 +155,7 @@ public class AccountsApiController implements AccountsApi {
                 count++;
 
             }
-        }else if(username != null){
+        }else if(username != null && limit == null){
             for(dbAccount dbAccount : dbAccounts){
                 if(dbAccount.getUser().getUsername().equals(username)){
 
@@ -168,6 +168,26 @@ public class AccountsApiController implements AccountsApi {
 
                 }
                 continue;
+            }
+        }else if(username != null && limit != null){
+            int count = 0;
+
+            for (dbAccount dbAccount : dbAccounts) {
+                if (count >= limit){
+                    break;
+                }
+                if(dbAccount.getUser().getUsername().equals(username)){
+
+                User user = setUserFromDTO(dbAccount);
+
+                Account account = setAccountFromDb(dbAccount, user);
+
+                accounts.add(account);
+
+
+
+                }
+                count++;
             }
         }
 

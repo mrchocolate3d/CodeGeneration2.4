@@ -1,7 +1,7 @@
 Feature: User tests
   Scenario: Login User status returns OK
-    When i log in with username "test" and password "test"
-    Then i get http code 200
+    When I log in with username "test" and password "test"
+    Then I get a http status 200
 
 
   Scenario: Employee Gets all Users
