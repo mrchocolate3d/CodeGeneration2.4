@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
 import io.swagger.service.AccountService;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -41,6 +43,13 @@ class AccountsApiControllerTest {
 
     private dbUser dbUser;
 
+    private Deposit deposit;
+
+    private Withdrawal withdrawal;
+
+    private String IBAN;
+
+    private Double delta = 0.001;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -49,7 +58,7 @@ class AccountsApiControllerTest {
         dbAccount = new dbAccount(AccountType.TYPE_CURRENT, 0, new dbUser(
                 "test", "test", "test", "test", "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE), 2500
         ));
-
+        dbAccount.setIban("NL02INHO14665901");
     }
 
     @Test
@@ -106,4 +115,29 @@ class AccountsApiControllerTest {
         JSONObject contentInJson = new JSONObject(content);
         return contentInJson.getString("Token");
     }
+
+    @Test
+    public void closedAccountShouldBeInactive() throws Exception{
+        accountService.closeAccount(IBAN);
+        assertEquals(accountService.getAccountByIban("NL02INHO14697882"), dbAccount);
+    }
+
+    @Test
+    public void getBalanceByIban() throws Exception{
+        accountService.createAccount(dbUser);
+        assertEquals(accountService.getBalance(IBAN), dbAccount);
+    }
+
+    @Test
+    public void depositTest() throws Exception{
+        accountService.deposit("NL01INHO1547654890", 500.00);
+        assertEquals(dbAccount.getBalance(), 5500.00, delta, "Deposit Test");
+    }
+
+    @Test
+    public void withdrawTest() throws Exception{
+        accountService.withdraw("NL01INHO1547654890", 500.00);
+        assertEquals(dbAccount.getBalance(),4500.00, delta, "Withdrawal Test");
+    }
+
 }

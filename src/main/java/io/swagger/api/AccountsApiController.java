@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,9 +64,10 @@ public class AccountsApiController implements AccountsApi {
         this.request = request;
     }
 
-    public ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The UserID of the account required", required=true, schema=@Schema()) @PathVariable("UserID") String userID) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+        accountService.closeAccount(IBAN);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
@@ -94,17 +97,6 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<ReturnAccount>(HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
-        try{
-            accountService.deposit(IBAN, amount);
-            return new ResponseEntity<Deposit>(HttpStatus.ACCEPTED);
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-        }
-
-
-    }
 
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
@@ -163,7 +155,7 @@ public class AccountsApiController implements AccountsApi {
                 count++;
 
             }
-        }else if(username != null){
+        }else if(username != null && limit == null){
             for(dbAccount dbAccount : dbAccounts){
                 if(dbAccount.getUser().getUsername().equals(username)){
 
@@ -176,6 +168,26 @@ public class AccountsApiController implements AccountsApi {
 
                 }
                 continue;
+            }
+        }else if(username != null && limit != null){
+            int count = 0;
+
+            for (dbAccount dbAccount : dbAccounts) {
+                if (count >= limit){
+                    break;
+                }
+                if(dbAccount.getUser().getUsername().equals(username)){
+
+                User user = setUserFromDTO(dbAccount);
+
+                Account account = setAccountFromDb(dbAccount, user);
+
+                accounts.add(account);
+
+
+
+                }
+                count++;
             }
         }
 
@@ -208,40 +220,38 @@ public class AccountsApiController implements AccountsApi {
 
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<ReturnBalance>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34\",\n  \"balance\" : 500,\n  \"accountType\" : \"CurrentAccount\"\n}", ReturnBalance.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ReturnBalance>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        dbAccount account = accountService.getBalance(IBAN);
+        if(account != null){
+            ReturnBalance balance = new ReturnBalance();
+            balance.setIBAN(account.getIban());
+            balance.setAccountType(account.getAccountType());
+            balance.setBalance(account.getBalance());
+            return new ResponseEntity<ReturnBalance>(HttpStatus.OK);
         }
-
-        return new ResponseEntity<ReturnBalance>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
-    public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) {
-        try{
-            accountService.withdraw(IBAN, amount);
-            return new ResponseEntity<Withdrawal>(HttpStatus.ACCEPTED);
+    public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = userService.getUserByUsername(auth.getName());
+        dbAccount account = accountService.getAccountByIban(IBAN);
+        if (account.getUser().getUsername().equals(user.getUsername())){
+            Deposit updatedAccount = accountService.deposit(IBAN, amount);
+            return new ResponseEntity<Deposit>(updatedAccount, HttpStatus.OK);
         }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-        }
-
-
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            try {
-//                return new ResponseEntity<Withdrawal>(objectMapper.readValue("{\n  \"IBAN\" : \"NL90RABO34567763\",\n  \"Amount\" : 0.8008281904610115\n}", Withdrawal.class), HttpStatus.NOT_IMPLEMENTED);
-//            } catch (IOException e) {
-//                log.error("Couldn't serialize response for content type application/json", e);
-//                return new ResponseEntity<Withdrawal>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
-//
-//        return new ResponseEntity<Withdrawal>(HttpStatus.NOT_IMPLEMENTED);
+        else
+            return new ResponseEntity<Deposit>(HttpStatus.NOT_ACCEPTABLE);
     }
 
+    public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = userService.getUserByUsername(auth.getName());
+        dbAccount account = accountService.getAccountByIban(IBAN);
+        if (account.getUser().getUsername().equals(user.getUsername())) {
+            Withdrawal updatedAccount = accountService.withdraw(IBAN, amount);
+            return new ResponseEntity<Withdrawal>(updatedAccount, HttpStatus.OK);
+        }
+        else
+            return new ResponseEntity<Withdrawal>(HttpStatus.NOT_ACCEPTABLE);
+    }
 }

@@ -36,6 +36,9 @@ public class dbAccount {
         this.balance = balance;
     }
 
+//    public void setActive(Boolean active){
+//        this.active = active;
+//    }
     public dbAccount(AccountType accountType, double balance, dbUser user) {
         this.accountType = accountType;
         this.balance = balance;

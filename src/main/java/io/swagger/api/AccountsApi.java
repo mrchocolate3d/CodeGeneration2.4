@@ -42,12 +42,12 @@ public interface AccountsApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation"),
         
-        @ApiResponse(responseCode = "400", description = "Invalid UserID"),
+        @ApiResponse(responseCode = "400", description = "Invalid IBAN"),
         
-        @ApiResponse(responseCode = "404", description = "UserID not found") })
+        @ApiResponse(responseCode = "404", description = "IBAN not found") })
     @RequestMapping(value = "/Accounts/{UserID}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The UserID of the account required", required=true, schema=@Schema()) @PathVariable("UserID") String userID);
+    ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 
     @Operation(summary = "Create an account", description = "Can only be done by user", security = {
@@ -74,9 +74,9 @@ public interface AccountsApi {
         
         @ApiResponse(responseCode = "405", description = "Unauthorized") })
     @RequestMapping(value = "/Accounts/{IBAN}/deposit",
-        produces = { "application/json", "application/xml" }, 
+        produces = { "application/json" },
         method = RequestMethod.POST)
-    ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount);
+    ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception;
 
 
     @Operation(summary = "Get specific account by iban", description = "Return an account by iban", security = {
@@ -111,7 +111,7 @@ public interface AccountsApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Balance is showed", content = @Content(schema = @Schema(implementation = ReturnBalance.class))) })
     @RequestMapping(value = "/Accounts/{IBAN}/balance",
-        produces = { "application/json", "application/xml" }, 
+        produces = { "application/json"},
         method = RequestMethod.GET)
     ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
@@ -127,7 +127,7 @@ public interface AccountsApi {
     @RequestMapping(value = "/Accounts/{IBAN}/withdraw",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount);
+    ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception;
 
 }
 

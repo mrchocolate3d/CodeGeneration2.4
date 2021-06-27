@@ -54,6 +54,10 @@ public class UserService {
 
     }
 
+    public List<dbUser> getAlldbUsers(){
+        return (List<dbUser>) userRepository.findAll();
+    }
+
     public User convertDbUserToUser(dbUser x){
         return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
     }
@@ -62,6 +66,7 @@ public class UserService {
     public dbUser getUserByUsername(String username){
         return userRepository.findUserByUsername(username);
     }
+
 
     public List<User> getUsersWithParameters(String name, Integer limit ) {
         List <User> users = new ArrayList<>();
