@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface UserRepository extends CrudRepository<dbUser, Long>{
     dbUser findUserByUsername(String username);
-
     //dbUser deletedbUserBy(Long id);
 }
 
