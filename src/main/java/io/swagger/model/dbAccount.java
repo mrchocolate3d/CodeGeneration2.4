@@ -7,34 +7,38 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
+@AllArgsConstructor
 @Table(name="DB_ACCOUNT")
 public class dbAccount {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(initialValue = 1, name="account_seq")
+    @GeneratedValue(generator = "account_seq", strategy = GenerationType.SEQUENCE)
     private long id;
     AccountType accountType;
-    private Double balance;
+    private double balance;
     private String iban;
 
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name="userId")
+    @ManyToOne
     @JsonBackReference
     private dbUser user;
 
-    public dbAccount(long id, AccountType accountType, Double balance, String iban){
-        this.id = id;
+    public void setBalance(double balance){
+        if(balance < 0.00){
+            throw  new IllegalArgumentException("Balance can not be negative");
+        }
+        this.balance = balance;
+    }
+
+    public dbAccount(AccountType accountType, double balance, dbUser user) {
         this.accountType = accountType;
         this.balance = balance;
-        this.iban = iban;
+        this.user = user;
     }
 }

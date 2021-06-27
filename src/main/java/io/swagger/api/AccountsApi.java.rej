@@ -1,0 +1,64 @@
+diff a/src/main/java/io/swagger/api/AccountsApi.java b/src/main/java/io/swagger/api/AccountsApi.java	(rejected hunks)
+@@ -41,7 +41,7 @@ import java.util.Map;
+ public interface AccountsApi {
+ 
+     @Operation(summary = "Close an account", description = "Can only be done by employee", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "successful operation"),
+         
+@@ -54,7 +54,7 @@ public interface AccountsApi {
+ 
+ 
+     @Operation(summary = "Create an account", description = "Can only be done by user", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ReturnAccount.class))),
+         
+@@ -69,7 +69,7 @@ public interface AccountsApi {
+ 
+ 
+     @Operation(summary = "Depositing money to an account using IBAN", description = "Depositing money into a customer account", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "Money has been deposited", content = @Content(schema = @Schema(implementation = Deposit.class))),
+         
+@@ -83,7 +83,7 @@ public interface AccountsApi {
+ 
+ 
+     @Operation(summary = "Get specific account by iban", description = "Return an account by iban", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Account.class))),
+         
+@@ -95,7 +95,7 @@ public interface AccountsApi {
+ 
+ 
+     @Operation(summary = "Get all customer accounts", description = "Return a list of customer accounts", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Account.class)))),
+         
+@@ -110,7 +110,7 @@ public interface AccountsApi {
+ 
+ 
+     @Operation(summary = "Get balance of an account using IBAN", description = "Get balance of account using IBAN", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "Balance is showed", content = @Content(schema = @Schema(implementation = ReturnBalance.class))) })
+     @RequestMapping(value = "/Accounts/{IBAN}/balance",
+@@ -120,7 +120,7 @@ public interface AccountsApi {
+ 
+ 
+     @Operation(summary = "Withdraw from an account using IBAN", description = "Customers withdraw money from their accounts", security = {
+-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Account" })
++        @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+     @ApiResponses(value = { 
+         @ApiResponse(responseCode = "200", description = "Money has been withdrawn", content = @Content(schema = @Schema(implementation = Withdrawal.class))),
+         

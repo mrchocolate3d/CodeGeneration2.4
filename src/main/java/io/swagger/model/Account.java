@@ -19,48 +19,27 @@ import javax.validation.constraints.*;
 
 public class Account   {
 
-  @JsonProperty("UserId")
-  private User user;
+  @JsonProperty("IBAN")
+  private String iban = null;
 
-  @JsonProperty("accountType")
-  private AccountType accountType = null;
-
-  public Account(Long userId, AccountType accountType) {
-    userId = user.getId();
-    this.accountType = accountType;
+  public Account iban(String iban){
+    this.iban = iban;
+    return this;
   }
+
+  public String getIban(){return iban;}
+
+  public void setIban(String iban){this.iban = iban;}
+
+  @JsonProperty("User")
+  private User user = null;
 
   /**
    * Gets or Sets accountType
    */
-  public enum AccountTypeEnum {
-    CURRENTACCOUNT("CurrentAccount"),
-    
-    SAVINGSACCOUNT("SavingsAccount");
 
-    private String value;
-
-    AccountTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static AccountTypeEnum fromValue(String text) {
-      for (AccountTypeEnum b : AccountTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-
+  @JsonProperty("accountType")
+  private AccountType accountType = null;
 
   public Account user(User user) {
     this.user = user;
@@ -72,13 +51,13 @@ public class Account   {
    * @return userId
    **/
   @Schema(example = "1", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public User getUser() {
+  public User getUser() {
     return user;
   }
 
-  public void setUserId(User user) {
+  public void setUser(User user) {
     this.user = user;
   }
 
@@ -92,9 +71,9 @@ public class Account   {
    * @return accountType
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public AccountType getAccountType() {
+  public AccountType getAccountType() {
     return accountType;
   }
 
@@ -113,7 +92,7 @@ public class Account   {
     }
     Account account = (Account) o;
     return Objects.equals(this.user, account.user) &&
-        Objects.equals(this.accountType, account.accountType);
+            Objects.equals(this.accountType, account.accountType);
   }
 
   @Override
@@ -125,7 +104,7 @@ public class Account   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Account {\n");
-    
+
     sb.append("    user: ").append(toIndentedString(user.toString())).append("\n");
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("}");
