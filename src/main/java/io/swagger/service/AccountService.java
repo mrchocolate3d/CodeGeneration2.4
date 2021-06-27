@@ -108,13 +108,13 @@ public class AccountService {
         return (List<dbAccount>) accountRepository.findAll();
     }
 
-//    public dbAccount closeAccount(dbAccount dbAccount){
-//        return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
-//    }
+    public dbAccount closeAccount(dbAccount dbAccount){
+        return accountRepository.deleteAccountByUserId(dbAccount.getUser().getId());
+    }
 
-//    public dbAccount getBalance(dbAccount dbAccount){
-//        return accountRepository.getBalanceByIban(dbAccount.getIban());
-//    }
+    public dbAccount getBalance(dbAccount dbAccount){
+        return accountRepository.getBalanceByIban(dbAccount.getIban());
+    }
 
     public void withdraw(String iban, double amount) throws Exception {
         dbAccount dbAccount = getAccountByIban(iban);
