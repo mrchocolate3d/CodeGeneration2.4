@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.model.User;
 import io.swagger.model.dbTransaction;
 import io.swagger.model.dbUser;
 import io.swagger.service.TransactionService;
@@ -7,6 +8,7 @@ import io.swagger.service.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -54,16 +56,20 @@ public class TransactionsApiController implements TransactionsApi {
                                                                      OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
                                                                      OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
                                                                      Integer limit) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        dbUser user = userService.getUserByUsername(username);
+        try{
+            String accept = request.getHeader("Accept");
+            String authKey = request.getHeader("X-AUTHENTICATION");
 
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
-        }
-        List<Transaction> transactionList = new ArrayList<>();
-        if(fromDate == null && toDate == null && limit !=0 ){
-            //getting transactions for both iban from and iban to
+
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        String username = auth.getName();
+//        dbUser user = userService.getUserByUsername(username);
+
+//        if(user == null){
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
+//        }
+            List<Transaction> transactionList = new ArrayList<>();
+
             List<dbTransaction> dbTransactionsFrom = transactionService.getTransactionByIBANfrom(IBAN);
             for (dbTransaction dbFrom : dbTransactionsFrom) {
                 Transaction transaction = transactionService.setTransactionsFromDb(dbFrom);
@@ -75,49 +81,21 @@ public class TransactionsApiController implements TransactionsApi {
                 Transaction transaction = transactionService.setTransactionsFromDb(dbTo);
                 transactionList.add(transaction);
             }
+            return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
+        }
+        catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
+        }
 
-        }
-        OffsetDateTime dateFrom;
-        OffsetDateTime dateTo;
-
-        if(limit == null){
-            limit = transactionService.CountAllTransactions();
-        }
-        if(fromDate == null){
-            dateFrom = OffsetDateTime.MIN;
-        }
-        else{
-            dateFrom = OffsetDateTime.parse(fromDate + "00:00:00.001+02:00");
-        }
-        if(toDate == null){
-            dateTo = OffsetDateTime.MAX;
-        }
-        else{
-            dateTo = OffsetDateTime.parse(toDate + "T23:59:59.999+02:00");
-        }
-        return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
 
     }
-
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        dbUser user = userService.getUserByUsername(username);
+        String accept = request.getHeader("Accept");
+        dbTransaction dbTransaction = new dbTransaction(transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),transactionService.getDateToString());
+        transactionService.addTransaction(dbTransaction);
+        return new ResponseEntity<Transaction>(transactionService.setTransactionsFromDb(dbTransaction), HttpStatus.CREATED);
 
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
-        }
-//        if(transaction.getUserPerform() == null || transaction.getAmount() == null ||
-//                transaction.getIbANFrom() == null || transaction.getIbANTo()==null){
-//            throw new ResponseStatusException(HttpStatus.CREATED,"Input field is missing");
-//        }
-
-        dbTransaction tr = new dbTransaction(
-                transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),OffsetDateTime.now()
-        );
-        transactionService.createTransaction(tr);
-        Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
-        return new ResponseEntity<Transaction>(transaction1,HttpStatus.CREATED);
 
     }
 

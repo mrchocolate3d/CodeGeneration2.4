@@ -5,6 +5,7 @@ import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.service.AccountService;
+import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
 import io.swagger.service.UserService;
 import lombok.extern.java.Log;
@@ -27,6 +28,8 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TransactionService transactionService;
    // @Autowired
    // private AccountService accountService;
 
@@ -54,8 +57,8 @@ public class BankApplicationRunner implements ApplicationRunner {
 
        // dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
 
-        dbTransaction dbTransaction = new dbTransaction("Test","NL10INH0000000000","NL20INH0000000000",700.00, OffsetDateTime.now());
-        dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, OffsetDateTime.now());
+        dbTransaction dbTransaction = new dbTransaction("Test","NL10INH0000000000","NL20INH0000000000",700.00, transactionService.getDateToString());
+        dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, transactionService.getDateToString());
         transactionRepository.save(dbTransaction);
         transactionRepository.save(dbTransaction2);
 

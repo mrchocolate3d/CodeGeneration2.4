@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
+import java.sql.Date;
 import javax.validation.constraints.*;
 
 /**
@@ -18,6 +19,10 @@ import javax.validation.constraints.*;
 
 
 public class Transaction   {
+
+  @JsonProperty("id")
+  private Long id = null;
+
   @JsonProperty("userPerform")
   private String userPerform = null;
 
@@ -34,7 +39,7 @@ public class Transaction   {
   private Double amount = null;
 
   @JsonProperty("time")
-  private String time = null;
+  private Date time = null;
 
   public Transaction userPerform(String userPerform) {
     this.userPerform = userPerform;
@@ -42,6 +47,14 @@ public class Transaction   {
   }
 
 
+  public Transaction(Long id, String userPerform, String ibANTo, String ibANFrom, Double amount, Date time){
+    this.id = id;
+    this.userPerform = userPerform;
+    this.ibANTo = ibANTo;
+    this.ibANFrom = ibANFrom;
+    this.amount = amount;
+    this.time = time;
+  }
   /**
    * Get userPerform
    * @return userPerform
@@ -132,7 +145,7 @@ public class Transaction   {
     this.amount = amount;
   }
 
-  public Transaction time(String time) {
+  public Transaction time(Date time) {
     this.time = time;
     return this;
   }
@@ -144,11 +157,11 @@ public class Transaction   {
   @Schema(description = "")
 
   @Valid
-  public String getTime() {
+  public Date getTime() {
     return time;
   }
 
-  public void setTime(String time) {
+  public void setTime(Date time) {
     this.time = time;
   }
 

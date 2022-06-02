@@ -27,17 +27,17 @@ public class dbTransaction {
     private String IBANto;
     private Double amount;
 
-    private OffsetDateTime timestamp;
+    private java.sql.Date timestamp;
     //private Integer dayLimit; //day limit //not sure entirely
 
-    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime timestamp) {
+    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, java.sql.Date timestamp) {
         this.userPerform = userPerform;
         this.IBANfrom = IBANfrom;
         this.IBANto = IBANto;
         this.amount = amount;
         this.timestamp = timestamp;
 
-        if (this.amount <=0){
+        if (this.amount <= 0){
             throw new IllegalArgumentException("Invalid amount");
         }
     }
