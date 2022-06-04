@@ -1,20 +1,18 @@
 package io.swagger.service;
 
 import io.swagger.model.*;
-/*import io.swagger.Repository.AccountRepository;*/
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.threeten.bp.OffsetDateTime;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+
+/*import io.swagger.Repository.AccountRepository;*/
 
 @Service
 @Transactional()
