@@ -16,6 +16,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -35,18 +38,6 @@ public class TransactionService {
     }
 
 
-    //TODO: complete this
-    //getting all transactions
-//    public List<dbTransaction> getTransactions(String IBAN,OffsetDateTime from,OffsetDateTime to,int dayLimit){
-//        //implementing the limit //has to be pageable
-//        Integer page = 1;
-//        Pageable p = PageRequest.of(page, dayLimit);
-//
-//        dbUser user = null;
-//        user = userRepository.findUserByUsername(user.getUsername());
-//        List<dbTransaction> transactions = new ArrayList<>();
-//        return transactions;
-//    }
 
 
 
@@ -59,53 +50,56 @@ public class TransactionService {
 //        UpdateBalanceFrom(transaction);
 //        UpdateBalanceTo(transaction);
 
-    //post transaction
-//    public dbTransaction createTransaction(dbTransaction transaction){
-//
-//        transactionRepository.save(transaction);
-//        return transaction;
-//    }
 
     public Transaction setTransactionsFromDb(dbTransaction dbT){
         return new Transaction(dbT.getId(),dbT.getUserPerform(),dbT.getIBANto(),dbT.getIBANfrom(),dbT.getAmount(),dbT.getTimestamp());
     }
     public dbTransaction addTransaction(dbTransaction transaction){
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        dbUser userPerforming = userRepository.findUserByUsername(auth.getName());
+        //get account of logged in user
+        dbAccount loggedInUser = accountRepository.getAccountTypeByUserId(userPerforming.getId(), AccountType.TYPE_CURRENT);
+
+        dbAccount fromAccount = accountRepository.getAccountTypeByIban(transaction.getIBANfrom(),AccountType.TYPE_CURRENT);
+        dbAccount toAccount = accountRepository.getAccountTypeByIban(transaction.getIBANto(),AccountType.TYPE_CURRENT);
+
+
+
+        //get account used for performing transactions
+        //get receiver account
+        //check if used account is the same
+        //check if user has admin rights
+        //check if iban equals admin iban
+
+        //check if account exists
+
+        //check if amount if nott below zero
+        if(accountAmountCheck(transaction.getAmount(),transaction.getIBANto())){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Amount is below zero. Try again");
+        }
+        //if(isValidTransaction())
+        //check if transaction stays below transaction limit
+
+        //check if its a valid tranaction
+        //check if performer's balance is not below limit
+        //check transaction limit of user
+        if(transaction.getAmount().compareTo(userPerforming.getTransactionLimit()) > 0){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Transaction cannot be completed because amount is higher than the transaction limit");
+        }
+
         transactionRepository.save(transaction);
         return transaction;
     }
 
 
-    //    ----------------------------------------------------
-//    public dbTransaction testing2(Transaction transaction){
-//        dbTransaction dbTransaction = new dbTransaction();
-//        dbTransaction.setAmount(transaction.getAmount());
-//        dbTransaction.setUserPerform(transaction.getUserPerform());
-//        dbTransaction.setIBANfrom(transaction.getIbANFrom());
-//        dbTransaction.setIBANto(transaction.getIbANTo());
-//        return dbTransaction;
-//    }
 
     public java.sql.Date getDateToString(){
         return new java.sql.Date(Calendar.getInstance().getTime().getTime());
+
     }
 
-//
-//    //converting dbtransaction to transaction
-
-
-
-
-
-
-
-//    public List<dbTransaction> getAllTransactionsFromAnAccount(String IBAN, OffsetDateTime from, OffsetDateTime to){
-//        List<dbTransaction> transactions = new ArrayList<>();
-//        dbTransaction transaction = null;
-//        transactions.add(transaction);
-//        return transactions;
-//
-//    }
 //
     public List<dbTransaction> getTransactionByIBANfrom(String IBAN){
         List<dbTransaction> getTransactionsByIBANfrom = transactionRepository.getTransactionsByIBANfrom(IBAN);
@@ -128,6 +122,50 @@ public class TransactionService {
     public Integer CountAllTransactions(){
         return transactionRepository.CountAllTransactions();
     }
+
+
+    //updating balance of accounts after transactions
+    public void UpdateAccountBalance(Account fromAccount, Account toAccount, Double amount){
+        Double accountFrom = accountRepository.getBalanceByIban(fromAccount.getIban(),fromAccount.getAccountType());
+        Double accountTo = accountRepository.getBalanceByIban(toAccount.getIban(), toAccount.getAccountType());
+
+        Double newBalanceForAccountFrom = (amount - accountFrom);
+        Double newBalanceForAccountTo = (amount + accountTo);
+
+        transactionRepository.updateAccountBalance(newBalanceForAccountFrom,fromAccount.getIban(),fromAccount.getAccountType());
+        transactionRepository.updateAccountBalance(newBalanceForAccountTo,toAccount.getIban(),toAccount.getAccountType());
+    }
+
+    //checking validity of transaction
+    private boolean isValidTransaction(Account fromAccount, Account toAccount){
+        boolean isValid = true;
+
+        //if iban is not the same
+        if(fromAccount.getIban().equals(toAccount.getIban())){
+            isValid = false;
+        }
+        //checking if both are current accounts
+        if(fromAccount.getAccountType().equals(AccountType.TYPE_CURRENT) && toAccount.getAccountType().equals(AccountType.TYPE_CURRENT)){
+            isValid = true;
+        }
+        return !isValid;
+    }
+
+    private void validWithdrawal(){}
+    private boolean accountAmountCheck(Double amount, String fromAccount){
+        boolean isAmountLessThanZero;
+        if(accountRepository.findAccountByIban(fromAccount) == null){
+            return true;
+        }
+        if(amount >= 0){
+            return true;
+        }
+        return false;
+    }
+
+    //getting transaction limit
+
+
 
 //
 //    public void UpdateBalanceFrom(dbTransaction transaction){
@@ -173,13 +211,3 @@ public class TransactionService {
 //
 //
 //        }
-
-//    public Transaction setTransactionsFromDb(dbTransaction dbTransaction){
-//        Transaction transaction = new Transaction();
-//        transaction.setTime(dbTransaction.getTimestamp().toString());
-//        transaction.setIbANFrom(dbTransaction.getIBANfrom());
-//        transaction.setIbANTo(dbTransaction.getIBANto());
-//        transaction.setAmount(dbTransaction.getAmount());
-//        transaction.setUserPerform(dbTransaction.getUserPerform());
-//        return transaction;
-//    }
