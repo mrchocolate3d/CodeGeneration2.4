@@ -27,8 +27,6 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
 //    added by samuel
     @Query("SELECT balance FROM dbAccount WHERE iban = ?1 AND account_type = ?2")
     Double getBalanceByIban(String iban, AccountType accountType);
+    dbAccount getAccountTypeByiban(String IBAN, AccountType accountType);
 
-    dbAccount getAccountTypeByIban(String iban, AccountType accountType);
-
-    dbAccount getAccountTypeByUserId(Long userID, AccountType accountType);
 }

@@ -60,10 +60,10 @@ public class TransactionService {
 
         dbUser userPerforming = userRepository.findUserByUsername(auth.getName());
         //get account of logged in user
-        dbAccount loggedInUser = accountRepository.getAccountTypeByUserId(userPerforming.getId(), AccountType.TYPE_CURRENT);
+        //dbAccount loggedInUser = accountRepository.getAccountTypeByUserId(userPerforming.getId(), AccountType.TYPE_CURRENT);
 
-        dbAccount fromAccount = accountRepository.getAccountTypeByIban(transaction.getIBANfrom(),AccountType.TYPE_CURRENT);
-        dbAccount toAccount = accountRepository.getAccountTypeByIban(transaction.getIBANto(),AccountType.TYPE_CURRENT);
+        dbAccount fromAccount = accountRepository.getAccountTypeByiban(transaction.getIBANfrom(),AccountType.TYPE_CURRENT);
+        dbAccount toAccount = accountRepository.getAccountTypeByiban(transaction.getIBANto(),AccountType.TYPE_CURRENT);
 
 
 
