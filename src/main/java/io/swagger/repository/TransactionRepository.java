@@ -7,24 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.threeten.bp.OffsetDateTime;
-import org.springframework.data.domain.Pageable;
 import java.util.List;
-import java.util.Optional;
-
 @Repository
 public interface TransactionRepository extends CrudRepository<dbTransaction,Long> {
-
-    //Iterable<dbTransaction>getTransactionsByIBANfrom(String IBAN);
-    //Iterable<dbTransaction>getTransactionsByIBANto(String IBAN);
-    //Iterable<dbTransaction>getTransactionsByIBAN(String IBAN);
-
-//    @Query("select t from dbTransaction t where t. =:IBAN OR t.ibanReceiver =:IBAN")
-//    List<Transaction> getTransactionsFromIBAN(@Param("IBAN") String IBAN);
-
     @Query("select t from dbTransaction t where t.IBANfrom =:IBAN")
     List<dbTransaction> getTransactionsByIBANfrom(String IBAN);
 
@@ -35,7 +23,6 @@ public interface TransactionRepository extends CrudRepository<dbTransaction,Long
     @Modifying
     @Query(value = "UPDATE db_Account SET balance = ?1 WHERE iban = ?2 AND account_type = ?3", nativeQuery = true)
     void updateAccountBalance(Double newBalance, String IBAN, AccountType accountType);
-
 
     @Query("SELECT COUNT(t) FROM dbTransaction t")
     Integer CountAllTransactions();

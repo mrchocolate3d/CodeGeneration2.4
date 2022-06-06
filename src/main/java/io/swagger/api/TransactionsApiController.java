@@ -89,11 +89,12 @@ public class TransactionsApiController implements TransactionsApi {
             dbTransaction dbTransaction = new dbTransaction(transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),transactionService.getDateToString());
             transactionService.addTransaction(dbTransaction);
             return new ResponseEntity<Transaction>(transactionService.setTransactionsFromDb(dbTransaction), HttpStatus.CREATED);
-
         }
         catch(Exception e){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
         }
+
+
     }
 
 }

@@ -24,9 +24,5 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     @Query("update dbAccount a set a.balance = ?1 where a.iban = ?2")
     void updateBalance(Double amount, String IBAN);
 
-//    added by samuel
-    @Query("SELECT balance FROM dbAccount WHERE iban = ?1 AND account_type = ?2")
-    Double getBalanceByIban(String iban, AccountType accountType);
-    dbAccount getAccountTypeByiban(String IBAN, AccountType accountType);
 
 }
