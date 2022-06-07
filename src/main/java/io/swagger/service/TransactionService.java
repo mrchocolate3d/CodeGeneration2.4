@@ -69,6 +69,10 @@ public class TransactionService {
         if(!user.getUsername().equals(transaction.getUserPerform())){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User does not exist");
         }
+        if(accountFrom.getAccountType().equals(AccountType.TYPE_CURRENT) && accountTo.getAccountType().equals(AccountType.TYPE_SAVING)){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Cannot transfer from your account to another customers savings account");
+        }
+
         // getting transaction limit
         dbUser transactionLimitOfUser = userRepository.getTransactionLimitByUsername(transaction.getUserPerform());
         double transactionLimit =  transactionLimitOfUser.getTransactionLimit();
