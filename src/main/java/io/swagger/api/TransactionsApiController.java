@@ -86,6 +86,7 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
         try{
+
             dbTransaction dbTransaction = new dbTransaction(transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),transactionService.getDateToString());
             transactionService.addTransaction(dbTransaction);
             return new ResponseEntity<Transaction>(transactionService.setTransactionsFromDb(dbTransaction), HttpStatus.CREATED);
