@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
+import java.sql.Date;
 import javax.validation.constraints.*;
 
 /**
@@ -18,11 +19,12 @@ import javax.validation.constraints.*;
 
 
 public class Transaction   {
+
+//  @JsonProperty("id")
+  private Long id = null;
+
   @JsonProperty("userPerform")
   private String userPerform = null;
-
-  @JsonProperty("token")
-  private String token = null;
 
   @JsonProperty("IBANFrom")
   private String ibANFrom = null;
@@ -34,7 +36,7 @@ public class Transaction   {
   private Double amount = null;
 
   @JsonProperty("time")
-  private String time = null;
+  private Date time = null;
 
   public Transaction userPerform(String userPerform) {
     this.userPerform = userPerform;
@@ -42,6 +44,14 @@ public class Transaction   {
   }
 
 
+  public Transaction(Long id, String userPerform, String ibANTo, String ibANFrom, Double amount, Date time){
+    this.id = id;
+    this.userPerform = userPerform;
+    this.ibANTo = ibANTo;
+    this.ibANFrom = ibANFrom;
+    this.amount = amount;
+    this.time = time;
+  }
   /**
    * Get userPerform
    * @return userPerform
@@ -56,24 +66,6 @@ public class Transaction   {
     this.userPerform = userPerform;
   }
 
-  public Transaction token(String token) {
-    this.token = token;
-    return this;
-  }
-
-  /**
-   * Get token
-   * @return token
-   **/
-  @Schema(example = "a1b2c3b4d5e6", description = "")
-
-  public String getToken() {
-    return token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
 
   public Transaction ibANFrom(String ibANFrom) {
     this.ibANFrom = ibANFrom;
@@ -132,7 +124,7 @@ public class Transaction   {
     this.amount = amount;
   }
 
-  public Transaction time(String time) {
+  public Transaction time(Date time) {
     this.time = time;
     return this;
   }
@@ -144,11 +136,11 @@ public class Transaction   {
   @Schema(description = "")
 
   @Valid
-  public String getTime() {
+  public Date getTime() {
     return time;
   }
 
-  public void setTime(String time) {
+  public void setTime(Date time) {
     this.time = time;
   }
 
@@ -163,7 +155,6 @@ public class Transaction   {
     }
     Transaction transaction = (Transaction) o;
     return Objects.equals(this.userPerform, transaction.userPerform) &&
-            Objects.equals(this.token, transaction.token) &&
             Objects.equals(this.ibANFrom, transaction.ibANFrom) &&
             Objects.equals(this.ibANTo, transaction.ibANTo) &&
             Objects.equals(this.amount, transaction.amount) &&
@@ -172,7 +163,7 @@ public class Transaction   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(userPerform, token, ibANFrom, ibANTo, amount, time);
+    return Objects.hash(userPerform, ibANFrom, ibANTo, amount, time);
   }
 
   @Override
@@ -181,7 +172,6 @@ public class Transaction   {
     sb.append("class Transaction {\n");
 
     sb.append("    userPerform: ").append(toIndentedString(userPerform)).append("\n");
-    sb.append("    token: ").append(toIndentedString(token)).append("\n");
     sb.append("    ibANFrom: ").append(toIndentedString(ibANFrom)).append("\n");
     sb.append("    ibANTo: ").append(toIndentedString(ibANTo)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");

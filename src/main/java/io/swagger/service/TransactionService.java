@@ -5,6 +5,8 @@ import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -12,9 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
-import org.threeten.bp.OffsetDateTime;
 import java.util.*;
 
 @Service
@@ -26,119 +26,139 @@ public class TransactionService {
     @Autowired
     UserRepository userRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository,AccountRepository accountRepository) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, AccountRepository accountRepository) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
     }
 
-    //TODO: complete this
-    //getting all transactions
-    public List<dbTransaction> getTransactions(String IBAN,OffsetDateTime from,OffsetDateTime to,int dayLimit){
-        //implementing the limit //has to be pageable
-        Integer page = 1;
-        Pageable p = PageRequest.of(page, dayLimit);
-
-        dbUser user = null;
-        user = userRepository.findUserByUsername(user.getUsername());
-        List<dbTransaction> transactions = new ArrayList<>();
-        return transactions;
+    public Transaction setTransactionsFromDb(dbTransaction dbT) {
+        return new Transaction(dbT.getId(), dbT.getUserPerform(), dbT.getIBANto(), dbT.getIBANfrom(), dbT.getAmount(), dbT.getTimestamp());
     }
 
+    public dbTransaction addTransaction(dbTransaction transaction) {
 
-    //post transaction
-    public dbTransaction createTransaction(dbTransaction transaction){
-        if(transaction.getAmount() == null||transaction.getIBANto() == null||
-                transaction.getIBANfrom() == null|| transaction.getUserPerform() == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Input field missing");
-        }
-        dbAccount accountFrom = accountRepository.findAccountByIban(transaction.getIBANfrom());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = userRepository.findUserByUsername(auth.getName());
+
         dbAccount accountTo = accountRepository.findAccountByIban(transaction.getIBANto());
-        dbUser user = userRepository.findUserByUsername(transaction.getUserPerform());
-        //...
-        if(accountFrom == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
-        }
-        else if(accountTo == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
-        }
-        dbUser userTo = userRepository.findById(accountTo.getId()).get();
-        if(accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId()!=user.getId()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
-        }
-        else{
-            accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
-            accountRepository.save(accountFrom);
+        dbAccount accountFrom = accountRepository.findAccountByIban(transaction.getIBANfrom());
 
-            accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
-            accountRepository.save(accountTo);
-
-
+        //checking if iban equals admin iban
+        if (accountTo.getIban().equals("NL01INHO0000000001") || accountFrom.getIban().equals("NL01INHO0000000001")) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "You cannot make a transaction with this IBAN");
         }
-//        UpdateBalanceFrom(transaction);
-//        UpdateBalanceTo(transaction);
+        //checking is iban exists
 
-        setTransactionsFromDb(transaction);
+        if(transaction.getIBANfrom() == null || transaction.getIBANto() == null){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "IBAN does not exist");
+        }
+        //checking validity of transaction
+        if (isValidTransaction(accountFrom.getIban(), accountTo.getIban())) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Transaction is not valid");
+        }
+
+        //checking if account balance is 0 or less
+        dbAccount accFrom = accountRepository.getBalanceByIban(transaction.getIBANfrom());
+        double balanceOfAccountFrom = accFrom.getBalance();
+
+        if(balanceOfAccountFrom <= 0){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Balance is low");
+        }
+        if(transaction.getAmount() > balanceOfAccountFrom){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Amount is higher than your balance. Try again");
+        }
+
+        //get the username using the userid from acc and check if it matches userPerforming string
+        if(!user.getUsername().equals(transaction.getUserPerform())){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User does not exist");
+        }
+        if(!accountTo.getUser().equals(accountFrom.getUser())){
+            if(accountFrom.getAccountType().equals(AccountType.TYPE_CURRENT) && accountTo.getAccountType().equals(AccountType.TYPE_SAVING)){
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Cannot transfer from your account to another customers savings account");
+            }
+        }
+
+        updateTransactionLimit(transaction);
+        updateAccountBalance(accountTo.getIban(), accountFrom.getIban(), transaction.getAmount());
         transactionRepository.save(transaction);
         return transaction;
     }
 
-    public Transaction setTransactionsFromDb(dbTransaction dbTransaction){
-        Transaction transaction = new Transaction();
-        transaction.setTime(dbTransaction.getTimestamp().toString());
-        transaction.setIbANFrom(dbTransaction.getIBANfrom());
-        transaction.setIbANTo(dbTransaction.getIBANto());
-        transaction.setAmount(dbTransaction.getAmount());
-        transaction.setUserPerform(dbTransaction.getUserPerform());
-        return transaction;
+
+    public java.sql.Date getDateToString() {
+        return new java.sql.Date(Calendar.getInstance().getTime().getTime());
     }
 
-
-    public List<dbTransaction> getAllTransactionsFromAnAccount(String IBAN, OffsetDateTime from, OffsetDateTime to){
-        List<dbTransaction> transactions = new ArrayList<>();
-        dbTransaction transaction = null;
-        transactions.add(transaction);
-        return transactions;
-
-    }
-    public List<dbTransaction> getAllTransactions(){
-        return (List<dbTransaction>)transactionRepository.findAll();
-    }
-
-    public List<dbTransaction> getTransactionByIBANfrom(String IBAN){
-        Iterable<dbTransaction> transactions = transactionRepository.getTransactionsByIBANfrom(IBAN);
-
-        if(IBAN.isEmpty() || IBAN == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"IBAN is not provided!");
+    public List<dbTransaction> getTransactionByIBANfrom(String IBAN) {
+        List<dbTransaction> getTransactionsByIBANfrom = transactionRepository.getTransactionsByIBANfrom(IBAN);
+        if (IBAN.isEmpty() || IBAN == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
         }
-        return (List<dbTransaction>) transactions;
-    }
-    public List<dbTransaction> getTransactionByIBANto(String IBAN){
-        Iterable<dbTransaction> transactions = transactionRepository.getTransactionsByIBANto(IBAN);
-
-        if(IBAN.isEmpty() || IBAN == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"IBAN is not provided!");
-        }
-        return (List<dbTransaction>) transactions;
+        return getTransactionsByIBANfrom;
     }
 
-    public Integer CountAllTransactions(){
-        return transactionRepository.CountAllTransactions();
+
+    public List<dbTransaction> getTransactionByIBANto(String iban) {
+        List<dbTransaction> transactionsOfIBANTo = transactionRepository.getTransactionsByIBANto(iban);
+        if (iban.isEmpty() || iban == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
+        }
+        return transactionsOfIBANTo;
     }
 
-    public void UpdateBalanceFrom(dbTransaction transaction){
-        dbAccount account = accountRepository.findAccountByIban(transaction.getIBANfrom());
-        if(account!=null){
-            account.setBalance(account.getBalance() - transaction.getAmount());
-            accountRepository.save(account);
+    public void updateTransactionLimit(dbTransaction transaction){
+        dbUser transactionLimitOfUser = userRepository.getTransactionLimitByUsername(transaction.getUserPerform());
+        double transactionLimit =  transactionLimitOfUser.getTransactionLimit();
+
+        if(transaction.getAmount() > transactionLimit){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Transaction limit has been reached.");
         }
-    }
-    public void UpdateBalanceTo(dbTransaction transaction){
-        dbAccount account = accountRepository.findAccountByIban(transaction.getIBANto());
-        if(account!=null){
-            account.setBalance(account.getBalance() + transaction.getAmount());
-            accountRepository.save(account);
+        else{
+            double newTransactionLimit = transactionLimit - transaction.getAmount();
+            userRepository.updateTransactionLimit(newTransactionLimit);
+            System.out.println(newTransactionLimit);
         }
+
+
     }
+
+
+    //updating balance of accounts after transactions
+    public void updateAccountBalance(String IBANfrom, String IBANTo, Double amount) {
+
+        dbAccount accountFrom = accountRepository.getBalanceByIban(IBANfrom);
+        dbAccount accountTo = accountRepository.getBalanceByIban(IBANTo);
+        double newBalanceForAccountFrom = accountFrom.getBalance() + amount;
+        double newBalanceForAccountTo = accountTo.getBalance() - amount;
+        accountRepository.updateBalance(newBalanceForAccountFrom, accountFrom.getIban());
+        accountRepository.updateBalance(newBalanceForAccountTo, accountTo.getIban());
+    }
+
+
+    //checking validity of transaction
+    private boolean isValidTransaction(String IBANfrom, String IBANto) {
+        boolean isValid = true;
+        //if iban is not the same
+        if (IBANfrom.equals(IBANto)) {
+            isValid = false;
+        }
+        //checking if both are current accounts
+        //if iban is the same and there is current and savings // isvalid is true
+        dbAccount accFrom = accountRepository.findAccountByIban(IBANfrom);
+        dbAccount accTo = accountRepository.findAccountByIban(IBANto);
+
+        if(accFrom.getIban().equals(accTo.getIban())){
+            if((accFrom.getAccountType().equals(AccountType.TYPE_CURRENT) && accTo.getAccountType().equals(AccountType.TYPE_SAVING))){
+                isValid = true;
+            }
+        }
+        return !isValid;
+    }
+
 
 }
+
+
+
+
