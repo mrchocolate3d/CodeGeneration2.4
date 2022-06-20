@@ -5,6 +5,8 @@ import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -47,7 +49,8 @@ public class TransactionService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "You cannot make a transaction with this IBAN");
         }
         //checking is iban exists
-        if (accountTo.getIban() == null || accountFrom.getIban() == null) {
+
+        if(transaction.getIBANfrom() == null || transaction.getIBANto() == null){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "IBAN does not exist");
         }
         //checking validity of transaction
@@ -58,6 +61,7 @@ public class TransactionService {
         //checking if account balance is 0 or less
         dbAccount accFrom = accountRepository.getBalanceByIban(transaction.getIBANfrom());
         double balanceOfAccountFrom = accFrom.getBalance();
+
         if(balanceOfAccountFrom <= 0){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Balance is low");
         }
@@ -75,15 +79,7 @@ public class TransactionService {
             }
         }
 
-
-        // getting transaction limit
-        dbUser transactionLimitOfUser = userRepository.getTransactionLimitByUsername(transaction.getUserPerform());
-        double transactionLimit =  transactionLimitOfUser.getTransactionLimit();
-        if(transaction.getAmount() >= transactionLimit){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Transaction limit has been reached.");
-        }
-        System.out.println(transactionLimit);
-
+        updateTransactionLimit(transaction);
         updateAccountBalance(accountTo.getIban(), accountFrom.getIban(), transaction.getAmount());
         transactionRepository.save(transaction);
         return transaction;
@@ -111,6 +107,21 @@ public class TransactionService {
         return transactionsOfIBANTo;
     }
 
+    public void updateTransactionLimit(dbTransaction transaction){
+        dbUser transactionLimitOfUser = userRepository.getTransactionLimitByUsername(transaction.getUserPerform());
+        double transactionLimit =  transactionLimitOfUser.getTransactionLimit();
+
+        if(transaction.getAmount() > transactionLimit){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Transaction limit has been reached.");
+        }
+        else{
+            double newTransactionLimit = transactionLimit - transaction.getAmount();
+            userRepository.updateTransactionLimit(newTransactionLimit);
+            System.out.println(newTransactionLimit);
+        }
+
+
+    }
 
 
     //updating balance of accounts after transactions
@@ -123,6 +134,7 @@ public class TransactionService {
         accountRepository.updateBalance(newBalanceForAccountFrom, accountFrom.getIban());
         accountRepository.updateBalance(newBalanceForAccountTo, accountTo.getIban());
     }
+
 
     //checking validity of transaction
     private boolean isValidTransaction(String IBANfrom, String IBANto) {
@@ -137,8 +149,7 @@ public class TransactionService {
         dbAccount accTo = accountRepository.findAccountByIban(IBANto);
 
         if(accFrom.getIban().equals(accTo.getIban())){
-            if((accFrom.getAccountType().equals(AccountType.TYPE_CURRENT) && accTo.getAccountType().equals(AccountType.TYPE_SAVING)) ||
-                    (accFrom.getAccountType().equals(AccountType.TYPE_SAVING) && accTo.equals(AccountType.TYPE_CURRENT))){
+            if((accFrom.getAccountType().equals(AccountType.TYPE_CURRENT) && accTo.getAccountType().equals(AccountType.TYPE_SAVING))){
                 isValid = true;
             }
         }

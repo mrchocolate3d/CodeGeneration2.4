@@ -3,6 +3,7 @@ package io.swagger.repository;
 import io.swagger.model.AccountType;
 import io.swagger.model.Transaction;
 import io.swagger.model.dbTransaction;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,10 +20,14 @@ public interface TransactionRepository extends CrudRepository<dbTransaction,Long
     @Query("select t from dbTransaction t where t.IBANto =:IBAN")
     List<dbTransaction> getTransactionsByIBANto(String IBAN);
 
+
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE db_Account SET balance = ?1 WHERE iban = ?2 AND account_type = ?3", nativeQuery = true)
     void updateAccountBalance(Double newBalance, String IBAN, AccountType accountType);
+
+    List<dbTransaction> findByIBANfrom(String IBAN, Pageable p);
 
     @Query("SELECT COUNT(t) FROM dbTransaction t")
     Integer CountAllTransactions();
