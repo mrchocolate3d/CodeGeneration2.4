@@ -20,7 +20,7 @@ import javax.validation.constraints.*;
 
 public class Transaction   {
 
-  @JsonProperty("id")
+//  @JsonProperty("id")
   private Long id = null;
 
   @JsonProperty("userPerform")

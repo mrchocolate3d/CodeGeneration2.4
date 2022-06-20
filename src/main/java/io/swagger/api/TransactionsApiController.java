@@ -51,7 +51,7 @@ public class TransactionsApiController implements TransactionsApi {
         this.transactionService = transactionService;
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE')")
     public ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1") @Parameter(in = ParameterIn.QUERY, description = "" , required=true, schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true)
                                                                      String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false)
                                                                      java.sql.Date fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
@@ -64,12 +64,12 @@ public class TransactionsApiController implements TransactionsApi {
             List<Transaction> transactionList = new ArrayList<>();
 
             List<dbTransaction> dbTransactionsFrom = transactionService.getTransactionByIBANfrom(IBAN);
+            List<dbTransaction>dbTransactionTo = transactionService.getTransactionByIBANto(IBAN);
+
             for (dbTransaction dbFrom : dbTransactionsFrom) {
                 Transaction transaction = transactionService.setTransactionsFromDb(dbFrom);
                 transactionList.add(transaction);
             }
-
-            List<dbTransaction>dbTransactionTo = transactionService.getTransactionByIBANto(IBAN);
             for(dbTransaction dbTo : dbTransactionTo){
                 Transaction transaction = transactionService.setTransactionsFromDb(dbTo);
                 transactionList.add(transaction);
@@ -82,7 +82,7 @@ public class TransactionsApiController implements TransactionsApi {
 
 
     }
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
+//    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK', 'ROLE_CUSTOMER')")
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
         try{
