@@ -91,6 +91,8 @@ public class TransactionService {
     }
 
     public List<dbTransaction> getTransactionByIBANfrom(String IBAN) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        dbUser user = userRepository.findUserByUsername(auth.getName());
         List<dbTransaction> getTransactionsByIBANfrom = transactionRepository.getTransactionsByIBANfrom(IBAN);
         if (IBAN.isEmpty() || IBAN == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
