@@ -50,7 +50,7 @@ public interface AccountsApi {
     ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 
-    @Operation(summary = "Create an account", description = "Can only be done by user", security = {
+    @Operation(summary = "Create an account", description = "Employee create account for user", security = {
         @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ReturnAccount.class))),

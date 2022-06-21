@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -77,23 +78,23 @@ public class AccountsApiController implements AccountsApi {
         dbUser user = userService.getUserById(account.getUserId());
 
         if(user != null){
-
             dbAccount dbAccount = new dbAccount();
+            ReturnAccount returnAccount = new ReturnAccount();
+            returnAccount.setUserId(user.getId());
             dbAccount.setUser(user);
+            AccountType accountType = AccountType.TYPE_CURRENT;
             if(account.getAccountType().equals("TYPE_CURRENT")) {
-                AccountType accountType = AccountType.TYPE_CURRENT;
-                dbAccount.setAccountType(accountType);
+                accountType = AccountType.TYPE_CURRENT;
             }else if(account.getAccountType().equals("TYPE_SAVING")){
-                AccountType accountType = AccountType.TYPE_SAVING;
-                dbAccount.setAccountType(accountType);
+                accountType = AccountType.TYPE_SAVING;
             }
+            returnAccount.setAccountType(accountType);
+            dbAccount.setAccountType(returnAccount.getAccountType());
+            returnAccount.setIBAN(dbAccount.getIban());
             dbAccount accountAdded = accountService.add(user, account.getAccountType());
-
 
             return new ResponseEntity<ReturnAccount>(HttpStatus.CREATED);
         }
-
-
         return new ResponseEntity<ReturnAccount>(HttpStatus.NOT_FOUND);
     }
 
@@ -133,39 +134,26 @@ public class AccountsApiController implements AccountsApi {
         if(limit == null && username == null) {
             for (dbAccount dbAccount : dbAccounts) {
                 User user = setUserFromDTO(dbAccount);
-
                 Account account = setAccountFromDb(dbAccount, user);
-
                 accounts.add(account);
             }
         }else if(limit != null && username == null){
             int count = 0;
-
             for (dbAccount dbAccount : dbAccounts) {
                 if (count >= limit){
                     break;
                 }
                 User user = setUserFromDTO(dbAccount);
-
                 Account account = setAccountFromDb(dbAccount, user);
-
                 accounts.add(account);
-
-
                 count++;
-
             }
         }else if(username != null && limit == null){
             for(dbAccount dbAccount : dbAccounts){
                 if(dbAccount.getUser().getUsername().equals(username)){
-
-
                     User user = setUserFromDTO(dbAccount);
-
                     Account account = setAccountFromDb(dbAccount, user);
-
                     accounts.add(account);
-
                 }
                 continue;
             }
@@ -177,15 +165,9 @@ public class AccountsApiController implements AccountsApi {
                     break;
                 }
                 if(dbAccount.getUser().getUsername().equals(username)){
-
                 User user = setUserFromDTO(dbAccount);
-
                 Account account = setAccountFromDb(dbAccount, user);
-
                 accounts.add(account);
-
-
-
                 }
                 count++;
             }
@@ -218,17 +200,19 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser userFromDB = userService.getUserByUsername(auth.getName());
+
         dbAccount account = accountService.getBalance(IBAN);
-        if(account != null){
+        if(account != null && userFromDB.getUsername().equals(account.getUser().getUsername())){
             ReturnBalance balance = new ReturnBalance();
             balance.setIBAN(account.getIban());
             balance.setAccountType(account.getAccountType());
             balance.setBalance(account.getBalance());
-            return new ResponseEntity<ReturnBalance>(HttpStatus.OK);
+            return new ResponseEntity<ReturnBalance>(balance, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Account not found or Not your account");
     }
 
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {

@@ -63,7 +63,6 @@ public class UsersApiController implements UsersApi {
     //@PreAuthorize("permitAll")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         dbUser userFromDB = userService.getUserByUsername(auth.getName());
         if(userFromDB != null){
@@ -71,7 +70,6 @@ public class UsersApiController implements UsersApi {
         }
         if (accept.contains("application/json")) {
             List<User> userList = userService.getUsers();
-
             if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))) {
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
             } else {
@@ -80,7 +78,7 @@ public class UsersApiController implements UsersApi {
                     userService.addUser(user);
                     return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
                 } else{
-                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),  body.getPhone() , passwordEncoder.encode(body.getPassword()), List.of(UserRole.ROLE_CUSTOMER), body.getTransactionLimit());
+                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),  body.getPhone() , passwordEncoder.encode(body.getPassword()), List.of(UserRole.ROLE_CUSTOMER), 300);
                     userService.addUser(user);
                     return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
                 }
@@ -95,8 +93,6 @@ public class UsersApiController implements UsersApi {
 
         userService.deleteUser(id);
         return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
-
-
     }
 
     //@PreAuthorize("hasRole('ROLE_EMPLOYEE')" , "hasRole('ROLE_CUSTOMER')")
@@ -106,7 +102,6 @@ public class UsersApiController implements UsersApi {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         dbUser userFromDB = userService.getUserByUsername(auth.getName());
-
 
         if (userFromDB != null && Editusername.equals(userFromDB.getUsername())) {
             if(body.getRoles() != userFromDB.getRoles() || body.getUsername() != userFromDB.getUsername() ||  body.getTransactionLimit() != userFromDB.getTransactionLimit()){

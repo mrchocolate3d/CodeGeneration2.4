@@ -94,6 +94,7 @@ class AccountsApiControllerTest {
 
     }
 
+    @Test
     public String getTokenWhenLoggingIn() throws Exception {
         Object login = new Object(){
             public final String username = "test";
