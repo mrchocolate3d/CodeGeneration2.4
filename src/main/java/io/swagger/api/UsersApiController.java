@@ -76,11 +76,11 @@ public class UsersApiController implements UsersApi {
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
             } else {
                 if(userFromDB != null){
-                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), body.getRoles(), body.getTransactionLimit());
+                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),  body.getPhone(), passwordEncoder.encode(body.getPassword()), body.getRoles(), body.getTransactionLimit());
                     userService.addUser(user);
                     return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
                 } else{
-                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_CUSTOMER), body.getTransactionLimit());
+                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),  body.getPhone() , passwordEncoder.encode(body.getPassword()), List.of(UserRole.ROLE_CUSTOMER), body.getTransactionLimit());
                     userService.addUser(user);
                     return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
                 }
@@ -99,16 +99,24 @@ public class UsersApiController implements UsersApi {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
-    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Username of the customer youj want to edit", required = false, schema = @Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
+    //@PreAuthorize("hasRole('ROLE_EMPLOYEE')" , "hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE','ROLE_CUSTOMER')")
+    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Username of the customer you want to edit", required = false, schema = @Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         dbUser userFromDB = userService.getUserByUsername(auth.getName());
 
-        if (userFromDB != null && Editusername == userFromDB.getUsername()) {
-            userService.editUser(userFromDB, body);
 
+        if (userFromDB != null && Editusername.equals(userFromDB.getUsername())) {
+            if(body.getRoles() != userFromDB.getRoles() || body.getUsername() != userFromDB.getUsername() ||  body.getTransactionLimit() != userFromDB.getTransactionLimit()){
+                userService.editUser(userFromDB, body);
+                return new ResponseEntity<Void>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+            }
+            userService.editUser(userFromDB, body);
+            return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+        } else if(userFromDB != null && userFromDB.getRoles().equals(List.of(UserRole.ROLE_EMPLOYEE)) ){
+            userService.AdminEditUser(userFromDB, body);
             return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);

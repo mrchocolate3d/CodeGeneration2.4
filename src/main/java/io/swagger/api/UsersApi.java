@@ -51,7 +51,7 @@ public interface UsersApi {
     @Operation(summary = "Delete User Info", description = "Deleting customer information using the id", security = {
         @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "successful operation"),
+        @ApiResponse(responseCode = "200", description = "User successfully defeated"),
         
         @ApiResponse(responseCode = "400", description = "Id is invalid"),
         
@@ -64,12 +64,14 @@ public interface UsersApi {
     @Operation(summary = "Edit User Info", description = "Editing specific user information using id", security = {
         @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Information changed"),
+        @ApiResponse(responseCode = "202", description = "Information changed"),
         
-        @ApiResponse(responseCode = "400", description = "Id is invalid"),
+        @ApiResponse(responseCode = "400", description = "Username is invalid"),
         
-        @ApiResponse(responseCode = "404", description = "Customer not found") })
-    @RequestMapping(value = "/Users/{id}",
+        @ApiResponse(responseCode = "406", description = "Customer not found") ,
+
+        @ApiResponse(responseCode = "203", description = "Roles, TransactionLimit, Username have not been updated ")})
+    @RequestMapping(value = "/Users/{username}",
         consumes = { "application/json", "application/xml" }, 
         method = RequestMethod.PUT)
     ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody InsertUser body);

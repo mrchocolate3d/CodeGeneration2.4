@@ -116,12 +116,23 @@ public class UserService {
     public void editUser(dbUser oldUser ,InsertUser newUser){
         oldUser.setFirstName(newUser.getFirstName());
         oldUser.setLastName(newUser.getLastName());
+        //oldUser.setUsername(newUser.getUsername());
+        oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        oldUser.setEmail(newUser.getEmail());
+        oldUser.setPhone(newUser.getPhone());
+        //oldUser.setTransactionLimit(newUser.getTransactionLimit());
+        userRepository.save(oldUser);
+
+    }
+    public void AdminEditUser(dbUser oldUser ,InsertUser newUser){
+        oldUser.setFirstName(newUser.getFirstName());
+        oldUser.setLastName(newUser.getLastName());
         oldUser.setUsername(newUser.getUsername());
         oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         oldUser.setEmail(newUser.getEmail());
         oldUser.setPhone(newUser.getPhone());
         oldUser.setTransactionLimit(newUser.getTransactionLimit());
-
+        oldUser.setRoles(newUser.getRoles());
         userRepository.save(oldUser);
 
     }
