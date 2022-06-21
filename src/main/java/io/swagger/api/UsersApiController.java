@@ -110,8 +110,9 @@ public class UsersApiController implements UsersApi {
             }
             userService.editUser(userFromDB, body);
             return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
-        } else if(userFromDB != null && userFromDB.getRoles().equals(List.of(UserRole.ROLE_EMPLOYEE)) ){
-            userService.AdminEditUser(userFromDB, body);
+        } else if(userFromDB != null && userFromDB.getRoles().contains(UserRole.ROLE_EMPLOYEE)){
+            dbUser selectedUser = userService.getUserByUsername(Editusername);
+            userService.AdminEditUser(selectedUser, body);
             return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);
