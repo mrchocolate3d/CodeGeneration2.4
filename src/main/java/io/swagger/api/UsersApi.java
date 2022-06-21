@@ -35,14 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
-@Validated
+//@Validated
 public interface UsersApi {
 
-    @Operation(summary = "Create User", description = "This can be done by a new customer", security = {
-        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
+    @Operation(summary = "Create User", description = "This can be done by a new customer. Employee = [0], Customer = [1]", tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "user created", content = @Content(schema = @Schema(implementation = User.class))) })
-    @RequestMapping(value = "/Users",
+    @RequestMapping(value = "/CreateUser",
         produces = { "application/json"},
         consumes = { "application/json"},
         method = RequestMethod.POST)
@@ -73,7 +72,7 @@ public interface UsersApi {
     @RequestMapping(value = "/Users/{id}",
         consumes = { "application/json", "application/xml" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody InsertUser body);
+    ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody InsertUser body);
 
 
     @Operation(summary = "Get all users", description = "This can be done by Employees", security = {

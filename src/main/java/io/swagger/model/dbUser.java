@@ -55,7 +55,4 @@ public class dbUser {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<dbAccount> accounts;
-
-
-
 }

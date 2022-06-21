@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,22 +60,32 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    //@PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    //@PreAuthorize("permitAll")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser userFromDB = userService.getUserByUsername(auth.getName());
+        if(userFromDB != null){
+            System.out.println(userFromDB.getRoles());
+        }
+        if (accept.contains("application/json")) {
             List<User> userList = userService.getUsers();
 
             if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))) {
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
             } else {
-
-                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_EMPLOYEE), body.getTransactionLimit());
-                userService.addUser(user);
-                return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
+                if(userFromDB != null){
+                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), body.getRoles(), body.getTransactionLimit());
+                    userService.addUser(user);
+                    return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
+                } else{
+                    dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_CUSTOMER), body.getTransactionLimit());
+                    userService.addUser(user);
+                    return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
+                }
             }
         }
-
         return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -84,17 +95,20 @@ public class UsersApiController implements UsersApi {
 
         userService.deleteUser(id);
         return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+
+
     }
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
-    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = false, schema = @Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
+    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Username of the customer youj want to edit", required = false, schema = @Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         dbUser userFromDB = userService.getUserByUsername(auth.getName());
 
-        if (userFromDB != null) {
+        if (userFromDB != null && Editusername == userFromDB.getUsername()) {
             userService.editUser(userFromDB, body);
+
             return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);

@@ -208,7 +208,7 @@ public class InsertUser   {
    * Get role
    * @return role
    **/
-  @Schema(example = "Customer", description = "")
+  @Schema(example = "[0]", description = "[0] =  employee, [1] = Customer")
   
     public List<UserRole> getRoles() {
     return roles;
