@@ -45,7 +45,7 @@ public interface AccountsApi {
         @ApiResponse(responseCode = "400", description = "Invalid IBAN"),
         
         @ApiResponse(responseCode = "404", description = "IBAN not found") })
-    @RequestMapping(value = "/Accounts/{UserID}",
+    @RequestMapping(value = "/Accounts/{IBAN}",
         method = RequestMethod.DELETE)
     ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 

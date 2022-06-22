@@ -18,6 +18,9 @@ public interface AccountRepository extends CrudRepository<dbAccount, Long> {
     dbAccount deleteAccountByIban(String IBAN);
     dbAccount getBalanceByIban(String IBAN);
 
+
+    void deleteByIban(String IBAN);
+
     dbAccount findAccountByIban(String IBAN);
     @Transactional
     @Modifying

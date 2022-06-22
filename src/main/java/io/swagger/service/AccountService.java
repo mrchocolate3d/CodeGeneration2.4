@@ -110,7 +110,7 @@ public class AccountService {
 
     public void closeAccount(String IBAN){
         dbAccount dbAccount = accountRepository.findAccountByIban(IBAN);
-        accountRepository.delete(dbAccount);
+        accountRepository.deleteByIban(IBAN);
     }
 
     public dbAccount getBalance(String IBAN){
