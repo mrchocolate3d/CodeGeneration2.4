@@ -95,7 +95,7 @@ public class TransactionService {
         dbUser user = userRepository.findUserByUsername(auth.getName());
         dbAccount loggedInAccount = accountRepository.findAccountByIban(IBAN);
 
-        if(!user.getUsername().equals(loggedInAccount.getUser())){
+        if(!user.getUsername().equals(loggedInAccount.getUser().getUsername())){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User is not logged in");
         }
         else{
@@ -114,7 +114,7 @@ public class TransactionService {
         dbUser user = userRepository.findUserByUsername(auth.getName());
         dbAccount loggedInAccount = accountRepository.findAccountByIban(iban);
 
-        if(!user.getUsername().equals(loggedInAccount.getUser())){
+        if(!user.getUsername().equals(loggedInAccount.getUser().getUsername())){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User is not logged in");
         }
         else{

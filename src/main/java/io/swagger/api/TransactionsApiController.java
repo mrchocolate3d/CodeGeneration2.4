@@ -58,9 +58,6 @@ public class TransactionsApiController implements TransactionsApi {
             java.sql.Date toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
                                                                      Integer limit) {
         try{
-            String accept = request.getHeader("Accept");
-            String authKey = request.getHeader("X-AUTHENTICATION");
-
             List<Transaction> transactionList = new ArrayList<>();
 
             List<dbTransaction> dbTransactionsFrom = transactionService.getTransactionByIBANfrom(IBAN);
@@ -86,7 +83,6 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<Transaction> makeNewTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction transaction) {
         String accept = request.getHeader("Accept");
         try{
-
             dbTransaction dbTransaction = new dbTransaction(transaction.getUserPerform(),transaction.getIbANTo(),transaction.getIbANFrom(),transaction.getAmount(),transactionService.getDateToString());
             transactionService.addTransaction(dbTransaction);
             return new ResponseEntity<Transaction>(transactionService.setTransactionsFromDb(dbTransaction), HttpStatus.CREATED);
@@ -94,8 +90,6 @@ public class TransactionsApiController implements TransactionsApi {
         catch(Exception e){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
         }
-
-
     }
 
 }
