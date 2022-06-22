@@ -91,22 +91,41 @@ public class TransactionService {
     }
 
     public List<dbTransaction> getTransactionByIBANfrom(String IBAN) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        dbUser user = userRepository.findUserByUsername(auth.getName());
-        List<dbTransaction> getTransactionsByIBANfrom = transactionRepository.getTransactionsByIBANfrom(IBAN);
-        if (IBAN.isEmpty() || IBAN == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = userRepository.findUserByUsername(auth.getName());
+        dbAccount loggedInAccount = accountRepository.findAccountByIban(IBAN);
+
+        if(!user.getUsername().equals(loggedInAccount.getUser())){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User is not logged in");
         }
-        return getTransactionsByIBANfrom;
+        else{
+            List<dbTransaction> getTransactionsByIBANfrom = transactionRepository.getTransactionsByIBANfrom(IBAN);
+            if (IBAN.isEmpty() || IBAN == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
+            }
+            return getTransactionsByIBANfrom;
+        }
     }
 
 
     public List<dbTransaction> getTransactionByIBANto(String iban) {
-        List<dbTransaction> transactionsOfIBANTo = transactionRepository.getTransactionsByIBANto(iban);
-        if (iban.isEmpty() || iban == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = userRepository.findUserByUsername(auth.getName());
+        dbAccount loggedInAccount = accountRepository.findAccountByIban(iban);
+
+        if(!user.getUsername().equals(loggedInAccount.getUser())){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User is not logged in");
         }
-        return transactionsOfIBANTo;
+        else{
+            List<dbTransaction> transactionsOfIBANTo = transactionRepository.getTransactionsByIBANto(iban);
+            if (iban.isEmpty() || iban == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IBAN is not provided!");
+            }
+            return transactionsOfIBANTo;
+        }
+
+
     }
 
     public void updateTransactionLimit(dbTransaction transaction){
