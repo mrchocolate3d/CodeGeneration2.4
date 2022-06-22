@@ -32,6 +32,7 @@ public class TransactionService {
         this.userRepository = userRepository;
     }
 
+    //converting
     public Transaction setTransactionsFromDb(dbTransaction dbT) {
         return new Transaction(dbT.getId(), dbT.getUserPerform(), dbT.getIBANto(), dbT.getIBANfrom(), dbT.getAmount(), dbT.getTimestamp());
     }
@@ -86,10 +87,12 @@ public class TransactionService {
     }
 
 
+    //date to string
     public java.sql.Date getDateToString() {
         return new java.sql.Date(Calendar.getInstance().getTime().getTime());
     }
 
+    //getting all transactions of IBANFROM
     public List<dbTransaction> getTransactionByIBANfrom(String IBAN) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         dbUser user = userRepository.findUserByUsername(auth.getName());
@@ -108,6 +111,7 @@ public class TransactionService {
     }
 
 
+    //getting all transactions of IBANTO
     public List<dbTransaction> getTransactionByIBANto(String iban) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -128,6 +132,7 @@ public class TransactionService {
 
     }
 
+    //method for updating transaction limit when performing transaction
     public void updateTransactionLimit(dbTransaction transaction){
         dbUser transactionLimitOfUser = userRepository.getTransactionLimitByUsername(transaction.getUserPerform());
         double transactionLimit =  transactionLimitOfUser.getTransactionLimit();
@@ -140,8 +145,6 @@ public class TransactionService {
             userRepository.updateTransactionLimit(newTransactionLimit, transaction.getUserPerform());
             System.out.println(newTransactionLimit);
         }
-
-
     }
 
 
