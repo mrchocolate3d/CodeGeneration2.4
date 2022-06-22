@@ -76,11 +76,11 @@ public class UsersApiController implements UsersApi {
                 if(userFromDB != null){
                     dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),  body.getPhone(), passwordEncoder.encode(body.getPassword()), body.getRoles(), body.getTransactionLimit());
                     userService.addUser(user);
-                    return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
+                    return new ResponseEntity<User>(userService.convertDbUsertoUserWithRoles(user),HttpStatus.CREATED);
                 } else{
                     dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),  body.getPhone() , passwordEncoder.encode(body.getPassword()), List.of(UserRole.ROLE_CUSTOMER), 300);
                     userService.addUser(user);
-                    return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
+                    return new ResponseEntity<User>(userService.convertDbUsertoUserWithRoles(user),HttpStatus.CREATED);
                 }
             }
         }
@@ -128,8 +128,7 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "50"
             , defaultValue = "50")) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<User>(userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))),HttpStatus.OK);
+        return new ResponseEntity<User>(userService.convertDbUsertoUserWithRoles(userService.getUserById(Long.parseLong(id.toString()))),HttpStatus.OK);
         //userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))),
     }
-
 }

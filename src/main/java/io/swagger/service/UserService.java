@@ -62,6 +62,9 @@ public class UserService {
         return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
     }
 
+    public User convertDbUsertoUserWithRoles(dbUser x){
+        return new User(x.getId(),x.getFirstName(), x.getLastName(), x.getUsername(), x.getEmail(), x.getPhone(), x.getRoles(),x.getTransactionLimit());
+    }
 
     public dbUser getUserByUsername(String username){
         return userRepository.findUserByUsername(username);
@@ -72,13 +75,13 @@ public class UserService {
         List <User> users = new ArrayList<>();
         int count;
         if (name != null && limit == null){
-            users.add(convertDbUserToUser(getUserByUsername(name)));
+            users.add(convertDbUsertoUserWithRoles(getUserByUsername(name)));
             return users;
         } else if (name == null && limit != null){
             count = 0;
             List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
             for (dbUser x : dbUsers) {
-                users.add(convertDbUserToUser(x));
+                users.add(convertDbUsertoUserWithRoles(x));
                 count++;
                 if (limit == count){
                     break;
@@ -99,7 +102,7 @@ public class UserService {
             List <User> users = new ArrayList<>();
             List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
             for (dbUser x : dbUsers) {
-                users.add(convertDbUserToUser(x));
+                users.add(convertDbUsertoUserWithRoles(x));
             }
             return users;
 

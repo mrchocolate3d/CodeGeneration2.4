@@ -1,5 +1,7 @@
 package io.swagger.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,6 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
 
 /**
  * User personal information
@@ -28,8 +33,19 @@ public class User   {
     this.transactionLimit = transactionLimit;
   }
 
+  public User(Long id, String firstName, String lastName, String username, String email, String phone, List<UserRole> roles, double transactionLimit) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.username = username;
+    this.email = email;
+    this.phone = phone;
+    this.roles = roles;
+    this.transactionLimit = transactionLimit;
+  }
 
-
+  @ElementCollection(fetch = FetchType.EAGER)
+  List<UserRole> roles;
   @JsonProperty("id")
   private Long id = null;
 
