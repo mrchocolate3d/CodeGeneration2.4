@@ -186,6 +186,7 @@ public class AccountsApiController implements AccountsApi {
         user.setPhone(dbUser.getPhone());
         user.setTransactionLimit(dbUser.getTransactionLimit());
         user.setUsername(dbUser.getUsername());
+        user.setRoles(dbUser.getRoles());
 
         return user;
     }

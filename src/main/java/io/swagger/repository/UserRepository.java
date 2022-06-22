@@ -16,8 +16,8 @@ public interface UserRepository extends CrudRepository<dbUser, Long>{
     dbUser getTransactionLimitByUsername(String username);
     @Transactional
     @Modifying
-    @Query("update dbUser u set u.transactionLimit = ?1")
-    void updateTransactionLimit(Double limit);
+    @Query("update dbUser u set u.transactionLimit = ?1 where u.username = ?2")
+    void updateTransactionLimit(Double limit, String username);
     //dbUser deletedbUserBy(Long id);
 }
 

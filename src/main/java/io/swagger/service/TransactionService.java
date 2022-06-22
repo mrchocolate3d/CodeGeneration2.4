@@ -71,7 +71,7 @@ public class TransactionService {
 
         //get the username using the userid from acc and check if it matches userPerforming string
         if(!user.getUsername().equals(transaction.getUserPerform())){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User does not exist");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Can't make transaction from other people's account");
         }
         if(!accountTo.getUser().equals(accountFrom.getUser())){
             if(accountFrom.getAccountType().equals(AccountType.TYPE_CURRENT) && accountTo.getAccountType().equals(AccountType.TYPE_SAVING)){
@@ -137,7 +137,7 @@ public class TransactionService {
         }
         else{
             double newTransactionLimit = transactionLimit - transaction.getAmount();
-            userRepository.updateTransactionLimit(newTransactionLimit);
+            userRepository.updateTransactionLimit(newTransactionLimit, transaction.getUserPerform());
             System.out.println(newTransactionLimit);
         }
 

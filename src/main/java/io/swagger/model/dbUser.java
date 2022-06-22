@@ -55,4 +55,20 @@ public class dbUser {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<dbAccount> accounts;
+
+    @Override
+    public String toString() {
+        return "dbUser{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", password='" + password + '\'' +
+                ", roles=" + roles +
+                ", transactionLimit=" + transactionLimit +
+                ", accounts=" + accounts +
+                '}';
+    }
 }
