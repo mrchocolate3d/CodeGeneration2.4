@@ -39,8 +39,9 @@ import java.util.Map;
 public interface UsersApi {
 
     @Operation(summary = "Create User", description = "This can be done by a new customer. Employee = [0], Customer = [1]", tags={ "Employee" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "user created", content = @Content(schema = @Schema(implementation = User.class))) })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "user created", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "406", description = "Customer Username is taken")})
     @RequestMapping(value = "/CreateUser",
         produces = { "application/json"},
         consumes = { "application/json"},
@@ -64,7 +65,7 @@ public interface UsersApi {
     @Operation(summary = "Edit User Info", description = "Editing specific user information using id", security = {
         @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "202", description = "Information changed"),
+        @ApiResponse(responseCode = "202", description = "Information changed", content = @Content(schema = @Schema(implementation = User.class))) ,
         
         @ApiResponse(responseCode = "400", description = "Username is invalid"),
         
@@ -74,7 +75,7 @@ public interface UsersApi {
     @RequestMapping(value = "/Users/{username}",
         consumes = { "application/json", "application/xml" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to edit", required=true, schema=@Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody InsertUser body);
+    ResponseEntity<User> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to edit", required=true, schema=@Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody InsertUser body);
 
 
     @Operation(summary = "Get all users", description = "This can be done by Employees", security = {

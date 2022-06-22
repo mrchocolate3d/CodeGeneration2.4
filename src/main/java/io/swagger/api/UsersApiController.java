@@ -97,7 +97,7 @@ public class UsersApiController implements UsersApi {
 
     //@PreAuthorize("hasRole('ROLE_EMPLOYEE')" , "hasRole('ROLE_CUSTOMER')")
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE','ROLE_CUSTOMER')")
-    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Username of the customer you want to edit", required = false, schema = @Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
+    public ResponseEntity<User> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Username of the customer you want to edit", required = false, schema = @Schema()) @PathVariable("username") String Editusername, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -106,16 +106,16 @@ public class UsersApiController implements UsersApi {
         if (userFromDB != null && Editusername.equals(userFromDB.getUsername())) {
             if(body.getRoles() != userFromDB.getRoles() || body.getUsername() != userFromDB.getUsername() ||  body.getTransactionLimit() != userFromDB.getTransactionLimit()){
                 userService.editUser(userFromDB, body);
-                return new ResponseEntity<Void>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+                return new ResponseEntity<User>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
             }
             userService.editUser(userFromDB, body);
-            return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+            return new ResponseEntity<User>(userService.convertDbUsertoUserWithRoles(userFromDB), HttpStatus.ACCEPTED);
         } else if(userFromDB != null && userFromDB.getRoles().contains(UserRole.ROLE_EMPLOYEE)){
             dbUser selectedUser = userService.getUserByUsername(Editusername);
             userService.AdminEditUser(selectedUser, body);
-            return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+            return new ResponseEntity<User>(userService.convertDbUsertoUserWithRoles(selectedUser), HttpStatus.ACCEPTED);
         }
-        return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")

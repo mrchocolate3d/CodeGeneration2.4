@@ -52,7 +52,7 @@ public class BankApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
-                "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
+                "02348789347", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
                 2500));
 
        // dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
