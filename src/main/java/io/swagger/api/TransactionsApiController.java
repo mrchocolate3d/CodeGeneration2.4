@@ -53,8 +53,8 @@ public class TransactionsApiController implements TransactionsApi {
 
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_CUSTOMER')")
     public ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1") @Parameter(in = ParameterIn.QUERY, description = "" , required=true, schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true)
-                                                                     String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "yyyy-mm-dd", required = false)
-                                                                     java.sql.Date fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "yyyy-mm-dd", required = false)
+                                                                     String IBAN, @Parameter(in = ParameterIn.QUERY, description = "yyyy-mm-dd" , schema=@Schema()) @Valid @RequestParam(value = "", required = false)
+                                                                     java.sql.Date fromDate, @Parameter(in = ParameterIn.QUERY, description = "yyyy-mm-dd" , schema=@Schema()) @Valid @RequestParam(value = "", required = false)
             java.sql.Date toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
                                                                      Integer limit) {
         try{
