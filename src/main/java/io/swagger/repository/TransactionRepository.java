@@ -8,12 +8,15 @@ import org.springframework.stereotype.Repository;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<dbTransaction,Long> {
 
+    @Query("SELECT amount FROM dbTransaction t WHERE t.timestamp =?1 AND t.IBANfrom =?2")
+    List<Double> getTransactionAmountByAccountAndDate(LocalDate timestamp, String IBANFrom);
     Iterable<dbTransaction>getTransactionsByIBANfrom(String IBAN);
     Iterable<dbTransaction>getTransactionsByIBANto(String IBAN);
     @Query("SELECT COUNT(t) FROM dbTransaction t")

@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
+
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -63,10 +65,15 @@ public class TransactionService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
         }
         dbUser userTo = userRepository.findById(accountTo.getId()).get();
-        if(accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId()!=user.getId()){
+        if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId()!=user.getId()) || (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
         }
         else{
+
+            if(accountFrom.getBalance() - transaction.getAmount() < accountFrom.getAbsoluteLimit()){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Limit reach. Please change your transaction amount");
+            }
+
             accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
             accountRepository.save(accountFrom);
 
@@ -100,6 +107,16 @@ public class TransactionService {
         transactions.add(transaction);
         return transactions;
 
+    }
+
+    public Double getTotalTransactionAmountByAccountAndDate(LocalDate date, String IbanFrom){
+        List<Double> transactionAmounts = transactionRepository.getTransactionAmountByAccountAndDate(date, IbanFrom);
+        double totalAmountInDay = 0;
+        for(double a : transactionAmounts){
+            totalAmountInDay += a;
+        }
+
+        return totalAmountInDay;
     }
     public List<dbTransaction> getAllTransactions(){
         return (List<dbTransaction>)transactionRepository.findAll();

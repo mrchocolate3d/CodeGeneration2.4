@@ -17,6 +17,7 @@ import org.threeten.bp.OffsetDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.threeten.bp.ZoneOffset;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -38,7 +39,7 @@ public class TransactionsApiControllerTest {
     public void setup() throws Exception {
 
         transaction = new dbTransaction(
-                "testuser","NL01INH0000000000","NL02INH0000000000",500.00,OffsetDateTime.of(2021,5,1,10,20,40,0, ZoneOffset.UTC)
+                "testuser","NL01INH0000000000","NL02INH0000000000",500.00, LocalDate.now()
         );
 
     }

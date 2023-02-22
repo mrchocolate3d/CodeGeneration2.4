@@ -24,6 +24,8 @@ public class dbAccount {
     private double balance;
     private String iban;
 
+    private double absoluteLimit;
+
 
     @ManyToOne
     @JsonBackReference
@@ -39,9 +41,10 @@ public class dbAccount {
 //    public void setActive(Boolean active){
 //        this.active = active;
 //    }
-    public dbAccount(AccountType accountType, double balance, dbUser user) {
+    public dbAccount(AccountType accountType, double balance, dbUser user, double absoluteLimit) {
         this.accountType = accountType;
         this.balance = balance;
         this.user = user;
+        this.absoluteLimit = absoluteLimit;
     }
 }

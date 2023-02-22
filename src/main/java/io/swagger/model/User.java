@@ -18,7 +18,7 @@ import org.springframework.validation.annotation.Validated;
 @Data
 @NoArgsConstructor
 public class User   {
-  public User(Long id, String username, String firstName, String lastName, String email, String phone, Double transactionLimit) {
+  public User(Long id, String username, String firstName, String lastName, String email, String phone, Double transactionLimit, Double dayLimit) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -26,6 +26,7 @@ public class User   {
     this.email = email;
     this.phone = phone;
     this.transactionLimit = transactionLimit;
+    this.dayLimit = dayLimit;
   }
 
 
@@ -51,6 +52,9 @@ public class User   {
 
   @JsonProperty("transactionLimit")
   private Double transactionLimit = null;
+
+  @JsonProperty("dayLimit")
+  private Double dayLimit = null;
 
 
 
@@ -193,6 +197,24 @@ public class User   {
     this.transactionLimit = transactionLimit;
   }
 
+  public User dayLimit(Double dayLimit) {
+    this.dayLimit = dayLimit;
+    return this;
+  }
+
+  /**
+   * Get dayLimit
+   * @return dayLimit
+   **/
+  @Schema(example = "10000", description = "")
+  public Double getDayLimit() {
+    return dayLimit;
+  }
+
+  public void setDayLimit(Double dayLimit) {
+    this.dayLimit = dayLimit;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -222,7 +244,6 @@ public class User   {
     StringBuilder sb = new StringBuilder();
     sb.append("class User {\n");
 
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");

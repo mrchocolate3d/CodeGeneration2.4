@@ -9,6 +9,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.threeten.bp.OffsetDateTime;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 //@NoArgsConstructor
@@ -27,10 +28,8 @@ public class dbTransaction {
     private String IBANto;
     private Double amount;
 
-    private OffsetDateTime timestamp;
-    //private Integer dayLimit; //day limit //not sure entirely
-
-    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, OffsetDateTime timestamp) {
+    private LocalDate timestamp;
+    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, LocalDate timestamp) {
         this.userPerform = userPerform;
         this.IBANfrom = IBANfrom;
         this.IBANto = IBANto;

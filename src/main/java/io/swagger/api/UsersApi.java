@@ -5,9 +5,7 @@
  */
 package io.swagger.api;
 
-import io.swagger.model.InsertUser;
-import io.swagger.model.User;
-import io.swagger.model.dbUser;
+import io.swagger.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -101,5 +99,27 @@ public interface UsersApi {
     ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit);
 
+
+    @Operation(summary = "Get User Logged In data", security = {
+            @SecurityRequirement(name = "Authorization")    }, tags={ "User" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
+
+            @ApiResponse(responseCode = "403", description = "User not logged in")})
+    @RequestMapping(value = "/User",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<User> getOwnedUserData();
+
+    @Operation(summary = "Get User Transaction Accounts data", security = {
+            @SecurityRequirement(name = "Authorization")    }, tags={ "User" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
+
+            @ApiResponse(responseCode = "403", description = "User not logged in")})
+    @RequestMapping(value = "/User/LimitAndRemainingAmount",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<List<ReturnLimitAndRemainingAmount>> getUserRemainingAmount();
 }
 

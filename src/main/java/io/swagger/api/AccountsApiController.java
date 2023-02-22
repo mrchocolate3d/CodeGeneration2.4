@@ -4,15 +4,9 @@ import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +18,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Log
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
@@ -128,7 +119,7 @@ public class AccountsApiController implements AccountsApi {
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<List<Account>> getAccounts(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
-        List<dbAccount> dbAccounts = accountService.getAllAccounts();
+        List<dbAccount> dbAccounts = accountService.employeeGetAllAccounts();
         List<Account> accounts = new ArrayList<>();
         if(limit == null && username == null) {
             for (dbAccount dbAccount : dbAccounts) {
@@ -194,6 +185,8 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
     }
 
+    //TODO: GetUserInfoByCustomer
+
     public User setUserFromDTO(dbAccount dbAccount){
         User user = new User();
         dbUser dbUser = dbAccount.getUser();
@@ -233,7 +226,7 @@ public class AccountsApiController implements AccountsApi {
 
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser user = userService.getUserByUsername(auth.getName());
+        dbUser user = userService.getdbUserByUserName(auth.getName());
         dbAccount account = accountService.getAccountByIban(IBAN);
         if (account.getUser().getUsername().equals(user.getUsername())){
             Deposit updatedAccount = accountService.deposit(IBAN, amount);
@@ -245,7 +238,7 @@ public class AccountsApiController implements AccountsApi {
 
     public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser user = userService.getUserByUsername(auth.getName());
+        dbUser user = userService.getdbUserByUserName(auth.getName());
         dbAccount account = accountService.getAccountByIban(IBAN);
         if (account.getUser().getUsername().equals(user.getUsername())) {
             Withdrawal updatedAccount = accountService.withdraw(IBAN, amount);

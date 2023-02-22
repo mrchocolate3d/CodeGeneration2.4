@@ -1,11 +1,9 @@
 package io.swagger.api;
 
-import io.swagger.model.InsertUser;
-import io.swagger.model.User;
+import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.UserRole;
-import io.swagger.model.dbUser;
 import io.swagger.repository.UserRepository;
+import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -13,27 +11,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 @Controller
@@ -44,6 +38,9 @@ public class UsersApiController implements UsersApi {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TransactionService transactionService;
 
     private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
 
@@ -69,9 +66,9 @@ public class UsersApiController implements UsersApi {
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
             } else {
 
-                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_EMPLOYEE), body.getTransactionLimit());
+                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_EMPLOYEE), body.getTransactionLimit(), body.getDayLimit());
                 userService.addUser(user);
-                return new ResponseEntity<User>(userService.convertDbUserToUser(user),HttpStatus.CREATED);
+                return new ResponseEntity<User>(userService.convertDbUserToUser(user), HttpStatus.CREATED);
             }
         }
 
@@ -87,11 +84,14 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
-    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = false, schema = @Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody InsertUser body) {
+    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = false, schema = @Schema())
+                                             @PathVariable("id") long id,
+                                             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
+                                             @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser userFromDB = userService.getUserByUsername(auth.getName());
+        dbUser userFromDB = userService.getdbUserByUserName(auth.getName());
 
         if (userFromDB != null) {
             userService.editUser(userFromDB, body);
@@ -103,15 +103,78 @@ public class UsersApiController implements UsersApi {
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<List<User>> getUser(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, maximum = "50"
             , defaultValue = "50")) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "get User by name", schema = @Schema()) @Valid @RequestParam(value = "name", required = false) String name) {
-        return new ResponseEntity<List<User>>(userService.getUsersWithParameters(name,limit), HttpStatus.OK);
+        return new ResponseEntity<List<User>>(userService.getUsersWithParameters(name, limit), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
-    public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "50"
-            , defaultValue = "50")) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
+    public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema())
+                                            @PathVariable("id") Integer id,
+                                            @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "50", defaultValue = "50"))
+                                            @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<User>(userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))),HttpStatus.OK);
+        return new ResponseEntity<User>(userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))), HttpStatus.OK);
         //userService.convertDbUserToUser(userService.getUserById(Long.parseLong(id.toString()))),
+    }
+
+//    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+//    public ResponseEntity<List<User>>GetAllUser(){
+//        List<User> allUsers = new List<User>();
+//
+//
+//        return new ResponseEntity<List<User>>(allUsers, HttpStatus.OK);
+//    }
+
+    public ResponseEntity<User> getOwnedUserData() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        System.out.println(auth.getName());
+
+        dbUser userFromDB = userService.getdbUserByUserName(auth.getName());
+
+        if (userFromDB != null) {
+            User u = setUserFromdbUser(userFromDB);
+            return new ResponseEntity<User>(u, HttpStatus.OK);
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "You are not allowed");
+    }
+
+    public ResponseEntity<List<ReturnLimitAndRemainingAmount>> getUserRemainingAmount(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser userFromDB = userService.getdbUserByUserName(auth.getName());
+        System.out.println(userFromDB.getAccounts());
+
+        List<ReturnLimitAndRemainingAmount> responses = new ArrayList<ReturnLimitAndRemainingAmount>();
+
+        if(userFromDB != null){
+            for (dbAccount acc : userFromDB.getAccounts()){
+                ReturnLimitAndRemainingAmount response = new ReturnLimitAndRemainingAmount();
+                response.setIBAN(acc.getIban());
+                response.setLimit(userFromDB.getDayLimit());
+                response.setRemainAmount(userFromDB.getDayLimit() - transactionService.getTotalTransactionAmountByAccountAndDate(LocalDate.now(), acc.getIban()));
+                response.setAccountType(acc.getAccountType());
+
+                responses.add(response);
+            }
+
+            return new ResponseEntity<List<ReturnLimitAndRemainingAmount>>(responses, HttpStatus.OK);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "You are not allowed");
+
+    }
+
+    private User setUserFromdbUser(dbUser dbUser) {
+        User u = new User();
+        u.setEmail(dbUser.getEmail());
+        u.setPhone(dbUser.getPhone());
+        u.setUsername(dbUser.getUsername());
+        u.setFirstName(dbUser.getFirstName());
+        u.setLastName(dbUser.getLastName());
+        u.setTransactionLimit(dbUser.getTransactionLimit());
+        u.setDayLimit(dbUser.getDayLimit());
+
+
+        return u;
     }
 
 }

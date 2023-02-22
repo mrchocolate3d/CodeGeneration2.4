@@ -34,8 +34,9 @@ public class dbUser {
     private String email;
     private String phone;
     private String password;
+    private double dayLimit;
 
-    public dbUser(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit) {
+    public dbUser(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit, double dayLimit) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -44,6 +45,7 @@ public class dbUser {
         this.password = password;
         this.roles = roles;
         this.transactionLimit = transactionLimit;
+        this.dayLimit = dayLimit;
         accounts = new ArrayList<>();
     }
 

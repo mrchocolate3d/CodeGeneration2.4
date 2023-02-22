@@ -1,18 +1,14 @@
 package io.swagger.service;
 
-import io.swagger.api.ApiException;
-import io.swagger.api.NotFoundException;
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -59,20 +55,25 @@ public class UserService {
     }
 
     public User convertDbUserToUser(dbUser x){
-        return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit());
+        return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit(), x.getDayLimit());
     }
 
 
-    public dbUser getUserByUsername(String username){
+    public dbUser getdbUserByUserName(String username){
         return userRepository.findUserByUsername(username);
     }
 
+    public User getUserByUsername(String username ){
+        dbUser u = userRepository.findUserByUsername(username);
+
+        return convertDbUserToUser(u);
+    }
 
     public List<User> getUsersWithParameters(String name, Integer limit ) {
         List <User> users = new ArrayList<>();
         int count;
         if (name != null && limit == null){
-            users.add(convertDbUserToUser(getUserByUsername(name)));
+            users.add(convertDbUserToUser(getdbUserByUserName(name)));
             return users;
         } else if (name == null && limit != null){
             count = 0;

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.threeten.bp.OffsetDateTime;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +28,8 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Autowired
     private UserService userService;
 
-   // @Autowired
-   // private AccountService accountService;
+    @Autowired
+    private AccountService accountService;
 
     @Autowired
     private UserRepository userRepository;
@@ -47,17 +48,25 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
+        dbUser bank = userService.addUser(new dbUser("Bank", "", "bank", "bank@bank.com", "098324567", passwordEncoder.encode("bank"), List.of(UserRole.ROLE_BANK), 50000, 5000));
+        dbAccount dbBank = accountService.addBankDefault(bank);
 
         dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
                 "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
-                2500));
+                2500, 2500));
 
-       // dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
 
-        dbTransaction dbTransaction = new dbTransaction("Test","NL10INH0000000000","NL20INH0000000000",700.00, OffsetDateTime.now());
-        dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, OffsetDateTime.now());
+        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
+
+        accountRepository.save(account);
+
+        dbTransaction dbTransaction = new dbTransaction("Test","NL10INH0000000000","NL20INH0000000000",700.00, LocalDate.now());
+        dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, LocalDate.now());
+        dbTransaction dbTransaction3 = new dbTransaction("Test","NL10INH0000000000",account.getIban(),700.00, LocalDate.now());
+
         transactionRepository.save(dbTransaction);
         transactionRepository.save(dbTransaction2);
+        transactionRepository.save(dbTransaction3);
 
 
 

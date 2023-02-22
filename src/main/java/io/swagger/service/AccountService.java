@@ -44,6 +44,15 @@ public class AccountService {
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "something is wrong idk");
     }
 
+
+    public dbAccount addBankDefault(dbUser user){
+        dbUser userDb = userRepository.findUserByUsername(user.getUsername());
+        dbAccount account = createAccount(userDb);
+        account.setIban("NL01INHO0000000001");
+        accountRepository.save(account);
+
+        return account;
+    }
     public dbAccount getAccountByIban(String iban){
         return accountRepository.findAccountByIban(iban);
     }
@@ -106,6 +115,10 @@ public class AccountService {
         return (List<dbAccount>) accountRepository.findAll();
     }
 
+    public List<dbAccount> employeeGetAllAccounts(){
+        return (List<dbAccount>) accountRepository.getAllAccounts();
+    }
+
     public void closeAccount(String IBAN){
         dbAccount dbAccount = accountRepository.findAccountByIban(IBAN);
         accountRepository.delete(dbAccount);
@@ -118,7 +131,7 @@ public class AccountService {
     public Withdrawal withdraw(String IBAN, double amount) throws Exception {
         dbAccount account = getAccountByIban(IBAN);
         double newBalance = account.getBalance() - amount;
-        if (newBalance < 0){
+        if (newBalance < account.getAbsoluteLimit()){
             throw new Exception("Insufficient balance");
         }
         else{

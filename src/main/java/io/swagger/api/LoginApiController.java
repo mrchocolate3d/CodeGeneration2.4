@@ -50,7 +50,7 @@ public class LoginApiController implements LoginApi {
 
     @PostMapping(value="/Login")
     public ResponseEntity<LoggedIn> loginUser(@Parameter(in = ParameterIn.QUERY, description = "Logged into the system", schema=@Schema()) @Valid @RequestBody LoginUser userLogin) {
-        dbUser user = userService.getUserByUsername(userLogin.getUsername());
+        dbUser user = userService.getdbUserByUserName(userLogin.getUsername());
         if(user != null){
             String token = userService.login(userLogin.getUsername(), userLogin.getPassword());
             LoggedIn userLoggedIn = new LoggedIn();

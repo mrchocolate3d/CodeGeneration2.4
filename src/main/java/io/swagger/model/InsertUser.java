@@ -39,6 +39,9 @@ public class InsertUser   {
   @JsonProperty("transactionLimit")
   private Double transactionLimit = null;
 
+  @JsonProperty("dayLimit")
+  private Double dayLimit = null;
+
   /**
    * Gets or Sets role
    */
@@ -107,6 +110,20 @@ public class InsertUser   {
   }
   public void setTransactionLimit(Double transactionLimit){
     this.transactionLimit = transactionLimit;
+  }
+
+
+  @Schema(example = "3000", description = "")
+  public Double getDayLimit(){
+    return dayLimit;
+  }
+
+  public InsertUser dayLimit(Double dayLimit){
+    this.dayLimit = dayLimit;
+    return this;
+  }
+  public void setDayLimit(Double dayLimit){
+    this.dayLimit = dayLimit;
   }
 
   /**
