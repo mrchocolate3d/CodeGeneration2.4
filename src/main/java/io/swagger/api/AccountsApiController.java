@@ -93,22 +93,9 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         dbAccount dbAccount = accountService.getAccountByIban(IBAN);
         if(dbAccount != null){
-            User user = new User();
-            dbUser dbUser = dbAccount.getUser();
-            user.setEmail(dbUser.getEmail());
-            user.setFirstName(dbUser.getFirstName());
-            user.setId(dbUser.getId());
-            user.setLastName(dbUser.getLastName());
-            user.setPhone(dbUser.getPhone());
-            user.setTransactionLimit(dbUser.getTransactionLimit());
-            user.setUsername(dbUser.getUsername());
+            User user = setUserFromDTO(dbAccount);
 
-
-
-            Account account = new Account();
-            account.setAccountType(dbAccount.getAccountType());
-            account.setUser(user);
-            account.setIban(dbAccount.getIban());
+            Account account = setAccountFromDb(dbAccount, user);
 
             return new ResponseEntity<Account>(account, HttpStatus.OK);
 
@@ -197,6 +184,7 @@ public class AccountsApiController implements AccountsApi {
         user.setPhone(dbUser.getPhone());
         user.setTransactionLimit(dbUser.getTransactionLimit());
         user.setUsername(dbUser.getUsername());
+        user.setDayLimit(dbUser.getDayLimit());
 
         return user;
     }
@@ -206,7 +194,7 @@ public class AccountsApiController implements AccountsApi {
         account.setAccountType(dbAccount.getAccountType());
         account.setUser(user);
         account.setIban(dbAccount.getIban());
-
+        account.setAbsoluteLimit(dbAccount.getAbsoluteLimit());
         return account;
     }
 
@@ -219,7 +207,7 @@ public class AccountsApiController implements AccountsApi {
             balance.setIBAN(account.getIban());
             balance.setAccountType(account.getAccountType());
             balance.setBalance(account.getBalance());
-            return new ResponseEntity<ReturnBalance>(HttpStatus.OK);
+            return new ResponseEntity<ReturnBalance>(balance, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }

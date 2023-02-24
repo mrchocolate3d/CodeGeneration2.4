@@ -27,7 +27,6 @@ public class dbTransaction {
     private String IBANfrom;
     private String IBANto;
     private Double amount;
-
     private LocalDate timestamp;
     public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, LocalDate timestamp) {
         this.userPerform = userPerform;

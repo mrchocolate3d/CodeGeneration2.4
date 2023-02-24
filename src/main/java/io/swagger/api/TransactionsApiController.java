@@ -8,6 +8,7 @@ import io.swagger.service.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +54,9 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     public ResponseEntity<List<Transaction>> getTransactions(@NotNull @DecimalMin("1") @Parameter(in = ParameterIn.QUERY, description = "" , required=true, schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = true)
-                                                                     String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "fromDate", required = false)
-                                                                     OffsetDateTime fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @RequestParam(value = "toDate", required = false)
-                                                                     OffsetDateTime toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50", defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50")
+                                                                     String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Valid @RequestParam(value = "fromDate", required = false)
+    LocalDate fromDate, @Parameter(in = ParameterIn.QUERY, description = "" , schema=@Schema()) @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value = "toDate", required = false)
+    LocalDate toDate, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of transactions to return" , schema=@Schema(allowableValues={  }, maximum="50")) @Valid @RequestParam(value = "limit", required = false)
                                                                      Integer limit) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -64,40 +66,38 @@ public class TransactionsApiController implements TransactionsApi {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
         }
         List<Transaction> transactionList = new ArrayList<>();
-        if(fromDate == null && toDate == null && limit !=0 ){
-            //getting transactions for both iban from and iban to
-            List<dbTransaction> dbTransactionsFrom = transactionService.getTransactionByIBANfrom(IBAN);
-            for (dbTransaction dbFrom : dbTransactionsFrom) {
-                Transaction transaction = transactionService.setTransactionsFromDb(dbFrom);
-                transactionList.add(transaction);
+        List<dbTransaction> dbTransactionsFrom = transactionService.getTransactionByIBANfrom(IBAN);
+
+        for (dbTransaction DbTransaction : dbTransactionsFrom){
+            if(fromDate !=  null && toDate == null){
+                if(DbTransaction.getTimestamp().isAfter(fromDate)){
+                    addToTransactionList(DbTransaction, transactionList);
+                }
             }
-
-            List<dbTransaction>dbTransactionTo = transactionService.getTransactionByIBANto(IBAN);
-            for(dbTransaction dbTo : dbTransactionTo){
-                Transaction transaction = transactionService.setTransactionsFromDb(dbTo);
-                transactionList.add(transaction);
+            else if(fromDate == null && toDate != null){
+                if(DbTransaction.getTimestamp().isBefore(toDate)){
+                    addToTransactionList(DbTransaction, transactionList);
+                }
             }
-
+            else if(fromDate != null && toDate != null) {
+                if (DbTransaction.getTimestamp().isBefore(toDate) && DbTransaction.getTimestamp().isAfter(fromDate)) {
+                    addToTransactionList(DbTransaction, transactionList);
+                }
+            }
+            else{
+                addToTransactionList(DbTransaction, transactionList);
+            }
         }
-        OffsetDateTime dateFrom;
-        OffsetDateTime dateTo;
 
-        if(limit == null){
-            limit = transactionService.CountAllTransactions();
-        }
-        if(fromDate == null){
-            dateFrom = OffsetDateTime.MIN;
+        List<Transaction> limitList = new ArrayList<Transaction>();
+        if(limit != null && limit < transactionList.size() && limit > 0){
+            limitList = transactionList.subList(0, limit);
         }
         else{
-            dateFrom = OffsetDateTime.parse(fromDate + "00:00:00.001+02:00");
+            limitList = transactionList;
         }
-        if(toDate == null){
-            dateTo = OffsetDateTime.MAX;
-        }
-        else{
-            dateTo = OffsetDateTime.parse(toDate + "T23:59:59.999+02:00");
-        }
-        return new ResponseEntity<List<Transaction>>(transactionList,HttpStatus.OK);
+
+        return new ResponseEntity<List<Transaction>>(limitList,HttpStatus.OK);
 
     }
 
@@ -147,4 +147,8 @@ public class TransactionsApiController implements TransactionsApi {
         throw new ResponseStatusException(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED, "You are not allowed to make this transaction");
     }
 
+    public void addToTransactionList(dbTransaction DbTransaction, List<Transaction> transactionList){
+        Transaction transaction = transactionService.setTransactionsFromDb(DbTransaction);
+        transactionList.add(transaction);
+    }
 }

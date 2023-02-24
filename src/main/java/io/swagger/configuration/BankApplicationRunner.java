@@ -53,7 +53,7 @@ public class BankApplicationRunner implements ApplicationRunner {
 
         dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
                 "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
-                2500, 2500));
+                2500, 10000));
 
 
         dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
@@ -64,9 +64,15 @@ public class BankApplicationRunner implements ApplicationRunner {
         dbTransaction dbTransaction2 = new dbTransaction("Test","NL30INH0000000000","NL20INH0000000000",600.00, LocalDate.now());
         dbTransaction dbTransaction3 = new dbTransaction("Test","NL10INH0000000000",account.getIban(),700.00, LocalDate.now());
 
+
+        dbTransaction dbTransaction4 = new dbTransaction("Test","NL10INH0000000000",account.getIban(),700.00, LocalDate.of(2023, 1, 20));
+        dbTransaction dbTransaction5 = new dbTransaction("Test","NL10INH0000000000",account.getIban(),700.00, LocalDate.of(2023, 1, 23));
+
         transactionRepository.save(dbTransaction);
         transactionRepository.save(dbTransaction2);
         transactionRepository.save(dbTransaction3);
+        transactionRepository.save(dbTransaction4);
+        transactionRepository.save(dbTransaction5);
 
 
 
