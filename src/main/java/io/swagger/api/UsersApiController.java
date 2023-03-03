@@ -66,7 +66,7 @@ public class UsersApiController implements UsersApi {
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
             } else {
 
-                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_EMPLOYEE), body.getTransactionLimit(), body.getDayLimit());
+                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(), passwordEncoder.encode(body.getPassword()), body.getPhone(), List.of(UserRole.ROLE_CUSTOMER), body.getTransactionLimit(), body.getDayLimit());
                 userService.addUser(user);
                 return new ResponseEntity<User>(userService.convertDbUserToUser(user), HttpStatus.CREATED);
             }

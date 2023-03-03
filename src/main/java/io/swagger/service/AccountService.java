@@ -49,6 +49,7 @@ public class AccountService {
         dbUser userDb = userRepository.findUserByUsername(user.getUsername());
         dbAccount account = createAccount(userDb);
         account.setIban("NL01INHO0000000001");
+        account.setAccountType(AccountType.TYPE_BANK);
         accountRepository.save(account);
 
         return account;

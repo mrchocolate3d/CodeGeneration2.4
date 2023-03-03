@@ -110,7 +110,7 @@ public class TransactionsApiController implements TransactionsApi {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
         }
 
-        if (transaction.getUserPerform() == null || transaction.getAmount() == null ||
+        if (transaction.getAmount() == null ||
                 transaction.getIbANFrom() == null || transaction.getIbANTo() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Input field is missing");
         }
@@ -136,7 +136,7 @@ public class TransactionsApiController implements TransactionsApi {
             }
 
             dbTransaction tr = new dbTransaction(
-                    transaction.getUserPerform(), transaction.getIbANTo(), transaction.getIbANFrom(), transaction.getAmount(), LocalDate.now()
+                    user.getUsername(), transaction.getIbANTo(), transaction.getIbANFrom(), transaction.getAmount(), LocalDate.now()
             );
 
             transactionService.createTransaction(tr);

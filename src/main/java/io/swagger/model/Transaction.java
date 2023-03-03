@@ -18,9 +18,6 @@ import javax.validation.constraints.*;
 
 
 public class Transaction   {
-  @JsonProperty("userPerform")
-  private String userPerform = null;
-
   @JsonProperty("IBANFrom")
   private String ibANFrom = null;
 
@@ -29,30 +26,6 @@ public class Transaction   {
 
   @JsonProperty("amount")
   private Double amount = null;
-
-  @JsonProperty("time")
-  private String time = null;
-
-  public Transaction userPerform(String userPerform) {
-    this.userPerform = userPerform;
-    return this;
-  }
-
-
-  /**
-   * Get userPerform
-   * @return userPerform
-   **/
-  @Schema(example = "username", description = "")
-
-  public String getUserPerform() {
-    return userPerform;
-  }
-
-  public void setUserPerform(String userPerform) {
-    this.userPerform = userPerform;
-  }
-
 
   public Transaction ibANFrom(String ibANFrom) {
     this.ibANFrom = ibANFrom;
@@ -111,26 +84,6 @@ public class Transaction   {
     this.amount = amount;
   }
 
-  public Transaction time(String time) {
-    this.time = time;
-    return this;
-  }
-
-  /**
-   * Get time
-   * @return time
-   **/
-
-  @Valid
-  public String getTime() {
-    return time;
-  }
-
-  public void setTime(String time) {
-    this.time = time;
-  }
-
-
   @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
@@ -140,28 +93,24 @@ public class Transaction   {
       return false;
     }
     Transaction transaction = (Transaction) o;
-    return Objects.equals(this.userPerform, transaction.userPerform) &&
+    return
             Objects.equals(this.ibANFrom, transaction.ibANFrom) &&
             Objects.equals(this.ibANTo, transaction.ibANTo) &&
-            Objects.equals(this.amount, transaction.amount) &&
-            Objects.equals(this.time, transaction.time);
+            Objects.equals(this.amount, transaction.amount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userPerform, ibANFrom, ibANTo, amount, time);
+    return Objects.hash(ibANFrom, ibANTo, amount);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-
-    sb.append("    userPerform: ").append(toIndentedString(userPerform)).append("\n");
     sb.append("    ibANFrom: ").append(toIndentedString(ibANFrom)).append("\n");
     sb.append("    ibANTo: ").append(toIndentedString(ibANTo)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
-    sb.append("    time: ").append(toIndentedString(time)).append("\n");
     sb.append("}");
     return sb.toString();
   }

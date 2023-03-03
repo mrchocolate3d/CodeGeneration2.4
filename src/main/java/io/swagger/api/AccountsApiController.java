@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -229,6 +230,9 @@ public class AccountsApiController implements AccountsApi {
         dbUser user = userService.getdbUserByUserName(auth.getName());
         dbAccount account = accountService.getAccountByIban(IBAN);
         if (account.getUser().getUsername().equals(user.getUsername())) {
+            if(account.getBalance() < amount){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
+            }
             Withdrawal updatedAccount = accountService.withdraw(IBAN, amount);
             return new ResponseEntity<Withdrawal>(updatedAccount, HttpStatus.OK);
         }
