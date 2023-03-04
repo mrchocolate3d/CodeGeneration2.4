@@ -92,11 +92,9 @@ public class TransactionService {
 
     public Transaction setTransactionsFromDb(dbTransaction dbTransaction){
         Transaction transaction = new Transaction();
-        transaction.setTime(dbTransaction.getTimestamp().toString());
         transaction.setIbANFrom(dbTransaction.getIBANfrom());
         transaction.setIbANTo(dbTransaction.getIBANto());
         transaction.setAmount(dbTransaction.getAmount());
-        transaction.setUserPerform(dbTransaction.getUserPerform());
         return transaction;
     }
 
