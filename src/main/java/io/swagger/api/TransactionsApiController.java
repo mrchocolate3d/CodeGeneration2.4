@@ -122,9 +122,11 @@ public class TransactionsApiController implements TransactionsApi {
         System.out.println(account.getUser() == user);
 
         if (user.getRoles().contains(UserRole.ROLE_EMPLOYEE) || account.getUser() == user) {
+            System.out.println(account.getUser() == user);
+            System.out.println(user.getRoles().contains(UserRole.ROLE_EMPLOYEE));
             if(account.getAbsoluteLimit() > account.getBalance() - transaction.getAmount())
             {
-                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "You don't have enough credit to make the transaction");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
             }
 
             if(account.getUser().getDayLimit() < transactionService.getTotalTransactionAmountByAccountAndDate(LocalDate.now(), transaction.getIbANFrom()) + transaction.getAmount()){
@@ -132,7 +134,7 @@ public class TransactionsApiController implements TransactionsApi {
             }
 
             if(account.getUser().getTransactionLimit() < transaction.getAmount()){
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Transaction limit reached");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction limit reached");
             }
 
             dbTransaction tr = new dbTransaction(

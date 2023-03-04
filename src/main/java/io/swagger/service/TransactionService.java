@@ -64,7 +64,7 @@ public class TransactionService {
         else if(accountTo == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
         }
-        dbUser userTo = userRepository.findById(accountTo.getId()).get();
+        dbUser userTo = userRepository.findById(accountTo.getUser().getId()).get();
         if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId()!=user.getId()) || (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
         }
