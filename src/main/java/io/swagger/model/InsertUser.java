@@ -73,7 +73,7 @@ public class InsertUser   {
     }
   }
   @JsonProperty("role")
-  private List<UserRole> roles = null;
+  private String role = null;
 
   public InsertUser username(String username) {
     this.username = username;
@@ -216,8 +216,8 @@ public class InsertUser   {
     this.phone = phone;
   }
 
-  public InsertUser roles(List<UserRole> roles) {
-    this.roles = roles;
+  public InsertUser role(String role) {
+    this.role = role;
     return this;
   }
 
@@ -227,12 +227,12 @@ public class InsertUser   {
    **/
   @Schema(example = "Customer", description = "")
   
-    public List<UserRole> getRoles() {
-    return roles;
+    public String getRole() {
+    return role;
   }
 
-  public void setRole(UserRole role) {
-    this.roles = roles;
+  public void setRole(String role) {
+    this.role = role;
   }
 
 
@@ -251,13 +251,13 @@ public class InsertUser   {
         Objects.equals(this.lastName, insertUser.lastName) &&
         Objects.equals(this.email, insertUser.email) &&
         Objects.equals(this.phone, insertUser.phone) &&
-        Objects.equals(this.roles, insertUser.roles) &&
+        Objects.equals(this.role, insertUser.role) &&
         Objects.equals(this.transactionLimit, insertUser.transactionLimit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(username, password, firstName, lastName, email, phone, roles, transactionLimit);
+    return Objects.hash(username, password, firstName, lastName, email, phone, role, transactionLimit);
   }
 
   @Override
@@ -271,7 +271,7 @@ public class InsertUser   {
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
-    sb.append("    role: ").append(toIndentedString(roles)).append("\n");
+    sb.append("    role: ").append(toIndentedString(role)).append("\n");
     sb.append("    transactionLimit:").append(toIndentedString(transactionLimit)).append("\n");
     sb.append("}");
     return sb.toString();

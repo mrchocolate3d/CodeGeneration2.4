@@ -18,7 +18,7 @@ import org.springframework.validation.annotation.Validated;
 @Data
 @NoArgsConstructor
 public class User   {
-  public User(Long id, String username, String firstName, String lastName, String email, String phone, Double transactionLimit, Double dayLimit) {
+  public User(Long id, String username, String firstName, String lastName, String email, String role, String phone, Double transactionLimit, Double dayLimit) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -27,6 +27,7 @@ public class User   {
     this.phone = phone;
     this.transactionLimit = transactionLimit;
     this.dayLimit = dayLimit;
+    this.role = role;
   }
 
 
@@ -45,6 +46,9 @@ public class User   {
 
   @JsonProperty("email")
   private String email = null;
+
+  @JsonProperty("role")
+  private String role = null;
 
   @JsonProperty("phone")
   private String phone = null;
@@ -155,6 +159,25 @@ public class User   {
     this.email = email;
   }
 
+  public User role(String role) {
+    this.role = role;
+    return this;
+  }
+
+  /**
+   * Get email
+   * @return email
+   **/
+  @Schema(example = "ROLE_CUSTOMER", description = "")
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
+  }
+
   public User phone(String phone) {
     this.phone = phone;
     return this;
@@ -230,6 +253,7 @@ public class User   {
             Objects.equals(this.firstName, user.firstName) &&
             Objects.equals(this.lastName, user.lastName) &&
             Objects.equals(this.email, user.email) &&
+            Objects.equals(this.role, user.role) &&
             Objects.equals(this.phone, user.phone) &&
             Objects.equals(this.transactionLimit, user.transactionLimit);
   }
@@ -248,6 +272,7 @@ public class User   {
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
+    sb.append("    role: ").append(toIndentedString(role)).append("\n");
     sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
     sb.append("    transactionLimit: ").append(toIndentedString(transactionLimit)).append("\n");
     sb.append("}");

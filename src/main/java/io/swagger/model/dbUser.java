@@ -36,22 +36,19 @@ public class dbUser {
     private String password;
     private double dayLimit;
 
-    public dbUser(String firstName, String lastName, String username, String email, String phone, String password, List<UserRole> roles, double transactionLimit, double dayLimit) {
+    public dbUser(String firstName, String lastName, String username, String email, String phone, String password, UserRole role, double transactionLimit, double dayLimit) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.phone = phone;
         this.password = password;
-        this.roles = roles;
+        this.role = role;
         this.transactionLimit = transactionLimit;
         this.dayLimit = dayLimit;
         accounts = new ArrayList<>();
     }
-
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    List<UserRole> roles;
+    UserRole role;
     private double transactionLimit;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

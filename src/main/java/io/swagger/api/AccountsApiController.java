@@ -186,6 +186,7 @@ public class AccountsApiController implements AccountsApi {
         user.setTransactionLimit(dbUser.getTransactionLimit());
         user.setUsername(dbUser.getUsername());
         user.setDayLimit(dbUser.getDayLimit());
+        user.setRole(dbUser.getRole().toString());
 
         return user;
     }

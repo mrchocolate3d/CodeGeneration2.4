@@ -121,9 +121,9 @@ public class TransactionsApiController implements TransactionsApi {
 
         System.out.println(account.getUser() == user);
 
-        if (user.getRoles().contains(UserRole.ROLE_EMPLOYEE) || account.getUser() == user) {
+        if (user.getRole() == UserRole.ROLE_EMPLOYEE || account.getUser() == user) {
             System.out.println(account.getUser() == user);
-            System.out.println(user.getRoles().contains(UserRole.ROLE_EMPLOYEE));
+            System.out.println(user.getRole() == UserRole.ROLE_EMPLOYEE);
             if(account.getAbsoluteLimit() > account.getBalance() - transaction.getAmount())
             {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");

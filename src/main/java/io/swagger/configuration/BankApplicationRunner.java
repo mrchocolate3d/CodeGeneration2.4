@@ -48,11 +48,11 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        dbUser bank = userService.addUser(new dbUser("Bank", "", "bank", "bank@bank.com", "098324567", passwordEncoder.encode("bank"), List.of(UserRole.ROLE_BANK), 50000, 5000));
+        dbUser bank = userService.addUser(new dbUser("Bank", "", "bank", "bank@bank.com", "098324567", passwordEncoder.encode("bank"), UserRole.ROLE_BANK, 50000, 5000));
         dbAccount dbBank = accountService.addBankDefault(bank);
 
         dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
-                "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE),
+                "test", passwordEncoder.encode("test"), UserRole.ROLE_EMPLOYEE,
                 2500, 10000));
 
 

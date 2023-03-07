@@ -74,7 +74,7 @@ public interface UsersApi {
     ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody InsertUser body);
 
 
-    @Operation(summary = "Get all users", description = "This can be done by Employees", security = {
+    @Operation(summary = "Get users", description = "This can be done by Employees", security = {
         @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))) })

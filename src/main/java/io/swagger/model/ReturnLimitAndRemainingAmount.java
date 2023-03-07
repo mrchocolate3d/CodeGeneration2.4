@@ -17,7 +17,6 @@ public class ReturnLimitAndRemainingAmount {
     @JsonProperty("IBAN")
     private String IBAN = null;
 
-
     @JsonProperty("accountType")
     private AccountType accountType = null;
 

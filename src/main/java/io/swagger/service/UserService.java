@@ -55,7 +55,7 @@ public class UserService {
     }
 
     public User convertDbUserToUser(dbUser x){
-        return new User(x.getId(),x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getPhone(),x.getTransactionLimit(), x.getDayLimit());
+        return new User(x.getId(), x.getUsername(), x.getFirstName(), x.getLastName(), x.getEmail(), x.getRole().toString(), x.getPhone(),x.getTransactionLimit(), x.getDayLimit());
     }
 
 
@@ -72,21 +72,22 @@ public class UserService {
     public List<User> getUsersWithParameters(String name, Integer limit ) {
         List <User> users = new ArrayList<>();
         int count;
-        if (name != null && limit == null){
+        if (name != null){
             users.add(convertDbUserToUser(getdbUserByUserName(name)));
             return users;
-        } else if (name == null && limit != null){
+        } else if (name == null && limit != null) {
             count = 0;
-            List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
+            List<dbUser> dbUsers = (List<dbUser>) userRepository.findAll();
             for (dbUser x : dbUsers) {
                 users.add(convertDbUserToUser(x));
                 count++;
-                if (limit == count){
+                if (limit == count) {
                     break;
                 }
             }
             return users;
-        } else {
+        }
+        else {
             List<dbUser>  dbUsers = (List<dbUser>) userRepository.findAll();
             for (dbUser x : dbUsers) {
                 users.add(convertDbUserToUser(x));
@@ -139,7 +140,7 @@ public class UserService {
     public String login(String username, String password) {
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            return jwtTokenProvider.createToken(username, userRepository.findUserByUsername(username).getRoles());
+            return jwtTokenProvider.createToken(username, Collections.singletonList(userRepository.findUserByUsername(username).getRole()));
         }catch(AuthenticationException ae){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid credentials");
         }

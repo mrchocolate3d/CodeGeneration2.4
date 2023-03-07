@@ -56,17 +56,27 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    //@PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             List<User> userList = userService.getUsers();
 
+            System.out.println(userList);
+            System.out.println(body.getUsername());
+            System.out.println(userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername())));
+
             if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))) {
                 return new ResponseEntity<User>(HttpStatus.NOT_ACCEPTABLE);
-            } else {
-
-                dbUser user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), List.of(UserRole.ROLE_CUSTOMER), body.getTransactionLimit(), body.getDayLimit());
+            }
+            else {
+                dbUser user;
+                if(body.getRole().toUpperCase() == "ROLE_EMPLOYEE"){
+                    user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_EMPLOYEE, body.getTransactionLimit(), body.getDayLimit());
+                }
+                else{
+                    user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_CUSTOMER, body.getTransactionLimit(), body.getDayLimit());
+                }
                 userService.addUser(user);
                 return new ResponseEntity<User>(userService.convertDbUserToUser(user), HttpStatus.CREATED);
             }
