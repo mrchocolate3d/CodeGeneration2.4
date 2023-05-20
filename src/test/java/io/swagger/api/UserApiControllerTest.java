@@ -47,8 +47,8 @@ public class UserApiControllerTest {
 
     @BeforeEach
     public void init() throws Exception {
-        dbUser = new dbUser("test", "test", "test", "test", "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE), 2500);
-        userService.addUser(dbUser);
+/*        dbUser = new dbUser("test", "test", "test", "test", "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE), 2500);
+        userService.addUser(dbUser);*/
     }
 
     @Test

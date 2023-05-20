@@ -55,10 +55,10 @@ class AccountsApiControllerTest {
 
     @BeforeEach
     public void init() throws Exception {
-        dbAccount = new dbAccount(AccountType.TYPE_CURRENT, 0, new dbUser(
+/*        dbAccount = new dbAccount(AccountType.TYPE_CURRENT, 0, new dbUser(
                 "test", "test", "test", "test", "test", passwordEncoder.encode("test"), List.of(UserRole.ROLE_EMPLOYEE), 2500, 2500
         ), 0);
-        dbAccount.setIban("NL02INHO14665901");
+        dbAccount.setIban("NL02INHO14665901");*/
     }
 
     @Test

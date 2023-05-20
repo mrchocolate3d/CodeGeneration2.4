@@ -56,7 +56,7 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_BANK')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
