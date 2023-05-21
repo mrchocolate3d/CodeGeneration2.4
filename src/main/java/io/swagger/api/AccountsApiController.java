@@ -56,14 +56,14 @@ public class AccountsApiController implements AccountsApi {
         this.request = request;
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE', 'ROLE_CUSTOMER')")
     public ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         accountService.closeAccount(IBAN);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK' , 'ROLE_CUSTOMER')")
     public ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
 
         dbUser user = userService.getUserById(account.getUserId());
@@ -90,7 +90,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK' , 'ROLE_CUSTOMER')")
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         dbAccount dbAccount = accountService.getAccountByIban(IBAN);
         if(dbAccount != null){
@@ -104,7 +104,7 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<Account>(HttpStatus.NOT_FOUND);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK' , 'ROLE_CUSTOMER')")
     public ResponseEntity<List<Account>> getAccounts(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
         List<dbAccount> dbAccounts = accountService.employeeGetAllAccounts();
@@ -201,7 +201,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK' , 'ROLE_CUSTOMER')")
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         dbAccount account = accountService.getBalance(IBAN);
         if(account != null){
