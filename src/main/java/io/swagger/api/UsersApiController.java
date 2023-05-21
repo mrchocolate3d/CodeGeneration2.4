@@ -97,14 +97,20 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = false, schema = @Schema())
                                              @PathVariable("id") long id,
                                              @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
-                                             @Valid @RequestBody InsertUser body) {
+                                             @Valid @RequestBody EditUser body) {
         String accept = request.getHeader("Accept");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser userFromDB = userService.getdbUserByUserName(auth.getName());
+        dbUser user = userService.getdbUserByUserName(auth.getName());
+        if(user.getRole() == UserRole.ROLE_EMPLOYEE){
+            System.out.println("?");
+            dbUser userToChange = userService.getUserById(id);
+            userService.editUser(userToChange, body);
+            return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+        }
 
-        if (userFromDB != null) {
-            userService.editUser(userFromDB, body);
+        if (user != null) {
+            userService.editUser(user, body);
             return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);
@@ -182,7 +188,6 @@ public class UsersApiController implements UsersApi {
         u.setLastName(dbUser.getLastName());
         u.setTransactionLimit(dbUser.getTransactionLimit());
         u.setDayLimit(dbUser.getDayLimit());
-
 
         return u;
     }

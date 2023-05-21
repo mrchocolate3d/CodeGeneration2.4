@@ -81,6 +81,10 @@ public class AccountService {
         return iban;
     }
 
+    public List<dbAccount> getAllAccountsByCustomer(dbUser dbUser){
+        return accountRepository.getAccountsByUser(dbUser);
+    }
+
     public dbAccount createCurrentAccount(dbUser user){
         dbAccount currentAccount = createAccount(user);
         currentAccount.setAccountType(AccountType.TYPE_CURRENT);

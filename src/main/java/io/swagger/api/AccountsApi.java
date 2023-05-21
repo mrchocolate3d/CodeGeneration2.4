@@ -129,5 +129,15 @@ public interface AccountsApi {
         method = RequestMethod.POST)
     ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception;
 
+    @Operation(summary = "Get User All Accounts' data", security = {
+            @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "403", description = "User not logged in")})
+    @RequestMapping(value = "/User/GetUserAccountsData",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<List<Account>> getAllAccountsByCustomer();
+
 }
 

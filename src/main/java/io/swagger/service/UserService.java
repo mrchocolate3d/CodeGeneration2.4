@@ -115,10 +115,9 @@ public class UserService {
 
 
 
-    public void editUser(dbUser oldUser ,InsertUser newUser){
+    public void editUser(dbUser oldUser, EditUser newUser){
         oldUser.setFirstName(newUser.getFirstName());
         oldUser.setLastName(newUser.getLastName());
-        oldUser.setUsername(newUser.getUsername());
         oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         oldUser.setEmail(newUser.getEmail());
         oldUser.setPhone(newUser.getPhone());
