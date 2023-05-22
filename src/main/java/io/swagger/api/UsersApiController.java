@@ -123,7 +123,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
-    public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = true, schema = @Schema())
+    public ResponseEntity<User> getUserByID(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to get", required = true, schema = @Schema())
                                             @PathVariable("id") Integer id,
                                             @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return", schema = @Schema(allowableValues = {}, minimum = "1", maximum = "50", defaultValue = "50"))
                                             @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
