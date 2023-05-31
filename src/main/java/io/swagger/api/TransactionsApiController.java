@@ -106,8 +106,8 @@ public class TransactionsApiController implements TransactionsApi {
         String username = auth.getName();
         dbUser user = userService.getdbUserByUserName(username);
 
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No authentication token was given");
         }
 
         if (transaction.getAmount() == null ||
@@ -115,39 +115,40 @@ public class TransactionsApiController implements TransactionsApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Input field is missing");
         }
 
-        dbAccount account = accountService.getAccountByIban(transaction.getIbANFrom());
+        //dbAccount account = accountService.getAccountByIban(transaction.getIbANFrom());
 
-        System.out.println(account.toString());
+//        System.out.println(account.toString());
+//
+//        System.out.println(account.getUser() == user);
 
-        System.out.println(account.getUser() == user);
+//        if (user.getRole() == UserRole.ROLE_EMPLOYEE || account.getUser() == user) {
+//            System.out.println(account.getUser() == user);
+//            System.out.println(user.getRole() == UserRole.ROLE_EMPLOYEE);
+//            if(account.getAbsoluteLimit() > account.getBalance() - transaction.getAmount())
+//            {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
+//            }
+//
+//            if(account.getUser().getDayLimit() < transactionService.getTotalTransactionAmountByAccountAndDate(LocalDate.now(), transaction.getIbANFrom()) + transaction.getAmount()){
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
+//            }
+//
+//            if(account.getUser().getTransactionLimit() < transaction.getAmount()){
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction limit reached");
+//            }
 
-        if (user.getRole() == UserRole.ROLE_EMPLOYEE || account.getUser() == user) {
-            System.out.println(account.getUser() == user);
-            System.out.println(user.getRole() == UserRole.ROLE_EMPLOYEE);
-            if(account.getAbsoluteLimit() > account.getBalance() - transaction.getAmount())
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
-            }
+        dbTransaction tr = new dbTransaction(
+                user.getUsername(), transaction.getIbANTo(), transaction.getIbANFrom(), transaction.getAmount(), LocalDate.now()
+        );
 
-            if(account.getUser().getDayLimit() < transactionService.getTotalTransactionAmountByAccountAndDate(LocalDate.now(), transaction.getIbANFrom()) + transaction.getAmount()){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
-            }
-
-            if(account.getUser().getTransactionLimit() < transaction.getAmount()){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction limit reached");
-            }
-
-            dbTransaction tr = new dbTransaction(
-                    user.getUsername(), transaction.getIbANTo(), transaction.getIbANFrom(), transaction.getAmount(), LocalDate.now()
-            );
-
-            transactionService.createTransaction(tr);
-            Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
-            return new ResponseEntity<Transaction>(transaction1, HttpStatus.CREATED);
-        }
-
-        throw new ResponseStatusException(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED, "You are not allowed to make this transaction");
+        transactionService.createTransaction(tr);
+        Transaction transaction1 = transactionService.setTransactionsFromDb(tr);
+        return new ResponseEntity<Transaction>(transaction1, HttpStatus.CREATED);
+        //}
     }
+
+       // throw new ResponseStatusException(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED, "You are not allowed to make this transaction");
+
 
     public void addToTransactionList(dbTransaction DbTransaction, List<Transaction> transactionList){
         Transaction transaction = transactionService.setTransactionsFromDb(DbTransaction);
