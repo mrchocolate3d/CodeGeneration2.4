@@ -34,7 +34,7 @@ public class TransactionService {
         this.userRepository = userRepository;
     }
 
-    //TODO: complete this
+
     //getting all transactions
     public List<dbTransaction> getTransactions(String IBAN,OffsetDateTime from,OffsetDateTime to,int dayLimit){
         //implementing the limit //has to be pageable
@@ -73,6 +73,24 @@ public class TransactionService {
             if(accountFrom.getBalance() - transaction.getAmount() < accountFrom.getAbsoluteLimit()){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Limit reach. Please change your transaction amount");
             }
+            //refactored
+            if (user.getRole() == UserRole.ROLE_EMPLOYEE || accountFrom.getUser() == user){
+                if(accountFrom.getAbsoluteLimit() > accountFrom.getBalance() - transaction.getAmount())
+                {
+                    throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "You don't have enough credit to make the transaction");
+                }
+                if(accountFrom.getUser().getDayLimit() < getTotalTransactionAmountByAccountAndDate(LocalDate.now(), accountFrom.getIban()) + transaction.getAmount()){
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
+                }
+                if(accountFrom.getUser().getTransactionLimit() < transaction.getAmount()){
+                    throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Transaction limit reached");
+                }
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED, "You are not allowed to make this transaction");
+            }
+            //end of refactoring
+            //end of refactoring
 
             accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
             accountRepository.save(accountFrom);
