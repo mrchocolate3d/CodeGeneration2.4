@@ -130,13 +130,13 @@ class AccountsApiControllerTest {
 
     @Test
     public void depositTest() throws Exception{
-        accountService.deposit("NL01INHO1547654890", 500.00);
+        accountService.DepositMoney("NL01INHO1547654890", 500.00);
         assertEquals(dbAccount.getBalance(), 5500.00, delta, "Deposit Test");
     }
 
     @Test
     public void withdrawTest() throws Exception{
-        accountService.withdraw("NL01INHO1547654890", 500.00);
+        accountService.WithdrawMoney( "NL01INHO1547654890", 500.00);
         assertEquals(dbAccount.getBalance(),4500.00, delta, "Withdrawal Test");
     }
 

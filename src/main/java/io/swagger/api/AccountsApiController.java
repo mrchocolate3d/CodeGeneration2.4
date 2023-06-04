@@ -57,196 +57,45 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        dbUser user = getDbUserAuthenticationInfor();
-        dbAccount dbAccount = accountService.getAccountByIban(IBAN);
-        if (user.getRole() == UserRole.ROLE_EMPLOYEE || dbAccount.getUser() == user) {
-            accountService.closeAccount(IBAN);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        accountService.CloseAccount(IBAN);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
 
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
-    public ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
-        dbUser user = userService.getUserById(account.getUserId());
-        if(user != null){
-            dbAccount dbAccount = new dbAccount();
-            dbAccount.setUser(user);
-            if(account.getAccountType().equals("TYPE_CURRENT")) {
-                AccountType accountType = AccountType.TYPE_CURRENT;
-                dbAccount.setAccountType(accountType);
-            }else if(account.getAccountType().equals("TYPE_SAVING")){
-                AccountType accountType = AccountType.TYPE_SAVING;
-                dbAccount.setAccountType(accountType);
-            }
-            dbAccount accountAdded = accountService.add(user, account.getAccountType());
-            return new ResponseEntity<ReturnAccount>(HttpStatus.CREATED);
-        }
-        return new ResponseEntity<ReturnAccount>(HttpStatus.NOT_FOUND);
+    public ResponseEntity createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
+        dbAccount dbAccount = accountService.CreateAccount(account);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
 
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        dbUser user = getDbUserAuthenticationInfor();
-        dbAccount dbAccount = accountService.getAccountByIban(IBAN);
-        if (dbAccount != null){
-            if (user.getRole() == UserRole.ROLE_EMPLOYEE || dbAccount.getUser() == user) {
-                User userDto = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, userDto);
-                return new ResponseEntity<Account>(account, HttpStatus.OK);
-            }
-            return new ResponseEntity<Account>(HttpStatus.FORBIDDEN);
-        }
-        return new ResponseEntity<Account>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<Account>(accountService.GetAccountByIban(IBAN), HttpStatus.OK);
+
     }
 
     public ResponseEntity<List<Account>> getAllAccountsByCustomer(){
-        List<Account> response = new ArrayList<>();
-        dbUser dbUser = getDbUserAuthenticationInfor();
-        List<dbAccount> dbAccounts = accountService.getAllAccountsByCustomer(dbUser);
-        if (dbAccounts.size() > 0) {
-            for (dbAccount dbAccount : dbAccounts){
-                User user = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, user);
-                response.add(account);
-            }
-            return new ResponseEntity<List<Account>>(response, HttpStatus.OK);
-        }
-        return new ResponseEntity<List<Account>>(HttpStatus.NOT_FOUND);
-
+        return new ResponseEntity<List<Account>>(accountService.GetAllAccountsByCustomer(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<List<Account>> getAccounts(@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
             , defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit,@Parameter(in = ParameterIn.QUERY, description = "Find Account by username" ,schema=@Schema()) @Valid @RequestParam(value = "username", required = false) String username) {
-        List<dbAccount> dbAccounts = accountService.employeeGetAllAccounts();
-        List<Account> accounts = new ArrayList<>();
-        if (limit == null && username == null) {
-            for (dbAccount dbAccount : dbAccounts) {
-                User user = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, user);
-                accounts.add(account);
-            }
-        }
-        else if (limit != null && username == null){
-            int count = 0;
-            for (dbAccount dbAccount : dbAccounts) {
-                if (count >= limit){
-                    break;
-                }
-                User user = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, user);
-                accounts.add(account);
-                count++;
-            }
-        }
-        else if (username != null && limit == null){
-            for(dbAccount dbAccount : dbAccounts){
-                if(dbAccount.getUser().getUsername().equals(username)){
-                    User user = setUserFromDTO(dbAccount);
-                    Account account = setAccountFromDb(dbAccount, user);
-                    accounts.add(account);
-                }
-                continue;
-            }
-        }
-        else if (username != null && limit != null){
-            int count = 0;
-
-            for (dbAccount dbAccount : dbAccounts) {
-                if (count >= limit){
-                    break;
-                }
-                if(dbAccount.getUser().getUsername().equals(username)){
-                User user = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, user);
-                accounts.add(account);
-                }
-                count++;
-            }
-        }
-
-        return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
+        return new ResponseEntity<List<Account>>(accountService.GetAccounts(limit, username), HttpStatus.OK);
     }
-
-    //TODO: GetUserInfoByCustomer
-
-    public User setUserFromDTO(dbAccount dbAccount){
-        User user = new User();
-        dbUser dbUser = dbAccount.getUser();
-        user.setEmail(dbUser.getEmail());
-        user.setFirstName(dbUser.getFirstName());
-        user.setId(dbUser.getId());
-        user.setLastName(dbUser.getLastName());
-        user.setPhone(dbUser.getPhone());
-        user.setTransactionLimit(dbUser.getTransactionLimit());
-        user.setUsername(dbUser.getUsername());
-        user.setDayLimit(dbUser.getDayLimit());
-        user.setRole(dbUser.getRole().toString());
-
-        return user;
-    }
-
-    public dbUser getDbUserAuthenticationInfor() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        dbUser user = userService.getdbUserByUserName(username);
-
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
-        }
-        return user;
-    }
-
-    public Account setAccountFromDb(dbAccount dbAccount, User user){
-        Account account = new Account();
-        account.setAccountType(dbAccount.getAccountType());
-        account.setUser(user);
-        account.setIban(dbAccount.getIban());
-        account.setAbsoluteLimit(dbAccount.getAbsoluteLimit());
-        return account;
-    }
-
 
     public ResponseEntity<ReturnBalance> getBalanceByIban(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        dbUser user = getDbUserAuthenticationInfor();
-        dbAccount account = accountService.getAccountByIban(IBAN);
+        return new ResponseEntity<ReturnBalance>(accountService.GetBalanceByIban(IBAN), HttpStatus.OK);
 
-        if (user.getRole() == UserRole.ROLE_EMPLOYEE || account.getUser() == user) {
-            ReturnBalance balance = new ReturnBalance();
-            balance.setIBAN(account.getIban());
-            balance.setAccountType(account.getAccountType());
-            balance.setBalance(account.getBalance());
-            return new ResponseEntity<ReturnBalance>(balance, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
     public ResponseEntity<Deposit> depositMoney(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to deposit" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser user = userService.getdbUserByUserName(auth.getName());
-        dbAccount account = accountService.getAccountByIban(IBAN);
-        if (account.getUser().getUsername().equals(user.getUsername())){
-            Deposit updatedAccount = accountService.deposit(IBAN, amount);
-            return new ResponseEntity<Deposit>(updatedAccount, HttpStatus.OK);
-        }
-        else
-            return new ResponseEntity<Deposit>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<Deposit>(accountService.DepositMoney(IBAN, amount), HttpStatus.OK);
     }
 
     public ResponseEntity<Withdrawal> withdrawal(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@NotNull @DecimalMin("0.01") @DecimalMax("10000") @Parameter(in = ParameterIn.QUERY, description = "The amount to withdraw" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "amount", required = true) Double amount) throws Exception {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser user = userService.getdbUserByUserName(auth.getName());
-        dbAccount account = accountService.getAccountByIban(IBAN);
-        if (account.getUser().getUsername().equals(user.getUsername())) {
-            if(account.getBalance() < amount){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
-            }
-            Withdrawal updatedAccount = accountService.withdraw(IBAN, amount);
-            return new ResponseEntity<Withdrawal>(updatedAccount, HttpStatus.OK);
-        }
-        else
-            return new ResponseEntity<Withdrawal>(HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<Withdrawal>(accountService.WithdrawMoney(IBAN, amount), HttpStatus.OK);
+
     }
 }

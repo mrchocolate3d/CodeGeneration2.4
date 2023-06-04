@@ -23,12 +23,12 @@ public class dbTransaction {
     @Column(name="ID" , updatable = false, nullable = false)
     private long id;
 
-    private String userPerform;
+    private long userPerform;
     private String IBANfrom;
     private String IBANto;
     private Double amount;
     private LocalDate timestamp;
-    public dbTransaction(String userPerform,String IBANto,String IBANfrom, Double amount, LocalDate timestamp) {
+    public dbTransaction(long userPerform,String IBANto,String IBANfrom, Double amount, LocalDate timestamp) {
         this.userPerform = userPerform;
         this.IBANfrom = IBANfrom;
         this.IBANto = IBANto;

@@ -39,7 +39,7 @@ public class TransactionsApiControllerTest {
     public void setup() throws Exception {
 
         transaction = new dbTransaction(
-                "testuser","NL01INH0000000000","NL02INH0000000000",500.00, LocalDate.now()
+                1,"NL01INH0000000000","NL02INH0000000000",500.00, LocalDate.now()
         );
 
     }

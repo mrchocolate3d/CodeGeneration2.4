@@ -27,12 +27,8 @@ public class TransactionService {
     AccountRepository accountRepository;
     @Autowired
     UserRepository userRepository;
-
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository,AccountRepository accountRepository) {
-        this.transactionRepository = transactionRepository;
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    UserService userService;
 
 
     //getting all transactions
@@ -51,12 +47,12 @@ public class TransactionService {
     //post transaction
     public dbTransaction createTransaction(dbTransaction transaction){
         if(transaction.getAmount() == null||transaction.getIBANto() == null||
-                transaction.getIBANfrom() == null|| transaction.getUserPerform() == null){
+                transaction.getIBANfrom() == null|| Objects.isNull(transaction.getUserPerform())){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Input field missing");
         }
         dbAccount accountFrom = accountRepository.findAccountByIban(transaction.getIBANfrom());
         dbAccount accountTo = accountRepository.findAccountByIban(transaction.getIBANto());
-        dbUser user = userRepository.findUserByUsername(transaction.getUserPerform());
+        dbUser user = userService.getUserById(transaction.getUserPerform());
         //...
         if(accountFrom == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");

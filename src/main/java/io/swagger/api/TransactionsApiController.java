@@ -138,7 +138,7 @@ public class TransactionsApiController implements TransactionsApi {
 //            }
 
         dbTransaction tr = new dbTransaction(
-                user.getUsername(), transaction.getIbANTo(), transaction.getIbANFrom(), transaction.getAmount(), LocalDate.now()
+                user.getId(), transaction.getIbANTo(), transaction.getIbANFrom(), transaction.getAmount(), LocalDate.now()
         );
 
         transactionService.createTransaction(tr);
