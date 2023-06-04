@@ -6,14 +6,18 @@ import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -34,8 +38,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private TransactionService transactionService;
 
-    public dbUser addUser(dbUser user) {
+
+    private dbUser addUser(dbUser user) {
         userRepository.save(user);
         return user;
     }
@@ -47,6 +54,53 @@ public class UserService {
         } else {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No user in the db");
         }
+
+    }
+
+    public User CreateUser(InsertUser body){
+        List<User> userList = getUsers();
+        if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
+        }
+        dbUser user;
+        if(body.getRole().toUpperCase() == "ROLE_EMPLOYEE"){
+            user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_EMPLOYEE, body.getTransactionLimit(), body.getDayLimit());
+        }
+        else{
+            user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_CUSTOMER, body.getTransactionLimit(), body.getDayLimit());
+        }
+        addUser(user);
+        return convertDbUserToUser(user);
+    }
+
+    public List<ReturnLimitAndRemainingAmount> GetUserRemainingAmount(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser userFromDB = getdbUserByUserName(auth.getName());
+        List<ReturnLimitAndRemainingAmount> responses = new ArrayList<ReturnLimitAndRemainingAmount>();
+
+        if(userFromDB != null){
+            for (dbAccount acc : userFromDB.getAccounts()){
+                ReturnLimitAndRemainingAmount response = new ReturnLimitAndRemainingAmount();
+                response.setIBAN(acc.getIban());
+                response.setLimit(userFromDB.getDayLimit());
+                response.setRemainAmount(userFromDB.getDayLimit() - transactionService.getTotalTransactionAmountByAccountAndDate(LocalDate.now(), acc.getIban()));
+                response.setAccountType(acc.getAccountType());
+
+                responses.add(response);
+            }
+        }
+        return responses;
+    }
+
+    public User GetOwnedUserData(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser userFromDB = getdbUserByUserName(auth.getName());
+
+        if (userFromDB != null) {
+            User u = convertDbUserToUser(userFromDB);
+            return u;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "You are not allowed");
 
     }
 
@@ -114,9 +168,23 @@ public class UserService {
     }
 
 
+    public User EditUser(long id, EditUser body){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = getdbUserByUserName(auth.getName());
+        if(user.getRole() == UserRole.ROLE_EMPLOYEE){
+            dbUser userToChange = getUserById(id);
+            editDbUser(userToChange, body);
+        }
+        if (user != null) {
+            //not allow user to change limit
+            body.setDayLimit(user.getDayLimit());
+            body.setTransactionLimit(user.getTransactionLimit());
+            editDbUser(user, body);
+        }
+        return convertDbUserToUser(user);
+    }
 
-    public void editUser(dbUser oldUser, EditUser newUser){
-
+    private dbUser editDbUser(dbUser oldUser, EditUser newUser){
         oldUser.setFirstName(newUser.getFirstName());
         oldUser.setLastName(newUser.getLastName());
         if(newUser.getPassword() != null){
@@ -127,8 +195,11 @@ public class UserService {
         if(newUser.getTransactionLimit() != null){
             oldUser.setTransactionLimit(newUser.getTransactionLimit());
         }
+        if(newUser.getDayLimit() != null){
+            oldUser.setDayLimit(newUser.getDayLimit());
+        }
         userRepository.save(oldUser);
-
+        return oldUser;
     }
 
     public void deleteUser(long id) {

@@ -48,15 +48,15 @@ public class BankApplicationRunner implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        dbUser bank = userService.addUser(new dbUser("Bank", "", "bank", "bank@bank.com", "098324567", passwordEncoder.encode("bank"), UserRole.ROLE_BANK, 50000, 5000));
+        dbUser bank = userRepository.save(new dbUser("Bank", "", "bank", "bank@bank.com", "098324567", passwordEncoder.encode("bank"), UserRole.ROLE_BANK, 50000, 5000));
         dbAccount dbBank = accountService.addBankDefault(bank);
 
-        dbUser user = userService.addUser(new dbUser("test", "test", "test", "test",
+        dbUser user = userRepository.save(new dbUser("test", "test", "test", "test",
                 "test", passwordEncoder.encode("test"), UserRole.ROLE_EMPLOYEE,
                 2500, 10000));
 
 
-        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
+        dbAccount account = accountRepository.save(new dbAccount(AccountType.TYPE_CURRENT, 0, user, 0));
 
         accountRepository.save(account);
 

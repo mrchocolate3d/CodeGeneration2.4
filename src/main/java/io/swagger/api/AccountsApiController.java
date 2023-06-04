@@ -67,7 +67,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK' , 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity<ReturnAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
         dbUser user = userService.getUserById(account.getUserId());
         if(user != null){
@@ -81,12 +81,8 @@ public class AccountsApiController implements AccountsApi {
                 dbAccount.setAccountType(accountType);
             }
             dbAccount accountAdded = accountService.add(user, account.getAccountType());
-
-
             return new ResponseEntity<ReturnAccount>(HttpStatus.CREATED);
         }
-
-
         return new ResponseEntity<ReturnAccount>(HttpStatus.NOT_FOUND);
     }
 
