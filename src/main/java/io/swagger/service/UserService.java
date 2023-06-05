@@ -6,7 +6,6 @@ import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -83,7 +82,7 @@ public class UserService {
                 ReturnLimitAndRemainingAmount response = new ReturnLimitAndRemainingAmount();
                 response.setIBAN(acc.getIban());
                 response.setLimit(userFromDB.getDayLimit());
-                response.setRemainAmount(userFromDB.getDayLimit() - transactionService.getTotalTransactionAmountByAccountAndDate(LocalDate.now(), acc.getIban()));
+                response.setRemainAmount(userFromDB.getDayLimit() - transactionService.GetTotalTransactionAmountByAccountAndDate(LocalDate.now(), acc.getIban()));
                 response.setAccountType(acc.getAccountType());
 
                 responses.add(response);

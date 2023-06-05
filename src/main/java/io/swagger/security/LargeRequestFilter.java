@@ -13,7 +13,7 @@ import java.io.IOException;
 @Order(1)
 public class LargeRequestFilter implements Filter {
 
-    private int maxSize = 1000;
+    private int maxSize = 10000;
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         int size = request.getContentLength();

@@ -91,6 +91,15 @@ public class Account   {
 
   public void setAbsoluteLimit(double absoluteLimit) {this.absoluteLimit = absoluteLimit;}
 
+  /**
+   * Balance
+   * */
+  @JsonProperty("balance")
+  private double balance;
+  public double getBalance() {return balance;}
+
+  public void setBalance(double balance) {this.balance = balance;}
+
   @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {

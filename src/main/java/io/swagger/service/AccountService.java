@@ -204,6 +204,7 @@ public class AccountService {
         account.setUser(user);
         account.setIban(dbAccount.getIban());
         account.setAbsoluteLimit(dbAccount.getAbsoluteLimit());
+        account.setBalance(dbAccount.getBalance());
         return account;
     }
 

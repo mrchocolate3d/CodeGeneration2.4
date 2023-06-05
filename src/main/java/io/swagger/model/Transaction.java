@@ -1,13 +1,10 @@
 package io.swagger.model;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Transfer money to another IBAN
@@ -27,6 +24,21 @@ public class Transaction   {
   @JsonProperty("amount")
   private Double amount = null;
 
+  @JsonProperty("timestamp")
+  private LocalDate timestamp = null;
+  public Transaction timestamp(LocalDate ibANFrom) {
+    this.timestamp = timestamp;
+    return this;
+  }
+  @Schema(example = "2023-06-05", description = "")
+
+  public LocalDate getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(LocalDate timestamp) {
+    this.timestamp = timestamp;
+  }
   public Transaction ibANFrom(String ibANFrom) {
     this.ibANFrom = ibANFrom;
     return this;
@@ -38,7 +50,7 @@ public class Transaction   {
    **/
   @Schema(example = "NL11INGB223345", description = "")
 
-  public String getIbANFrom() {
+  public String getIBANFrom() {
     return ibANFrom;
   }
 
@@ -57,7 +69,7 @@ public class Transaction   {
    **/
   @Schema(example = "NL44INGB556677", description = "")
 
-  public String getIbANTo() {
+  public String getIBANTo() {
     return ibANTo;
   }
 
