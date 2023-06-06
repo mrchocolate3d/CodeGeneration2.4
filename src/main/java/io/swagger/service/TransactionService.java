@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static io.swagger.repository.TransactionRepository.*;
@@ -66,6 +67,7 @@ public class TransactionService {
     //post transaction
     public Transaction createTransaction(Transaction transaction){
         dbUser user = checkAuthAndReturnUser();
+        LocalDateTime timeCreated = LocalDateTime.now();
         if(transaction.getAmount() == null||transaction.getIBANTo() == null|| transaction.getIBANFrom() == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Input field missing");
 
@@ -78,14 +80,9 @@ public class TransactionService {
         if(accountTo == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
 
-        dbUser userTo = userRepository.findById(accountTo.getUser().getId()).get();
-        if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId()!=user.getId()) || (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
-        }
+        checkTransactionCondition(user, accountFrom, accountTo, transaction, timeCreated.toLocalDate());
 
-        checkTransactionCondition(user, accountFrom, transaction);
-
-        dbTransaction validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), LocalDate.now());
+        dbTransaction validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), timeCreated);
         transactionRepository.save(validTransaction);
 
         accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
@@ -109,7 +106,12 @@ public class TransactionService {
         return user;
     }
 
-    private void checkTransactionCondition(dbUser user, dbAccount accountFrom, Transaction transaction){
+    private void checkTransactionCondition(dbUser user, dbAccount accountFrom, dbAccount accountTo, Transaction transaction, LocalDate timeCreated){
+        dbUser userTo = userRepository.findById(accountTo.getUser().getId()).get();
+        if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId()) ||
+                (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
+        }
         if(accountFrom.getBalance() - transaction.getAmount() < accountFrom.getAbsoluteLimit()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Limit reach. Please change your transaction amount");
         }
@@ -119,7 +121,7 @@ public class TransactionService {
             {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
             }
-            if(accountFrom.getUser().getDayLimit() < GetTotalTransactionAmountByAccountAndDate(LocalDate.now(), accountFrom.getIban()) + transaction.getAmount()){
+            if(accountFrom.getUser().getDayLimit() < GetTotalTransactionAmountByAccountAndDate(timeCreated, accountFrom.getIban()) + transaction.getAmount()){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
             }
             if(accountFrom.getUser().getTransactionLimit() < transaction.getAmount()){
@@ -142,7 +144,7 @@ public class TransactionService {
 
 
     public Double GetTotalTransactionAmountByAccountAndDate(LocalDate date, String IbanFrom){
-        List<Double> transactionAmounts = transactionRepository.getTransactionAmountByAccountAndDate(date, IbanFrom);
+        List<Double> transactionAmounts = transactionRepository.getTransactionAmountByAccountAndDate(date.atStartOfDay(), date.plusDays(1).atStartOfDay(), IbanFrom);
         double totalAmountInDay = 0;
         for(double a : transactionAmounts){
             totalAmountInDay += a;

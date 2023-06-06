@@ -1,6 +1,7 @@
 package io.swagger.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,18 +26,18 @@ public class Transaction   {
   private Double amount = null;
 
   @JsonProperty("timestamp")
-  private LocalDate timestamp = null;
-  public Transaction timestamp(LocalDate ibANFrom) {
+  private LocalDateTime timestamp = null;
+  public Transaction timestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
     return this;
   }
   @Schema(example = "2023-06-05", description = "")
 
-  public LocalDate getTimestamp() {
+  public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(LocalDate timestamp) {
+  public void setTimestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
   }
   public Transaction ibANFrom(String ibANFrom) {

@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -82,7 +83,7 @@ public class UserService {
                 ReturnLimitAndRemainingAmount response = new ReturnLimitAndRemainingAmount();
                 response.setIBAN(acc.getIban());
                 response.setLimit(userFromDB.getDayLimit());
-                response.setRemainAmount(userFromDB.getDayLimit() - transactionService.GetTotalTransactionAmountByAccountAndDate(LocalDate.now(), acc.getIban()));
+                response.setRemainAmount(userFromDB.getDayLimit() - transactionService.GetTotalTransactionAmountByAccountAndDate(LocalDateTime.now().toLocalDate(), acc.getIban()));
                 response.setAccountType(acc.getAccountType());
 
                 responses.add(response);

@@ -90,6 +90,16 @@ public interface AccountsApi {
         method = RequestMethod.GET)
     ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
+    @Operation(summary = "Edit account absolute limit by iban", description = "Edit account absolute limit by iban", security = {
+            @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Account.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid iban") })
+    @RequestMapping(value = "/Accounts",
+            consumes = { "application/json" },
+            method = RequestMethod.PUT)
+    ResponseEntity<Void> editAccountAbsoluteLimit(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody EditAbsoluteLimit editAbsoluteLimit);
 
     @Operation(summary = "Get all customer accounts", description = "Return a list of customer accounts", security = {
         @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
@@ -134,7 +144,7 @@ public interface AccountsApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
             @ApiResponse(responseCode = "403", description = "User not logged in")})
-    @RequestMapping(value = "/User/GetUserAccountsData",
+    @RequestMapping(value = "/Accounts/GetUserAccountsData",
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<List<Account>> getAllAccountsByCustomer();

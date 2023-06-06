@@ -19,6 +19,7 @@ import org.threeten.bp.OffsetDateTime;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,17 +57,17 @@ public class BankApplicationRunner implements ApplicationRunner {
                 2500, 10000));
 
 
-        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT);
+        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT, 0.0);
 
         accountRepository.save(account);
 
-        dbTransaction dbTransaction = new dbTransaction(2,"NL10INH0000000000","NL20INH0000000000",700.00, LocalDate.now());
-        dbTransaction dbTransaction2 = new dbTransaction(2,"NL30INH0000000000","NL20INH0000000000",600.00, LocalDate.now());
-        dbTransaction dbTransaction3 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDate.now());
+        dbTransaction dbTransaction = new dbTransaction(2,"NL10INH0000000000","NL20INH0000000000",700.00, LocalDateTime.now());
+        dbTransaction dbTransaction2 = new dbTransaction(2,"NL30INH0000000000","NL20INH0000000000",600.00, LocalDateTime.now());
+        dbTransaction dbTransaction3 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.now());
 
 
-        dbTransaction dbTransaction4 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDate.of(2023, 1, 20));
-        dbTransaction dbTransaction5 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDate.of(2023, 1, 23));
+        dbTransaction dbTransaction4 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.of(2023, 1, 20, 19, 0,0));
+        dbTransaction dbTransaction5 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.of(2023, 1, 23, 20,0,0));
 
         transactionRepository.save(dbTransaction);
         transactionRepository.save(dbTransaction2);

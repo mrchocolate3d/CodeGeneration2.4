@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.threeten.bp.ZoneOffset;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -39,7 +40,7 @@ public class TransactionsApiControllerTest {
     public void setup() throws Exception {
 
         transaction = new dbTransaction(
-                1,"NL01INH0000000000","NL02INH0000000000",500.00, LocalDate.now()
+                1,"NL01INH0000000000","NL02INH0000000000",500.00, LocalDateTime.now()
         );
 
     }

@@ -10,6 +10,7 @@ import org.threeten.bp.OffsetDateTime;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 //@NoArgsConstructor
@@ -27,8 +28,8 @@ public class dbTransaction {
     private String IBANfrom;
     private String IBANto;
     private Double amount;
-    private LocalDate timestamp;
-    public dbTransaction(long userPerform,String IBANto,String IBANfrom, Double amount, LocalDate timestamp) {
+    private LocalDateTime timestamp;
+    public dbTransaction(long userPerform,String IBANto,String IBANfrom, Double amount, LocalDateTime timestamp) {
         this.userPerform = userPerform;
         this.IBANfrom = IBANfrom;
         this.IBANto = IBANto;

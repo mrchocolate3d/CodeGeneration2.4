@@ -64,7 +64,7 @@ public interface UsersApi {
     @RequestMapping(value = "/Users/{id}",
         consumes = { "application/json", "application/xml" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required=true, schema=@Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody EditUser body);
+    ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to edit", required=true, schema=@Schema()) @PathVariable("id") long id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody EditUser body);
 
 
     @Operation(summary = "Get users", description = "This can be done by Employees", security = {

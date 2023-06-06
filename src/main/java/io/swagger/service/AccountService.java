@@ -32,22 +32,31 @@ public class AccountService {
     private UserService userService;
 
 
-    public dbAccount add(dbUser user, AccountType type){
+    public dbAccount add(dbUser user, AccountType type, Double absoluteLimit){
         dbUser userDb = userRepository.findUserByUsername(user.getUsername());
         if(userDb != null){
             dbAccount account;
             if(type == AccountType.TYPE_CURRENT){
-                account = createCurrentAccount(userDb);
+                account = createCurrentAccount(userDb, absoluteLimit);
                 account = accountRepository.save(account);
                 return account;
             }else if(type == AccountType.TYPE_SAVING){
-                account = createSavingAccount(userDb);
+                account = createSavingAccount(userDb, absoluteLimit);
                 account = accountRepository.save(account);
                 return account;
 
             }
         }
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "something is wrong idk");
+    }
+
+    public dbAccount EditAccountAbsoluteLimit(EditAbsoluteLimit editAbsoluteLimit){
+        dbAccount dbAccount = getAccountByIban(editAbsoluteLimit.getIban());
+        if (dbAccount != null){
+            dbAccount.setAbsoluteLimit(editAbsoluteLimit.getAbsoluteLimit());
+            return dbAccount;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     public dbAccount CreateAccount(InsertAccount account){
@@ -62,7 +71,7 @@ public class AccountService {
                 AccountType accountType = AccountType.TYPE_SAVING;
                 dbAccount.setAccountType(accountType);
             }
-            dbAccount accountAdded = add(user, account.getAccountType());
+            dbAccount accountAdded = add(user, account.getAccountType(), account.getAbsoluteLimit());
             return accountAdded;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -238,7 +247,7 @@ public class AccountService {
 
     public dbAccount addBankDefault(dbUser user){
         dbUser userDb = userRepository.findUserByUsername(user.getUsername());
-        dbAccount account = createAccount(userDb);
+        dbAccount account = createAccount(userDb, 0.0);
         account.setIban("NL01INHO0000000001");
         account.setAccountType(AccountType.TYPE_BANK);
         accountRepository.save(account);
@@ -276,23 +285,24 @@ public class AccountService {
         return accountRepository.getAccountsByUser(dbUser);
     }
 
-    public dbAccount createCurrentAccount(dbUser user){
-        dbAccount currentAccount = createAccount(user);
+    public dbAccount createCurrentAccount(dbUser user, Double limit){
+        dbAccount currentAccount = createAccount(user, limit);
         currentAccount.setAccountType(AccountType.TYPE_CURRENT);
 
         return currentAccount;
     }
 
-    public dbAccount createSavingAccount(dbUser user){
-        dbAccount savingAccount =  createAccount(user);
+    public dbAccount createSavingAccount(dbUser user, Double limit){
+        dbAccount savingAccount =  createAccount(user, limit);
         savingAccount.setAccountType(AccountType.TYPE_SAVING);
         return savingAccount;
     }
 
-    public dbAccount createAccount(dbUser user){
+    public dbAccount createAccount(dbUser user, Double limit){
         dbAccount account = new dbAccount();
         account.setBalance(0);
         account.setUser(user);
+        account.setAbsoluteLimit(limit);
         String iban = generateIban();
         Boolean duplicatedIban = true;
         while(duplicatedIban){

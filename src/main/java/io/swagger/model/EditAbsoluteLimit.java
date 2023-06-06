@@ -8,11 +8,9 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class InsertAccount {
-    @JsonProperty("userId")
-    private Long userId;
-    @JsonProperty("accountType")
-    private AccountType accountType;
+public class EditAbsoluteLimit {
+    @JsonProperty("Iban")
+    private String Iban;
     @JsonProperty("absoluteLimit")
     private Double absoluteLimit;
 }

@@ -61,8 +61,11 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
-
-
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
+    public ResponseEntity<Void> editAccountAbsoluteLimit(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody EditAbsoluteLimit editAbsoluteLimit){
+        accountService.EditAccountAbsoluteLimit(editAbsoluteLimit);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
     public ResponseEntity createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
         dbAccount dbAccount = accountService.CreateAccount(account);
