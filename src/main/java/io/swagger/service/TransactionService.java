@@ -69,7 +69,7 @@ public class TransactionService {
         dbUser user = checkAuthAndReturnUser();
         LocalDateTime timeCreated = LocalDateTime.now();
         if(transaction.getAmount() == null||transaction.getIBANTo() == null|| transaction.getIBANFrom() == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Input field missing");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Input field missing");
 
         dbAccount accountFrom = accountRepository.findAccountByIban(transaction.getIBANFrom());
         dbAccount accountTo = accountRepository.findAccountByIban(transaction.getIBANTo());
@@ -110,16 +110,16 @@ public class TransactionService {
         dbUser userTo = userRepository.findById(accountTo.getUser().getId()).get();
         if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId()) ||
                 (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can not transfer to a saving's account of another user");
         }
         if(accountFrom.getBalance() - transaction.getAmount() < accountFrom.getAbsoluteLimit()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Limit reach. Please change your transaction amount");
         }
-        //refactored
+
         if (user.getRole() == UserRole.ROLE_EMPLOYEE || accountFrom.getUser() == user){
             if(accountFrom.getAbsoluteLimit() > accountFrom.getBalance() - transaction.getAmount())
             {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have enough credit to make the transaction");
             }
             if(accountFrom.getUser().getDayLimit() < GetTotalTransactionAmountByAccountAndDate(timeCreated, accountFrom.getIban()) + transaction.getAmount()){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
