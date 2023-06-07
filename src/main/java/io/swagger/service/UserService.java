@@ -52,7 +52,7 @@ public class UserService {
         if (user.isPresent()){
             return user.get();
         } else {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No user in the db");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User dos not exist");
         }
 
     }
@@ -100,7 +100,7 @@ public class UserService {
             User u = convertDbUserToUser(userFromDB);
             return u;
         }
-        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "You are not allowed");
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed");
 
     }
 
@@ -206,7 +206,7 @@ public class UserService {
         try {
             userRepository.deleteById(id);
         } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No User with that id in the database");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
         }
 
     }

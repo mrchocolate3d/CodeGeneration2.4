@@ -56,7 +56,7 @@ public class AccountService {
             dbAccount.setAbsoluteLimit(editAbsoluteLimit.getAbsoluteLimit());
             return dbAccount;
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Absolute limit cannot be changed");
     }
 
     public dbAccount CreateAccount(InsertAccount account){
@@ -87,7 +87,7 @@ public class AccountService {
                 Account account = setAccountFromDb(dbAccount, userDto);
                 return account;
             }
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed");
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
@@ -104,7 +104,7 @@ public class AccountService {
             }
             return response;
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -114,7 +114,7 @@ public class AccountService {
         if (user.getRole() == UserRole.ROLE_EMPLOYEE || dbAccount.getUser() == user) {
             deleteAccount(IBAN);
         }
-       throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed");
     }
 
     public ReturnBalance GetBalanceByIban(String Iban){
