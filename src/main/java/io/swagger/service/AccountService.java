@@ -47,11 +47,11 @@ public class AccountService {
 
             }
         }
-        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "something is wrong idk");
+        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Incorrect Input");
     }
 
     public dbAccount EditAccountAbsoluteLimit(EditAbsoluteLimit editAbsoluteLimit){
-        dbAccount dbAccount = getAccountByIban(editAbsoluteLimit.getIban());
+        dbAccount dbAccount = findAccountByIban(editAbsoluteLimit.getIban());
         if (dbAccount != null){
             dbAccount.setAbsoluteLimit(editAbsoluteLimit.getAbsoluteLimit());
             return dbAccount;
@@ -71,15 +71,16 @@ public class AccountService {
                 AccountType accountType = AccountType.TYPE_SAVING;
                 dbAccount.setAccountType(accountType);
             }
-            dbAccount accountAdded = add(user, account.getAccountType(), account.getAbsoluteLimit());
-            return accountAdded;
+            //dbAccount accountAdded = add(user, account.getAccountType(), account.getAbsoluteLimit());
+            dbAccount = add(user, account.getAccountType(), account.getAbsoluteLimit());
+            return dbAccount;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     public Account GetAccountByIban(String Iban){
-        dbUser user = getDbUserAuthenticationInfor();
-        dbAccount dbAccount = getAccountByIban(Iban);
+        dbUser user = getUserAuthentication();
+        dbAccount dbAccount = findAccountByIban(Iban);
         if (dbAccount != null){
             if (user.getRole() == UserRole.ROLE_EMPLOYEE || dbAccount.getUser() == user) {
                 User userDto = setUserFromDTO(dbAccount);
@@ -93,10 +94,10 @@ public class AccountService {
 
     public List<Account> GetAllAccountsByCustomer(){
         List<Account> response = new ArrayList<>();
-        dbUser dbUser = getDbUserAuthenticationInfor();
-        List<dbAccount> dbAccounts = getAllAccountsByCustomer(dbUser);
-        if (dbAccounts.size() > 0) {
-            for (dbAccount dbAccount : dbAccounts){
+        dbUser dbUser = getUserAuthentication();
+        List<dbAccount> allAccounts = getAllAccountsByUser(dbUser);
+        if (allAccounts.size() > 0) {
+            for (dbAccount dbAccount : allAccounts){
                 User user = setUserFromDTO(dbAccount);
                 Account account = setAccountFromDb(dbAccount, user);
                 response.add(account);
@@ -106,18 +107,19 @@ public class AccountService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
+
     public void CloseAccount(String IBAN){
-        dbUser user = getDbUserAuthenticationInfor();
-        dbAccount dbAccount = getAccountByIban(IBAN);
+        dbUser user = getUserAuthentication();
+        dbAccount dbAccount = findAccountByIban(IBAN);
         if (user.getRole() == UserRole.ROLE_EMPLOYEE || dbAccount.getUser() == user) {
-            closeAccount(IBAN);
+            deleteAccount(IBAN);
         }
        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     public ReturnBalance GetBalanceByIban(String Iban){
-        dbUser user = getDbUserAuthenticationInfor();
-        dbAccount account = getAccountByIban(Iban);
+        dbUser user = getUserAuthentication();
+        dbAccount account = findAccountByIban(Iban);
 
         if (user.getRole() == UserRole.ROLE_EMPLOYEE || account.getUser() == user) {
             ReturnBalance balance = new ReturnBalance();
@@ -132,48 +134,19 @@ public class AccountService {
     public List<Account> GetAccounts(Integer limit, String username){
         List<dbAccount> dbAccounts = employeeGetAllAccounts();
         List<Account> accounts = new ArrayList<>();
-        if (limit == null && username == null) {
-            for (dbAccount dbAccount : dbAccounts) {
-                User user = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, user);
-                accounts.add(account);
-            }
-        }
-        else if (limit != null && username == null){
-            int count = 0;
-            for (dbAccount dbAccount : dbAccounts) {
-                if (count >= limit){
-                    break;
-                }
-                User user = setUserFromDTO(dbAccount);
-                Account account = setAccountFromDb(dbAccount, user);
-                accounts.add(account);
-                count++;
-            }
-        }
-        else if (username != null && limit == null){
-            for(dbAccount dbAccount : dbAccounts){
-                if(dbAccount.getUser().getUsername().equals(username)){
-                    User user = setUserFromDTO(dbAccount);
-                    Account account = setAccountFromDb(dbAccount, user);
-                    accounts.add(account);
-                }
+
+        for (dbAccount dbAccount : dbAccounts) {
+            User user = setUserFromDTO(dbAccount);
+            Account account = setAccountFromDb(dbAccount, user);
+
+            if (username != null && !dbAccount.getUser().getUsername().equals(username)) {
                 continue;
             }
-        }
-        else if (username != null && limit != null){
-            int count = 0;
 
-            for (dbAccount dbAccount : dbAccounts) {
-                if (count >= limit){
-                    break;
-                }
-                if(dbAccount.getUser().getUsername().equals(username)){
-                    User user = setUserFromDTO(dbAccount);
-                    Account account = setAccountFromDb(dbAccount, user);
-                    accounts.add(account);
-                }
-                count++;
+            accounts.add(account);
+
+            if (limit != null && accounts.size() >= limit) {
+                break;
             }
         }
 
@@ -181,9 +154,8 @@ public class AccountService {
     }
 
     public Deposit DepositMoney(String Iban, Double amount){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser user = userService.getdbUserByUserName(auth.getName());
-        dbAccount account = getAccountByIban(Iban);
+        dbUser user = getUserAuthentication();
+        dbAccount account = findAccountByIban(Iban);
         if (account.getUser().getUsername().equals(user.getUsername())){
             Deposit updatedAccount = deposit(Iban, amount);
             return updatedAccount;
@@ -192,19 +164,19 @@ public class AccountService {
         throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
     }
 
-    public Withdrawal WithdrawMoney(String Iban, Double amount){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser user = userService.getdbUserByUserName(auth.getName());
-        dbAccount account = getAccountByIban(Iban);
-        if (account.getUser().getUsername().equals(user.getUsername())) {
-            if(account.getBalance() < amount){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
-            }
-            Withdrawal updatedAccount = withdraw(Iban, amount);
-            return updatedAccount;
-        }
-        else
+
+    public Withdrawal WithdrawMoney(String Iban, Double amount) {
+        dbUser user = getUserAuthentication();
+        dbAccount account = findAccountByIban(Iban);
+
+        if (!account.getUser().getUsername().equals(user.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
+        }
+        if (account.getBalance() < amount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
+        }
+
+        return withdraw(Iban, amount);
     }
 
     public Account setAccountFromDb(dbAccount dbAccount, User user){
@@ -233,7 +205,7 @@ public class AccountService {
         return user;
     }
 
-    public dbUser getDbUserAuthenticationInfor() {
+    public dbUser getUserAuthentication() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         dbUser user = userService.getdbUserByUserName(username);
@@ -254,34 +226,33 @@ public class AccountService {
 
         return account;
     }
-    public dbAccount getAccountByIban(String iban){
+    public dbAccount findAccountByIban(String iban){
         return accountRepository.findAccountByIban(iban);
     }
 
 
-
-    public String generateIban(){
+    public String generateIban() {
         Random rand = new Random();
-        String PREFIX  = "NL";
-        String MIDFIX  = "INHO";
-        String iban = PREFIX;
+        final String PREFIX = "NL";
+        final String MIDFIX = "INHO";
+        StringBuilder iban = new StringBuilder(PREFIX);
 
-
-        for(int i = 0; i < 2; i++){
+        for (int i = 0; i < 2; i++) {
             int x = rand.nextInt(10);
-            iban += Integer.toString(x);
-        }
-        iban += MIDFIX;
-        for(int i = 0; i < 10; i ++){
-            int x = rand.nextInt(10);
-            iban += x;
+            iban.append(x);
         }
 
+        iban.append(MIDFIX);
 
-        return iban;
+        for (int i = 0; i < 10; i++) {
+            int x = rand.nextInt(10);
+            iban.append(x);
+        }
+
+        return iban.toString();
     }
 
-    public List<dbAccount> getAllAccountsByCustomer(dbUser dbUser){
+    public List<dbAccount> getAllAccountsByUser(dbUser dbUser){
         return accountRepository.getAccountsByUser(dbUser);
     }
 
@@ -298,25 +269,30 @@ public class AccountService {
         return savingAccount;
     }
 
-    public dbAccount createAccount(dbUser user, Double limit){
+    public dbAccount createAccount(dbUser user, Double limit) {
         dbAccount account = new dbAccount();
         account.setBalance(0);
         account.setUser(user);
         account.setAbsoluteLimit(limit);
-        String iban = generateIban();
-        Boolean duplicatedIban = true;
-        while(duplicatedIban){
-            List<String> allIbans = accountRepository.getAllIban();
-            if(allIbans.contains(iban)){
-                iban = generateIban();
-            }else{
-                duplicatedIban = false;
-            }
-        }
 
+        String iban = generateUniqueIban();
         account.setIban(iban);
+
         return account;
     }
+
+    private String generateUniqueIban() {
+        String iban;
+        boolean duplicatedIban;
+
+        do {
+            iban = generateIban();
+            duplicatedIban = accountRepository.getAllIban().contains(iban);
+        } while (duplicatedIban);
+
+        return iban;
+    }
+
     public List<dbAccount> getAllAccounts() {
         return (List<dbAccount>) accountRepository.findAll();
     }
@@ -325,7 +301,7 @@ public class AccountService {
         return (List<dbAccount>) accountRepository.getAllAccounts();
     }
 
-    public void closeAccount(String IBAN){
+    public void deleteAccount(String IBAN){
         dbAccount dbAccount = accountRepository.findAccountByIban(IBAN);
         accountRepository.delete(dbAccount);
     }
@@ -335,31 +311,28 @@ public class AccountService {
     }
 
     private Withdrawal withdraw(String IBAN, double amount) {
-        dbAccount account = getAccountByIban(IBAN);
+        dbAccount account = findAccountByIban(IBAN);
         double newBalance = account.getBalance() - amount;
-        if (newBalance < account.getAbsoluteLimit()){
+
+        if (newBalance < account.getAbsoluteLimit()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Insufficient balance");
         }
-        else{
-            account.setIban(IBAN);
-            account.setBalance(newBalance);
-            accountRepository.updateBalance(newBalance, IBAN);
-            return new Withdrawal(IBAN, newBalance);
-        }
+        account.setBalance(newBalance);
+        accountRepository.updateBalance(newBalance, IBAN);
+        return new Withdrawal(IBAN, newBalance);
     }
 
-    private Deposit deposit(String IBAN, double amount){
-        dbAccount account = getAccountByIban(IBAN);
+
+    private Deposit deposit(String IBAN, double amount) {
+        dbAccount account = findAccountByIban(IBAN);
+
+        if (account.getAccountType() != AccountType.TYPE_CURRENT) {
+           throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Account must be of type current");
+        }
         double newBalance = account.getBalance() + amount;
-        if (account.getAccountType() != AccountType.TYPE_CURRENT){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Account must be type current");
-        }
-        else{
-            account.setIban(IBAN);
-            account.setBalance(newBalance);
-            accountRepository.updateBalance(newBalance, IBAN);
-            return new Deposit(IBAN, newBalance);
-        }
+        account.setBalance(newBalance);
+        accountRepository.updateBalance(newBalance, IBAN);
+        return new Deposit(IBAN, newBalance);
     }
 
 }

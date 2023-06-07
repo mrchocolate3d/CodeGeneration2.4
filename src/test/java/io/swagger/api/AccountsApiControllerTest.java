@@ -118,8 +118,8 @@ class AccountsApiControllerTest {
 
     @Test
     public void closedAccountShouldBeInactive() throws Exception{
-        accountService.closeAccount(IBAN);
-        assertEquals(accountService.getAccountByIban("NL02INHO14697882"), dbAccount);
+        accountService.deleteAccount(IBAN);
+        assertEquals(accountService.findAccountByIban("NL02INHO14697882"), dbAccount);
     }
 
     @Test

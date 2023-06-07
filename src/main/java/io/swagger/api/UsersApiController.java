@@ -68,7 +68,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
-    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to delete", required = false, schema = @Schema())
+    public ResponseEntity<Void> editUserbyId(@Parameter(in = ParameterIn.PATH, description = "The Id of the customer to edit", required = false, schema = @Schema())
                                              @PathVariable("id") long id,
                                              @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
                                              @Valid @RequestBody EditUser body) {

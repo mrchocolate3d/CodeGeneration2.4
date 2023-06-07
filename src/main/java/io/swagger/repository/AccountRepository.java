@@ -20,7 +20,6 @@ public interface AccountRepository extends JpaRepository<dbAccount, Long>, JpaSp
     @Query("SELECT a FROM dbAccount a WHERE NOT (ID = 1)")
     List<dbAccount> getAllAccounts();
     List<dbAccount> getAccountsByUser(dbUser user);
-    dbAccount deleteAccountByIban(String IBAN);
     dbAccount getBalanceByIban(String IBAN);
     dbAccount findAccountByIban(String IBAN);
     @Transactional
