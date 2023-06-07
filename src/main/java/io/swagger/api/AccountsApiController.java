@@ -62,18 +62,18 @@ public class AccountsApiController implements AccountsApi {
 
     }
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
-    public ResponseEntity<Void> editAccountAbsoluteLimit(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody EditAbsoluteLimit editAbsoluteLimit){
+    public ResponseEntity<Void> editAccountAbsoluteLimit(@Parameter(in = ParameterIn.DEFAULT, description = "Account object is created", required=true, schema=@Schema()) @Valid @RequestBody EditAbsoluteLimit editAbsoluteLimit){
         accountService.EditAccountAbsoluteLimit(editAbsoluteLimit);
         return new ResponseEntity<>(HttpStatus.OK);
     }
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_BANK')")
-    public ResponseEntity createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
-        dbAccount dbAccount = accountService.CreateAccount(account);
+    public ResponseEntity createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "Account object is created", required=true, schema=@Schema()) @Valid @RequestBody InsertAccount account) {
+        accountService.CreateAccount(account);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
 
-    public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "iban needed for finding", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+    public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "IBAN information", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         return new ResponseEntity<Account>(accountService.GetAccountByIban(IBAN), HttpStatus.OK);
 
     }
