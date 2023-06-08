@@ -35,33 +35,30 @@ public class TransactionService {
         dbUser user = checkAuthAndReturnUser();
 
         List<Transaction> transactionList = new ArrayList<>();
-        List<dbTransaction> dbTransactions = new ArrayList<>();
+        List<dbTransaction> dbTransactions;
+        dbAccount accountCheck = accountRepository.findAccountByIban(IBAN);
+        if(user.getRole() == UserRole.ROLE_EMPLOYEE || (user.getRole() == UserRole.ROLE_CUSTOMER && accountCheck.getUser() == user)) {
+            if (fromDate != null && toDate == null)
+                dbTransactions = transactionRepository.findAll(where(afterDate(fromDate)).and(hasIbanFrom(IBAN)));
+            else if (fromDate == null && toDate != null)
+                dbTransactions = transactionRepository.findAll(where(beforeDate(toDate)).and(hasIbanFrom(IBAN)));
+            else if (fromDate != null && toDate != null)
+                dbTransactions = transactionRepository.findAll(where(beforeDate(toDate)).and(afterDate(fromDate)).and(hasIbanFrom(IBAN)));
+            else
+                dbTransactions = transactionRepository.findAll(hasIbanFrom(IBAN));
 
-        if(fromDate !=  null && toDate == null)
-            dbTransactions = transactionRepository.findAll(where(afterDate(fromDate)).and(hasIbanFrom(IBAN)));
-        else if(fromDate == null && toDate != null)
-            dbTransactions = transactionRepository.findAll(where(beforeDate(toDate)).and(hasIbanFrom(IBAN)));
-        else if(fromDate != null && toDate != null)
-            dbTransactions = transactionRepository.findAll(where(beforeDate(toDate)).and(afterDate(fromDate)).and(hasIbanFrom(IBAN)));
-
-
-        for(dbTransaction dbTransaction : dbTransactions)
-            addToTransactionList(dbTransaction, transactionList);
-        List<Transaction> limitList = new ArrayList<Transaction>();
-        if(limit != null && limit < transactionList.size() && limit > 0)
-            limitList = transactionList.subList(0, limit);
-
-        else if(limit <= 0)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Limit has to be bigger than 0");
-        else
-            limitList = transactionList;
-
-        return limitList;
-    }
-
-    private void addToTransactionList(dbTransaction DbTransaction, List<Transaction> transactionList){
-        Transaction transaction = setTransactionsFromDb(DbTransaction);
-        transactionList.add(transaction);
+            for (dbTransaction dbTransaction : dbTransactions) {
+                Transaction transaction = setTransactionsFromDb(dbTransaction);
+                transactionList.add(transaction);
+            }
+            if (limit != null && limit < transactionList.size() && limit > 0){
+                List<Transaction> limitList = transactionList.subList(0, limit);
+                return limitList;
+            } else if (limit != null && limit <= 0)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Limit has to be bigger than 0");
+            return transactionList;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     //post transaction
@@ -69,7 +66,7 @@ public class TransactionService {
         dbUser user = checkAuthAndReturnUser();
         LocalDateTime timeCreated = LocalDateTime.now();
         if(transaction.getAmount() == null||transaction.getIBANTo() == null|| transaction.getIBANFrom() == null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Input field missing");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Input field missing");
 
         dbAccount accountFrom = accountRepository.findAccountByIban(transaction.getIBANFrom());
         dbAccount accountTo = accountRepository.findAccountByIban(transaction.getIBANTo());
@@ -77,21 +74,25 @@ public class TransactionService {
         if(accountFrom == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
 
+
         if(accountTo == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
 
-        checkTransactionCondition(user, accountFrom, accountTo, transaction, timeCreated.toLocalDate());
+        if(user.getRole() == UserRole.ROLE_EMPLOYEE || (user.getRole() == UserRole.ROLE_CUSTOMER && accountFrom.getUser() == user)) {
+            checkTransactionCondition(user, accountFrom, accountTo, transaction, timeCreated.toLocalDate());
 
-        dbTransaction validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), timeCreated);
-        transactionRepository.save(validTransaction);
+            dbTransaction validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), timeCreated);
+            transactionRepository.save(validTransaction);
 
-        accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
-        accountRepository.save(accountFrom);
+            accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
+            accountRepository.save(accountFrom);
 
-        accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
-        accountRepository.save(accountTo);
+            accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
+            accountRepository.save(accountTo);
 
-        return setTransactionsFromDb(validTransaction);
+            return setTransactionsFromDb(validTransaction);
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     private dbUser checkAuthAndReturnUser(){
@@ -110,16 +111,16 @@ public class TransactionService {
         dbUser userTo = userRepository.findById(accountTo.getUser().getId()).get();
         if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId()) ||
                 (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can not transfer to a saving's account of another user");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
         }
         if(accountFrom.getBalance() - transaction.getAmount() < accountFrom.getAbsoluteLimit()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Limit reach. Please change your transaction amount");
         }
-
+        //refactored
         if (user.getRole() == UserRole.ROLE_EMPLOYEE || accountFrom.getUser() == user){
             if(accountFrom.getAbsoluteLimit() > accountFrom.getBalance() - transaction.getAmount())
             {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have enough credit to make the transaction");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
             }
             if(accountFrom.getUser().getDayLimit() < GetTotalTransactionAmountByAccountAndDate(timeCreated, accountFrom.getIban()) + transaction.getAmount()){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
