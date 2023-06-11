@@ -45,9 +45,10 @@ public class TransactionService {
             else if (fromDate != null && toDate != null)
                 dbTransactions = transactionRepository.findAll(where(beforeDate(toDate)).and(afterDate(fromDate)).and(hasIbanFrom(IBAN)));
             else
-                dbTransactions = transactionRepository.findAll(hasIbanFrom(IBAN));
+                dbTransactions = transactionRepository.findAll(where(hasIbanFrom(IBAN)).or(hasIbanTo(IBAN)));
 
             for (dbTransaction dbTransaction : dbTransactions) {
+                System.out.println(dbTransaction);
                 Transaction transaction = setTransactionsFromDb(dbTransaction);
                 transactionList.add(transaction);
             }

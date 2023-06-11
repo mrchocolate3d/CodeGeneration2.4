@@ -24,15 +24,15 @@ public interface TransactionRepository extends JpaRepository<dbTransaction,Long>
     @Query("SELECT amount FROM dbTransaction t WHERE t.IBANfrom =?3 AND  t.timestamp BETWEEN ?1 AND ?2")
     List<Double> getTransactionAmountByAccountAndDate(LocalDateTime startOfDay, LocalDateTime endOfDay, String IBANFrom);
     static Specification<dbTransaction> beforeDate(LocalDate toDate){
-        return (trans, cq, cb) -> cb.lessThanOrEqualTo(trans.get("timestamp"), toDate);
+        return (trans, cq, cb) -> cb.lessThanOrEqualTo(trans.get("timestamp"), toDate.plusDays(1).atStartOfDay());
     }
     static Specification<dbTransaction> afterDate(LocalDate fromDate){
-        return (trans, cq, cb) -> cb.greaterThanOrEqualTo(trans.get("timestamp"), fromDate);
+        return (trans, cq, cb) -> cb.greaterThanOrEqualTo(trans.get("timestamp"), fromDate.atStartOfDay());
     }
     static Specification<dbTransaction> hasIbanFrom(String Iban){
-        return (trans, cq, cb) -> cb.greaterThanOrEqualTo(trans.get("IBANfrom"), Iban);
+        return (trans, cq, cb) -> cb.equal(trans.get("IBANfrom"), Iban);
     }
     static Specification<dbTransaction> hasIbanTo(String Iban){
-        return (trans, cq, cb) -> cb.greaterThanOrEqualTo(trans.get("IBANto"), Iban);
+        return (trans, cq, cb) -> cb.equal(trans.get("IBANto"), Iban);
     }
 }
