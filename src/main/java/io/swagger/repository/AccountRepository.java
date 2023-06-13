@@ -26,4 +26,6 @@ public interface AccountRepository extends JpaRepository<dbAccount, Long>, JpaSp
     @Modifying
     @Query("update dbAccount a set a.balance = ?1 where a.iban = ?2")
     void updateBalance(Double amount, String IBAN);
+    @Query("SELECT SUM(balance) FROM dbAccount t WHERE t.user = ?1")
+    Double getTotalBalanceOfUser(dbUser user);
 }

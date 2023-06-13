@@ -32,16 +32,16 @@ public class AccountService {
     private UserService userService;
 
 
-    public dbAccount add(dbUser user, AccountType type, Double absoluteLimit){
+    public dbAccount add(dbUser user, AccountType type, Double absoluteLimit, Double transactionLimit, Double dayLimit){
         dbUser userDb = userRepository.findUserByUsername(user.getUsername());
         if(userDb != null){
             dbAccount account;
             if(type == AccountType.TYPE_CURRENT){
-                account = createCurrentAccount(userDb, absoluteLimit);
+                account = createCurrentAccount(userDb, absoluteLimit, transactionLimit, dayLimit);
                 account = accountRepository.save(account);
                 return account;
             }else if(type == AccountType.TYPE_SAVING){
-                account = createSavingAccount(userDb, absoluteLimit);
+                account = createSavingAccount(userDb, absoluteLimit, transactionLimit, dayLimit);
                 account = accountRepository.save(account);
                 return account;
 
@@ -72,7 +72,7 @@ public class AccountService {
                 dbAccount.setAccountType(accountType);
             }
             //dbAccount accountAdded = add(user, account.getAccountType(), account.getAbsoluteLimit());
-            dbAccount = add(user, account.getAccountType(), account.getAbsoluteLimit());
+            dbAccount = add(user, account.getAccountType(), account.getAbsoluteLimit(), account.getTransactionLimit(), account.getDayLimit());
             return dbAccount;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -172,7 +172,7 @@ public class AccountService {
         if (!account.getUser().getUsername().equals(user.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
         }
-        if (account.getBalance() < amount) {
+        if (account.getBalance() < amount  + account.getAbsoluteLimit()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
         }
 
@@ -205,7 +205,7 @@ public class AccountService {
         return user;
     }
 
-    public dbUser getUserAuthentication() {
+    private dbUser getUserAuthentication() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         dbUser user = userService.getdbUserByUserName(username);
@@ -219,7 +219,7 @@ public class AccountService {
 
     public dbAccount addBankDefault(dbUser user){
         dbUser userDb = userRepository.findUserByUsername(user.getUsername());
-        dbAccount account = createAccount(userDb, 0.0);
+        dbAccount account = createAccount(userDb, 0.0, 0.0, 0.0);
         account.setIban("NL01INHO0000000001");
         account.setAccountType(AccountType.TYPE_BANK);
         accountRepository.save(account);
@@ -256,24 +256,27 @@ public class AccountService {
         return accountRepository.getAccountsByUser(dbUser);
     }
 
-    public dbAccount createCurrentAccount(dbUser user, Double limit){
-        dbAccount currentAccount = createAccount(user, limit);
+    public dbAccount createCurrentAccount(dbUser user, Double absoluteLimit, Double transactionLimit, Double dayLimit){
+        dbAccount currentAccount = createAccount(user, absoluteLimit, transactionLimit, dayLimit);
         currentAccount.setAccountType(AccountType.TYPE_CURRENT);
 
         return currentAccount;
     }
 
-    public dbAccount createSavingAccount(dbUser user, Double limit){
-        dbAccount savingAccount =  createAccount(user, limit);
+    public dbAccount createSavingAccount(dbUser user, Double absoluteLimit, Double transactionLimit, Double dayLimit){
+        dbAccount savingAccount = createAccount(user, absoluteLimit, transactionLimit, dayLimit);
         savingAccount.setAccountType(AccountType.TYPE_SAVING);
         return savingAccount;
     }
 
-    public dbAccount createAccount(dbUser user, Double limit) {
+    public dbAccount createAccount(dbUser user, Double absoluteLimit, Double transactionLimit, Double dayLimit) {
         dbAccount account = new dbAccount();
         account.setBalance(0);
         account.setUser(user);
-        account.setAbsoluteLimit(limit);
+        account.setAbsoluteLimit(absoluteLimit);
+
+        user.setDayLimit(dayLimit);
+        user.setTransactionLimit(transactionLimit);
 
         String iban = generateUniqueIban();
         account.setIban(iban);
@@ -335,4 +338,12 @@ public class AccountService {
         return new Deposit(IBAN, newBalance);
     }
 
+    public Double GetTotalBalanceInAccounts() {
+        dbUser u = getUserAuthentication();
+        try{
+            return accountRepository.getTotalBalanceOfUser(u);
+        }catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No account registered");
+        }
+    }
 }

@@ -18,19 +18,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-06-01T11:41:56.516Z[GMT]")
 @Validated
 public interface UsersApi {
 
-    @Operation(summary = "Create User", description = "This can be done by a new customer", security = {
-        @SecurityRequirement(name = "Authorization")    }, tags={ "Employee" })
+    @Operation(summary = "Create User", description = "This can be done by a new customer", tags={ "Employee" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "user created", content = @Content(schema = @Schema(implementation = User.class))) })
     @RequestMapping(value = "/Users",
@@ -114,5 +111,16 @@ public interface UsersApi {
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<List<ReturnLimitAndRemainingAmount>> getUserRemainingAmount();
+
+    @Operation(summary = "Get Users With No Accounts", security = {
+            @SecurityRequirement(name = "Authorization")    }, tags={ "User" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
+
+            @ApiResponse(responseCode = "403", description = "User not logged in")})
+    @RequestMapping(value = "/User/UsersWithNoAccount",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<List<User>> GetUsersWithNoAccount();
 }
 

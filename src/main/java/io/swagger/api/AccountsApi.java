@@ -149,5 +149,15 @@ public interface AccountsApi {
             method = RequestMethod.GET)
     ResponseEntity<List<Account>> getAllAccountsByCustomer();
 
+    @Operation(summary = "Get User Total Balance In All Accounts' data", security = {
+            @SecurityRequirement(name = "Authorization")    }, tags={ "Account" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "403", description = "User not logged in")})
+    @RequestMapping(value = "/Accounts/GetTotalBalanceInAccounts",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<Double> GetTotalBalanceInAccounts();
+
 }
 

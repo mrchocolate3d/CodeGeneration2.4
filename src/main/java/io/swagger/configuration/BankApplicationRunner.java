@@ -57,17 +57,17 @@ public class BankApplicationRunner implements ApplicationRunner {
                 2500, 10000));
 
 
-        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT, 0.0);
+        dbAccount account = accountService.add(user, AccountType.TYPE_CURRENT, 0.0, 1000.0, 2500.0);
 
         accountRepository.save(account);
 
-        dbTransaction dbTransaction = new dbTransaction(2,"NL10INH0000000000","NL20INH0000000000",700.00, LocalDateTime.now());
-        dbTransaction dbTransaction2 = new dbTransaction(2,"NL30INH0000000000","NL20INH0000000000",600.00, LocalDateTime.now());
-        dbTransaction dbTransaction3 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.now());
+        dbTransaction dbTransaction = new dbTransaction(2,"NL10INH0000000000","NL20INH0000000000",700.00, LocalDateTime.now(), false);
+        dbTransaction dbTransaction2 = new dbTransaction(2,"NL30INH0000000000","NL20INH0000000000",600.00, LocalDateTime.now(), false);
+        dbTransaction dbTransaction3 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.now(), false);
 
 
-        dbTransaction dbTransaction4 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.of(2023, 1, 20, 19, 0,0));
-        dbTransaction dbTransaction5 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.of(2023, 1, 23, 20,0,0));
+        dbTransaction dbTransaction4 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.of(2023, 1, 20, 19, 0,0), false);
+        dbTransaction dbTransaction5 = new dbTransaction(2,"NL10INH0000000000",account.getIban(),700.00, LocalDateTime.of(2023, 1, 23, 20,0,0),false);
 
         transactionRepository.save(dbTransaction);
         transactionRepository.save(dbTransaction2);

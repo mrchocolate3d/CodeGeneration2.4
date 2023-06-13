@@ -20,6 +20,9 @@ public interface UserRepository extends JpaRepository<dbUser, Long>, JpaSpecific
     //@Query("SELECT * FROM dbUser WHERE NOT (Id = 1)")
     //dbUser getAllUsersExceptForBank();
 
+    @Query("SELECT u FROM dbUser u WHERE u NOT IN (SELECT a.user FROM dbAccount a)")
+    List<dbUser> GetUserWithNoAccount();
+
 
 }
 

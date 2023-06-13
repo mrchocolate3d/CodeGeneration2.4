@@ -15,4 +15,9 @@ public class InsertAccount {
     private AccountType accountType;
     @JsonProperty("absoluteLimit")
     private Double absoluteLimit;
+    @JsonProperty("transactionLimit")
+    private Double transactionLimit;
+    @JsonProperty("dayLimit")
+    private Double dayLimit;
+
 }

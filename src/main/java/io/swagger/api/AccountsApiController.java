@@ -56,6 +56,10 @@ public class AccountsApiController implements AccountsApi {
         this.request = request;
     }
 
+    public ResponseEntity<Double> GetTotalBalanceInAccounts(){
+        return new ResponseEntity<Double>(accountService.GetTotalBalanceInAccounts(), HttpStatus.OK);
+    }
+
     public ResponseEntity<Void> closeAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN of the account required", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         accountService.CloseAccount(IBAN);
         return new ResponseEntity<>(HttpStatus.OK);

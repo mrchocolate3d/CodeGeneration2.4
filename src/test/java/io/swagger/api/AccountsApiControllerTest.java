@@ -124,7 +124,7 @@ class AccountsApiControllerTest {
 
     @Test
     public void getBalanceByIban() throws Exception{
-        accountService.createAccount(dbUser, 0.0);
+        accountService.createAccount(dbUser, 0.0, 0.0, 0.0);
         assertEquals(accountService.getBalance(IBAN), dbAccount);
     }
 

@@ -54,8 +54,7 @@ public class UsersApiController implements UsersApi {
         this.objectMapper = objectMapper;
         this.request = request;
     }
-
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_BANK')")
+    @PostMapping(value="/Users")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Created User object", schema = @Schema()) @Valid @RequestBody InsertUser body) {
         User u = userService.CreateUser(body);
         return new ResponseEntity<User>(u, HttpStatus.CREATED);
@@ -102,5 +101,10 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<List<ReturnLimitAndRemainingAmount>> getUserRemainingAmount(){
         List<ReturnLimitAndRemainingAmount> responses = userService.GetUserRemainingAmount();
         return new ResponseEntity<List<ReturnLimitAndRemainingAmount>>(responses, HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<User>> GetUsersWithNoAccount(){
+        return new ResponseEntity<List<User>>(userService.GetUserWithNoAccount(), HttpStatus.OK);
+
     }
 }

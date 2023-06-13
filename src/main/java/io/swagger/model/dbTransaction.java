@@ -29,16 +29,18 @@ public class dbTransaction {
     private String IBANto;
     private Double amount;
     private LocalDateTime timestamp;
-    public dbTransaction(long userPerform,String IBANto,String IBANfrom, Double amount, LocalDateTime timestamp) {
+    private boolean sameAccount;
+    public dbTransaction(long userPerform,String IBANto,String IBANfrom, Double amount, LocalDateTime timestamp, boolean sameAccount) {
         this.userPerform = userPerform;
         this.IBANfrom = IBANfrom;
         this.IBANto = IBANto;
         this.amount = amount;
         this.timestamp = timestamp;
-
+        this.sameAccount = sameAccount;
         if (this.amount <=0){
             throw new IllegalArgumentException("Invalid amount");
         }
+
     }
 
 

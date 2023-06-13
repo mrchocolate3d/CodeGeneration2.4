@@ -58,24 +58,25 @@ public class UserService {
     }
 
     public User CreateUser(InsertUser body){
+        dbUser userFromDB = getLoginUser();
         List<User> userList = getUsers();
         if (userList.stream().anyMatch((user) -> user.getUsername().equals(body.getUsername()))) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
         }
         dbUser user;
-        if(body.getRole().toUpperCase() == "ROLE_EMPLOYEE"){
+        if(body.getRole().toUpperCase() == "ROLE_EMPLOYEE" && userFromDB.getRole() == UserRole.ROLE_EMPLOYEE){
             user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_EMPLOYEE, body.getTransactionLimit(), body.getDayLimit());
         }
         else{
-            user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_CUSTOMER, body.getTransactionLimit(), body.getDayLimit());
+            user = new dbUser(body.getFirstName(), body.getLastName(), body.getUsername(), body.getEmail(),body.getPhone(), passwordEncoder.encode(body.getPassword()), UserRole.ROLE_CUSTOMER, 0, 0);
         }
         addUser(user);
         return convertDbUserToUser(user);
     }
 
     public List<ReturnLimitAndRemainingAmount> GetUserRemainingAmount(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser userFromDB = getdbUserByUserName(auth.getName());
+        dbUser userFromDB = getLoginUser();
+
         List<ReturnLimitAndRemainingAmount> responses = new ArrayList<ReturnLimitAndRemainingAmount>();
 
         if(userFromDB != null){
@@ -83,6 +84,7 @@ public class UserService {
                 ReturnLimitAndRemainingAmount response = new ReturnLimitAndRemainingAmount();
                 response.setIBAN(acc.getIban());
                 response.setLimit(userFromDB.getDayLimit());
+                System.out.println(transactionService.GetTotalTransactionAmountByAccountAndDate(LocalDateTime.now().toLocalDate(), acc.getIban()));
                 response.setRemainAmount(userFromDB.getDayLimit() - transactionService.GetTotalTransactionAmountByAccountAndDate(LocalDateTime.now().toLocalDate(), acc.getIban()));
                 response.setAccountType(acc.getAccountType());
 
@@ -93,8 +95,7 @@ public class UserService {
     }
 
     public User GetOwnedUserData(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        dbUser userFromDB = getdbUserByUserName(auth.getName());
+        dbUser userFromDB = getLoginUser();
 
         if (userFromDB != null) {
             User u = convertDbUserToUser(userFromDB);
@@ -102,6 +103,12 @@ public class UserService {
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed");
 
+    }
+
+    private dbUser getLoginUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        dbUser user = getdbUserByUserName(auth.getName());
+        return user;
     }
 
     public List<dbUser> getAlldbUsers(){
@@ -115,12 +122,6 @@ public class UserService {
 
     public dbUser getdbUserByUserName(String username){
         return userRepository.findUserByUsername(username);
-    }
-
-    public User getUserByUsername(String username ){
-        dbUser u = userRepository.findUserByUsername(username);
-
-        return convertDbUserToUser(u);
     }
 
     public List<User> getUsersWithParameters(String name, Integer limit ) {
@@ -161,18 +162,17 @@ public class UserService {
 
     }
 
-
-
     public List<dbUser> getUsersOfDb() {
         return (List<dbUser>) userRepository.findAll();
     }
-
 
     public User EditUser(long id, EditUser body){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         dbUser user = getdbUserByUserName(auth.getName());
         if(user.getRole() == UserRole.ROLE_EMPLOYEE){
             dbUser userToChange = getUserById(id);
+            if(userToChange.getRole() == UserRole.ROLE_BANK)
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             editDbUser(userToChange, body);
         }
         if (user != null) {
@@ -203,11 +203,14 @@ public class UserService {
     }
 
     public void deleteUser(long id) {
-        try {
-            userRepository.deleteById(id);
-        } catch (Exception ex) {
+        dbUser userToDelete = getUserById(id);
+        if(userToDelete != null && userToDelete.getRole() == UserRole.ROLE_BANK)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        if(userToDelete == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
-        }
+
+        userRepository.deleteById(id);
 
     }
 
@@ -220,5 +223,17 @@ public class UserService {
         }
     }
 
+    public List<User> GetUserWithNoAccount() {
+        dbUser userLoggedIn = getLoginUser();
+        List<User> users = new ArrayList<>();
+        if(userLoggedIn.getRole() == UserRole.ROLE_EMPLOYEE) {
+            for (dbUser user : userRepository.GetUserWithNoAccount()) {
+                User u = convertDbUserToUser(user);
+                users.add(u);
+            }
+            return users;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed");
+    }
 }
 

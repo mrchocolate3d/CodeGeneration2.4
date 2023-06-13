@@ -48,7 +48,6 @@ public class TransactionService {
                 dbTransactions = transactionRepository.findAll(where(hasIbanFrom(IBAN)).or(hasIbanTo(IBAN)));
 
             for (dbTransaction dbTransaction : dbTransactions) {
-                System.out.println(dbTransaction);
                 Transaction transaction = setTransactionsFromDb(dbTransaction);
                 transactionList.add(transaction);
             }
@@ -75,22 +74,25 @@ public class TransactionService {
         if(accountFrom == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
 
-
         if(accountTo == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This Account does not exist");
 
         if(user.getRole() == UserRole.ROLE_EMPLOYEE || (user.getRole() == UserRole.ROLE_CUSTOMER && accountFrom.getUser() == user)) {
-            checkTransactionCondition(user, accountFrom, accountTo, transaction, timeCreated.toLocalDate());
+            dbTransaction validTransaction;
+            if(accountFrom.getUser() != accountTo.getUser()) {
+                checkDifferentUserTransactionCondition(user, accountFrom, accountTo, transaction, timeCreated.toLocalDate());
+                validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), timeCreated, false);
+            }
+            else{
+                checkTransactionCondition(accountFrom, transaction);
+                validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), timeCreated, true);
+            }
 
-            dbTransaction validTransaction = new dbTransaction(user.getId(), transaction.getIBANTo(), transaction.getIBANFrom(), transaction.getAmount(), timeCreated);
             transactionRepository.save(validTransaction);
-
             accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());
             accountRepository.save(accountFrom);
-
             accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
             accountRepository.save(accountTo);
-
             return setTransactionsFromDb(validTransaction);
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -98,8 +100,7 @@ public class TransactionService {
 
     private dbUser checkAuthAndReturnUser(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        dbUser user = userService.getdbUserByUserName(username);
+        dbUser user = userService.getdbUserByUserName(auth.getName());
 
         if(user == null){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
@@ -108,31 +109,24 @@ public class TransactionService {
         return user;
     }
 
-    private void checkTransactionCondition(dbUser user, dbAccount accountFrom, dbAccount accountTo, Transaction transaction, LocalDate timeCreated){
-        dbUser userTo = userRepository.findById(accountTo.getUser().getId()).get();
-        if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId()) ||
-                (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
-        }
+    private void checkTransactionCondition(dbAccount accountFrom, Transaction transaction) {
         if(accountFrom.getBalance() - transaction.getAmount() < accountFrom.getAbsoluteLimit()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Limit reach. Please change your transaction amount");
         }
-        //refactored
-        if (user.getRole() == UserRole.ROLE_EMPLOYEE || accountFrom.getUser() == user){
-            if(accountFrom.getAbsoluteLimit() > accountFrom.getBalance() - transaction.getAmount())
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have enough credit to make the transaction");
-            }
-            if(accountFrom.getUser().getDayLimit() < GetTotalTransactionAmountByAccountAndDate(timeCreated, accountFrom.getIban()) + transaction.getAmount()){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Day limit reached");
-            }
-            if(accountFrom.getUser().getTransactionLimit() < transaction.getAmount()){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction limit reached");
-            }
-        }
-        else{
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this transaction");
-        }
+    }
+
+    private void checkDifferentUserTransactionCondition(dbUser user, dbAccount accountFrom, dbAccount accountTo, Transaction transaction, LocalDate timeCreated){
+        if(accountFrom.getUser().getTransactionLimit() < transaction.getAmount())
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Transaction limit reached");
+
+        if(accountFrom.getUser().getDayLimit() < GetTotalTransactionAmountByAccountAndDate(timeCreated, accountFrom.getIban()) + transaction.getAmount())
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Day limit reached");
+
+        dbUser userTo = userService.getUserById(accountTo.getUser().getId());
+        if((accountFrom.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId()) ||
+                (accountTo.getAccountType() == AccountType.TYPE_SAVING && userTo.getId() != user.getId()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not transfer to a saving's account of another user");
+
     }
 
     private Transaction setTransactionsFromDb(dbTransaction dbTransaction){
@@ -146,12 +140,7 @@ public class TransactionService {
 
 
     public Double GetTotalTransactionAmountByAccountAndDate(LocalDate date, String IbanFrom){
-        List<Double> transactionAmounts = transactionRepository.getTransactionAmountByAccountAndDate(date.atStartOfDay(), date.plusDays(1).atStartOfDay(), IbanFrom);
-        double totalAmountInDay = 0;
-        for(double a : transactionAmounts){
-            totalAmountInDay += a;
-        }
-
-        return totalAmountInDay;
+        Double amount = transactionRepository.getTransactionAmountByAccountAndDate(date.atStartOfDay(), date.plusDays(1).atStartOfDay(), IbanFrom);
+        return amount != null ? amount : 0.0;
     }
 }
