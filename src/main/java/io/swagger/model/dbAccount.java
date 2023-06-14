@@ -34,8 +34,8 @@ public class dbAccount {
     private dbUser user;
 
     public void setBalance(double balance){
-        if(balance < 0.00){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative!");
+        if(balance < absoluteLimit){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be lower than absolute limit!");
         }
         this.balance = balance;
     }

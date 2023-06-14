@@ -322,7 +322,7 @@ public class AccountService {
         }
         account.setBalance(newBalance);
         accountRepository.updateBalance(newBalance, IBAN);
-        return new Withdrawal(IBAN, newBalance);
+        return new Withdrawal(IBAN, amount);
     }
 
 
