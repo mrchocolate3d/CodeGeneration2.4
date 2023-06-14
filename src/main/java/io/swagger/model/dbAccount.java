@@ -35,7 +35,7 @@ public class dbAccount {
 
     public void setBalance(double balance){
         if(balance < 0.00){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative!");
         }
         this.balance = balance;
     }
