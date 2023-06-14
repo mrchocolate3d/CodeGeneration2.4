@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import java.util.List;
@@ -33,7 +35,7 @@ public class dbAccount {
 
     public void setBalance(double balance){
         if(balance < 0.00){
-            throw  new IllegalArgumentException("Balance can not be negative");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative");
         }
         this.balance = balance;
     }
