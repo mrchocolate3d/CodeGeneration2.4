@@ -172,7 +172,7 @@ public class AccountService {
         if (!account.getUser().getUsername().equals(user.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
         }
-        if (account.getBalance() < amount  + account.getAbsoluteLimit()) {
+        if (account.getBalance() - amount < account.getAbsoluteLimit()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
         }
 
