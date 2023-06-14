@@ -339,9 +339,9 @@ public class AccountService {
     }
 
     public Double GetTotalBalanceInAccounts() {
-        dbUser u = getUserAuthentication();
+        dbUser user = getUserAuthentication();
         try{
-            return accountRepository.getTotalBalanceOfUser(u);
+            return accountRepository.getTotalBalanceOfUser(user);
         }catch(Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No account registered");
         }
