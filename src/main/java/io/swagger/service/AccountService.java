@@ -71,7 +71,7 @@ public class AccountService {
                 AccountType accountType = AccountType.TYPE_SAVING;
                 dbAccount.setAccountType(accountType);
             }
-            //dbAccount accountAdded = add(user, account.getAccountType(), account.getAbsoluteLimit());
+
             dbAccount = add(user, account.getAccountType(), account.getAbsoluteLimit(), account.getTransactionLimit(), account.getDayLimit());
             return dbAccount;
         }
@@ -211,7 +211,7 @@ public class AccountService {
         dbUser user = userService.getdbUserByUserName(username);
 
         if(user == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was given");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"No authentication token was provided");
         }
         return user;
     }
